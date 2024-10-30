@@ -1,0 +1,53 @@
+﻿@{
+    ViewData["Title"] = "Alta de edificios";
+}
+
+<div class="content-wrapper">
+    <div class="content">
+        <div class="container-fluid">
+
+            <!-- Título de la sección -->
+            <div class="row mb-4">
+                <div class="col-12">
+                    <h3>Alta de edificio</h3>
+                </div>
+            </div>
+            <!-- Columna derecha: Campos de información del edificio -->
+            <div class="col-md-12">
+                <form>
+                    <div class="row">
+                        <!-- Primer par de campos: Nombre de edificio y Dirección -->
+                        <div class="col-md-6 mb-3">
+                            <label for="buildingName">Nombre de Edificio</label>
+                            <input type="text" class="form-control" id="buildingName" placeholder="Nombre del edificio">
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="address">Dirección</label>
+                            <input type="text" class="form-control" id="address" placeholder="Dirección">
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <!-- Segundo par de campos: Longitud y Latitud -->
+                        <div class="col-md-6 mb-3">
+                            <label for="longitude">Longitud</label>
+                            <input type="text" class="form-control" id="longitude" placeholder="Longitud">
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="latitude">Latitud</label>
+                            <input type="text" class="form-control" id="latitude" placeholder="Latitud">
+                        </div>
+                    </div>
+
+                    <!-- Botón Guardar -->
+                    <div class="row">
+                        <div class="col-md-12 text-right">
+                            <button type="submit" class="btn btn-primary">Guardar</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+</div>
