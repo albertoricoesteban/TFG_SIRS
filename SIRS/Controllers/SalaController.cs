@@ -1,6 +1,5 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using SIRS.Data.Repositorio;
 
 namespace SIRS.Controllers
 {

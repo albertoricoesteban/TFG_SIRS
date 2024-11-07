@@ -1,17 +1,18 @@
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using SIRS.Data;
+using SISR.StartupExtensions;
+
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();
 
-// Registrar el DbContext y la cadena de conexión
-builder.Services.AddDbContext<AppDbContext>(options =>
-    options.UseSqlServer(builder.Configuration.GetConnectionString("SIRSDBConnection")));
-
+// ----- Database -----
+builder.Services.AddCustomizedDatabase(builder.Configuration, builder.Environment);
 
 var app = builder.Build();
 
