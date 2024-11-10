@@ -11,7 +11,7 @@ using SIRS.Services.Api.Controllers;
 
 namespace SIRS.Service.API.Controllers
 {
-    [Authorize]
+
     [ApiController]
     [Route("api/[controller]")]
     public class EdificioController : ControllerBase

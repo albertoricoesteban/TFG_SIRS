@@ -1,43 +1,40 @@
-using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Configuration;
-using SIRS.Data;
-using SISR.StartupExtensions;
-
+using SIRS.Application.Interfaces;
+using SIRS.Application.Services;
+using SIRS.Data.Context;
+using SIRS.Data.Repository;
+using SIRS.Domain.Interfaces;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
-builder.Services.AddControllersWithViews();
 
-// ----- Database -----
-builder.Services.AddCustomizedDatabase(builder.Configuration, builder.Environment);
+builder.Services.AddControllers();
+builder.Services.AddEndpointsApiExplorer();
+//builder.Services.AddSwaggerGen();
 
-builder.Services.AddControllersWithViews();
-// Agrega el cliente HTTP services.AddHttpClient();
-builder.Services.AddHttpClient();
+// Registrar ApplicationDbContext
+builder.Services.AddDbContext<ApplicationDbContext>(options =>
+    options.UseSqlServer(builder.Configuration.GetConnectionString("SIRSDBConnection")));
+
+// Registrar servicios
+builder.Services.AddScoped<IEdificioAppService, EdificioAppService>();
+builder.Services.AddScoped<IEdificioRepository, EdificioRepository>();
+builder.Services.AddAutoMapper(typeof(Program));
 
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
-if (!app.Environment.IsDevelopment())
-{
-    app.UseExceptionHandler("/Home/Error");
-    // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
-    app.UseHsts();
-}
+//if (app.Environment.IsDevelopment())
+//{
+//    app.UseSwagger();
+//    app.UseSwaggerUI();
+//}
 
 app.UseHttpsRedirection();
-app.UseStaticFiles();
-
-app.UseRouting();
 
 app.UseAuthorization();
 
-app.MapControllerRoute(
-    name: "default",
-    pattern: "{controller=Home}/{action=Index}/{id?}");
+app.MapControllers();
 
 app.Run();
-

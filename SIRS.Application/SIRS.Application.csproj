@@ -15,4 +15,8 @@
     <ProjectReference Include="..\SIRS.Domain\SIRS.Domain.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="EventSourcedNormalizers\" />
+  </ItemGroup>
+
 </Project>

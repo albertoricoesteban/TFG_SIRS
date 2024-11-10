@@ -1,51 +1,31 @@
-﻿using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
+using SIRS.ApliClient;
+using SIRS.Application.ViewModels;
+using System.Threading.Tasks;
 
-namespace SIRS.Controllers
+[Route("api/[controller]")]
+public class EdificioController : ControllerBase
 {
-    public class EdificioController : Controller
+    private readonly ApiClientService _apiClientService;
+
+    public EdificioController(ApiClientService apiClientService)
     {
-        // GET: EdificioController
-        public ActionResult Index()
-        {
-            return View();
-        }
-        public ActionResult Add()
-        {
-            return View();
-        }
+        _apiClientService = apiClientService;
+    }
 
-        public IActionResult GetEdificios(string nombre, string direccion)
-        {
-            // Aquí iría la consulta a la base de datos, ejemplo:
-            var edificios = ObtenerTodosLosEdificios(); // Método ficticio para obtener datos
+    [HttpGet("GetAll")]
+    public async Task<IActionResult> GetAll()
+    {
+        var edificios = await _apiClientService.GetAsync<IEnumerable<EdificioViewModel>>("https://api-url/api/edificio/getall");
+        return Ok(edificios);
+    }
 
-            // Filtrar según el nombre y dirección, si existen
-            if (!string.IsNullOrEmpty(nombre))
-            {
-                edificios = edificios.Where(e => e.Nombre.Contains(nombre)).ToList();
-            }
-            if (!string.IsNullOrEmpty(direccion))
-            {
-                edificios = edificios.Where(e => e.Direccion.Contains(direccion)).ToList();
-            }
-
-            // Devolver los datos en formato JSON
-            return Json(edificios);
-        }
-
-        private readonly HttpClient _httpClient; public EdificioService(HttpClient httpClient) { _httpClient = httpClient; }
-        public async Task<IEnumerable<EdificioViewModel>> GetAllEdificiosAsync()
-        {
-            var response = await _httpClient.GetAsync("https://api-url/api/edificio"); response.EnsureSuccessStatusCode(); var responseBody = await response.Content.ReadAsStringAsync(); var edificios = JsonConvert.DeserializeObject<IEnumerable<EdificioViewModel>>(responseBody); return edificios;
-        }
-     
+    [HttpGet("GetEdificiosPorFiltro")]
+    public async Task<IActionResult> GetEdificiosPorFiltro(string nombre, string direccion)
+    {
+        var uri = $"https://api-url/api/edificio/getbyfilter?nombre={nombre}&direccion={direccion}";
+        var edificios = await _apiClientService.GetAsync<IEnumerable<EdificioViewModel>>(uri);
+        return Ok(edificios);
+    }
 }
-// Clase de ejemplo para los edificios
-public class Edificio
-{
-    public string Nombre { get; set; }
-    public string Direccion { get; set; }
-    public string Latitud { get; set; }
-    public string Longitud { get; set; }
-}
+

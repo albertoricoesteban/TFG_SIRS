@@ -13,6 +13,10 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 //builder.Services.AddSwaggerGen();
 
+// Registrar servicios
+builder.Services.AddScoped<IEdificioAppService, EdificioAppService>();
+builder.Services.AddAutoMapper(typeof(Program));
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -21,11 +25,6 @@ var app = builder.Build();
 //    app.UseSwagger();
 //    app.UseSwaggerUI();
 //}
-
-builder.Services.AddScoped<IEdificioAppService, EdificioAppService>(); 
-builder.Services.AddScoped<IEdificioRepository, EdificioRepository>();
-builder.Services.AddAutoMapper(typeof(Program));
-
 
 app.UseHttpsRedirection();
 
