@@ -1,13 +1,14 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using SIRS.Services.Api.Controllers;
+using SIRS.Domain.Bus;
+using SIRS.Domain.Notifications;
+using MediatR;
 
 namespace SIRS.Service.API.Controllers
 {
-    public class EstadoSalaController : Controller
-    {
         [Authorize]
-        [ApiVersion("1.0")]
         [Route("api/v1/[controller]")]
         public class EstadoSalaController : ApiController
         {

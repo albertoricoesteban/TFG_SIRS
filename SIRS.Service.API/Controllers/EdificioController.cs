@@ -1,15 +1,19 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using SIRS.Application.Interfaces;
+using SIRS.Domain.Bus;
+using SIRS.Domain.Notifications;
+using SIRS.Services.Api.Controllers;
 
 namespace SIRS.Service.API.Controllers
 {
     [Authorize]
-    [ApiVersion("1.0")]
     [Route("api/v{version:apiVersion}/edificio-management")]
     public class EdificioController : ApiController
     {
-        private readonly IEdificioAppService _edificioAppService;
+        private readonly EdificioAppService _edificioAppService;
 
         public EdificioController(
             IEdificioAppService edificioAppService,
