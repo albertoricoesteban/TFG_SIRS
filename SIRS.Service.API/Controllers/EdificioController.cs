@@ -23,7 +23,7 @@ namespace SIRS.Service.API.Controllers
             _edificioAppService = edificioAppService;
         }
 
-        [HttpGet]
+        [HttpGet("GetAll")]
         public IActionResult GetAll()
         {
             var edificios = _edificioAppService.GetAll();

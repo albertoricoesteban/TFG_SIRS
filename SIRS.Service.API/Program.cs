@@ -1,6 +1,8 @@
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.EntityFrameworkCore;
 using SIRS.Application.Interfaces;
 using SIRS.Application.Services;
+using SIRS.Data.Context;
 using SIRS.Data.Repository;
 using SIRS.Domain.Interfaces;
 
@@ -13,9 +15,15 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 //builder.Services.AddSwaggerGen();
 
+// Agregar ApplicationDbContext al contenedor de dependencias
+builder.Services.AddDbContext<ApplicationDbContext>(options =>
+    options.UseSqlServer(builder.Configuration.GetConnectionString("SIRSDBConnection")));
+
 // Registrar servicios
+builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
+
+builder.Services.AddScoped<IEdificioRepository, EdificioRepository>();
 builder.Services.AddScoped<IEdificioAppService, EdificioAppService>();
-builder.Services.AddAutoMapper(typeof(Program));
 
 var app = builder.Build();
 

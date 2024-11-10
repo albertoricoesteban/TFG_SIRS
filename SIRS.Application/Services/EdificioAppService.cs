@@ -10,8 +10,11 @@ namespace SIRS.Application.Services
     public class EdificioAppService : IEdificioAppService
     {
         private readonly IMapper _mapper;
-        private readonly IEdificioRepository _edificioRepository;
-
+        private IEdificioRepository _edificioRepository;
+        public EdificioAppService(IEdificioRepository edificioRepository)
+        {
+            _edificioRepository = edificioRepository;
+        }
         public EdificioAppService(
             IMapper mapper,
             IEdificioRepository edificioRepository)
