@@ -1,3 +1,9 @@
+using Microsoft.AspNetCore.Hosting;
+using SIRS.Application.Interfaces;
+using SIRS.Application.Services;
+using SIRS.Data.Repository;
+using SIRS.Domain.Interfaces;
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
@@ -15,6 +21,11 @@ var app = builder.Build();
 //    app.UseSwagger();
 //    app.UseSwaggerUI();
 //}
+
+builder.Services.AddScoped<IEdificioAppService, EdificioAppService>(); 
+builder.Services.AddScoped<IEdificioRepository, EdificioRepository>();
+builder.Services.AddAutoMapper(typeof(Program));
+
 
 app.UseHttpsRedirection();
 

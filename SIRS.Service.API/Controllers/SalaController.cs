@@ -1,77 +1,78 @@
 ﻿using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using SIRS.Domain.Bus;
-using SIRS.Domain.Notifications;
-using MediatR;
-using SIRS.Services.Api.Controllers;
+using SIRS.Application.Interfaces;
+using SIRS.Application.ViewModels;
+using System.Collections.Generic;
 
 namespace SIRS.Service.API.Controllers
 {
     [Authorize]
-    [Route("api/v{version:apiVersion}/sala-management")]
-    public class SalaController : ApiController
+    [ApiController]
+    [Route("api/[controller]")]
+    public class SalaController : ControllerBase
     {
         private readonly ISalaAppService _salaAppService;
 
-        public SalaController(
-            ISalaAppService salaAppService,
-            INotificationHandler<DomainNotification> notifications,
-            IMediatorHandler mediator)
-            : base(notifications, mediator)
+        public SalaController(ISalaAppService salaAppService)
         {
             _salaAppService = salaAppService;
         }
 
-        [HttpGet]
-        [AllowAnonymous]
-        public IActionResult Get()
+        [HttpGet("{id}")]
+        public IActionResult GetById(int id)
         {
-            return Response(_salaAppService.GetAll());
-        }
-
-        [HttpGet("{id:int}")]
-        [AllowAnonymous]
-        public IActionResult Get(int id)
-        {
-            var salaViewModel = _salaAppService.GetById(id);
-            return Response(salaViewModel);
+            var sala = _salaAppService.GetById(id);
+            if (sala == null)
+            {
+                return NotFound();
+            }
+            return Ok(sala);
         }
 
         [HttpPost]
-        [Authorize(Policy = "CanWriteSalaData", Roles = Roles.Admin)]
-        public IActionResult Post([FromBody] SalaViewModel salaViewModel)
+        public IActionResult Add(SalaViewModel sala)
         {
-            if (!ModelState.IsValid)
-            {
-                NotifyModelStateErrors();
-                return Response(salaViewModel);
-            }
-
-            _salaAppService.Register(salaViewModel);
-            return Response(salaViewModel);
+            _salaAppService.Add(sala);
+            return CreatedAtAction(nameof(GetById), new { id = sala.Id }, sala);
         }
 
-        [HttpPut]
-        [Authorize(Policy = "CanWriteSalaData", Roles = Roles.Admin)]
-        public IActionResult Put([FromBody] SalaViewModel salaViewModel)
+        [HttpPut("{id}")]
+        public IActionResult Update(int id, SalaViewModel sala)
         {
-            if (!ModelState.IsValid)
+            if (id != sala.Id)
             {
-                NotifyModelStateErrors();
-                return Response(salaViewModel);
+                return BadRequest();
             }
-
-            _salaAppService.Update(salaViewModel);
-            return Response(salaViewModel);
+            _salaAppService.Update(sala);
+            return NoContent();
         }
 
-        [HttpDelete("{id:int}")]
-        [Authorize(Policy = "CanRemoveSalaData", Roles = Roles.Admin)]
+        [HttpDelete("{id}")]
         public IActionResult Delete(int id)
         {
-            _salaAppService.Remove(id);
-            return Response();
+            _salaAppService.Delete(id);
+            return NoContent();
+        }
+
+        [HttpGet("search/{descripcion}")]
+        public IActionResult SearchByDescripcion(string descripcion)
+        {
+            var salas = _salaAppService.SearchByDescripcion(descripcion);
+            return Ok(salas);
+        }
+
+        [HttpGet("estado/{estado}")]
+        public IActionResult GetByEstado(string estado)
+        {
+            var salas = _salaAppService.GetByEstado(estado);
+            return Ok(salas);
+        }
+
+        [HttpGet]
+        public IActionResult GetAllSalas()
+        {
+            var salas = _salaAppService.GetAllSalas();
+            return Ok(salas);
         }
     }
 }

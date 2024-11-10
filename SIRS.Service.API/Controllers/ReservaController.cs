@@ -1,81 +1,85 @@
 ﻿using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using SIRS.Domain.Bus;
-using SIRS.Domain.Notifications;
-using MediatR;
-using SIRS.Services.Api.Controllers;
+using SIRS.Application.Interfaces;
+using SIRS.Application.ViewModels;
+using System;
 
 namespace SIRS.Service.API.Controllers
 {
-
     [Authorize]
-    [Route("api/v1/[controller]")]
-    public class ReservaController : ApiController
+    [ApiController]
+    [Route("api/[controller]")]
+    public class ReservaController : ControllerBase
     {
         private readonly IReservaAppService _reservaAppService;
 
-        public ReservaController(IReservaAppService reservaAppService, INotificationHandler<DomainNotification> notifications, IMediatorHandler mediator)
-            : base(notifications, mediator)
+        public ReservaController(IReservaAppService reservaAppService)
         {
             _reservaAppService = reservaAppService;
         }
 
-        [HttpGet]
-        [AllowAnonymous]
-        [Route("all")]
-        public IActionResult GetAllReservations()
-        {
-            var reservas = _reservaAppService.GetAll();
-            return Response(reservas);
-        }
-
-        [HttpGet]
-        [AllowAnonymous]
-        [Route("{id:int}")]
-        public IActionResult GetReservationById(int id)
+        [HttpGet("{id}")]
+        public IActionResult GetById(int id)
         {
             var reserva = _reservaAppService.GetById(id);
-            return Response(reserva);
+            if (reserva == null)
+            {
+                return NotFound();
+            }
+            return Ok(reserva);
         }
 
         [HttpPost]
-        [Authorize(Policy = "CanWriteReservationData", Roles = "Admin,User")]
-        [Route("create")]
-        public IActionResult CreateReservation([FromBody] ReservaViewModel reservaViewModel)
+        public IActionResult Add(ReservaViewModel reserva)
         {
-            if (!ModelState.IsValid)
-            {
-                NotifyModelStateErrors();
-                return Response(reservaViewModel);
-            }
-
-            _reservaAppService.Create(reservaViewModel);
-            return Response(reservaViewModel);
+            _reservaAppService.Add(reserva);
+            return CreatedAtAction(nameof(GetById), new { id = reserva.Id }, reserva);
         }
 
-        [HttpPut]
-        [Authorize(Policy = "CanWriteReservationData", Roles = "Admin")]
-        [Route("update")]
-        public IActionResult UpdateReservation([FromBody] ReservaViewModel reservaViewModel)
+        [HttpPut("{id}")]
+        public IActionResult Update(int id, ReservaViewModel reserva)
         {
-            if (!ModelState.IsValid)
+            if (id != reserva.Id)
             {
-                NotifyModelStateErrors();
-                return Response(reservaViewModel);
+                return BadRequest();
             }
-
-            _reservaAppService.Update(reservaViewModel);
-            return Response(reservaViewModel);
+            _reservaAppService.Update(reserva);
+            return NoContent();
         }
 
-        [HttpDelete]
-        [Authorize(Policy = "CanRemoveReservationData", Roles = "Admin")]
-        [Route("delete/{id:int}")]
-        public IActionResult DeleteReservation(int id)
+        [HttpDelete("{id}")]
+        public IActionResult Delete(int id)
         {
             _reservaAppService.Delete(id);
-            return Response();
+            return NoContent();
+        }
+
+        [HttpGet("sala/{salaId}")]
+        public IActionResult GetBySala(int salaId)
+        {
+            var reservas = _reservaAppService.GetBySala(salaId);
+            return Ok(reservas);
+        }
+
+        [HttpGet("usuario/{usuarioId}")]
+        public IActionResult GetByUsuario(int usuarioId)
+        {
+            var reservas = _reservaAppService.GetByUsuario(usuarioId);
+            return Ok(reservas);
+        }
+
+        [HttpGet("fecha")]
+        public IActionResult GetByFecha([FromQuery] DateTime fecha)
+        {
+            var reservas = _reservaAppService.GetByFecha(fecha);
+            return Ok(reservas);
+        }
+
+        [HttpGet]
+        public IActionResult GetAll()
+        {
+            var reservas = _reservaAppService.GetAll();
+            return Ok(reservas);
         }
     }
 }

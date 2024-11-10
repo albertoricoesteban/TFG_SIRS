@@ -11,6 +11,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\DATA\SIRS.Data.csproj" />
     <ProjectReference Include="..\SIRS.Domain\SIRS.Domain.csproj" />
   </ItemGroup>
 

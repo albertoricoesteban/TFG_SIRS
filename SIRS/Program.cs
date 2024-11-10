@@ -14,6 +14,10 @@ builder.Services.AddControllersWithViews();
 // ----- Database -----
 builder.Services.AddCustomizedDatabase(builder.Configuration, builder.Environment);
 
+builder.Services.AddControllersWithViews();
+// Agrega el cliente HTTP services.AddHttpClient();
+builder.Services.AddHttpClient();
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.

@@ -3,6 +3,8 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using SIRS.Application.Interfaces;
+using SIRS.Application.Services;
+using SIRS.Application.ViewModels;
 using SIRS.Domain.Bus;
 using SIRS.Domain.Notifications;
 using SIRS.Services.Api.Controllers;
@@ -10,69 +12,69 @@ using SIRS.Services.Api.Controllers;
 namespace SIRS.Service.API.Controllers
 {
     [Authorize]
-    [Route("api/v{version:apiVersion}/edificio-management")]
-    public class EdificioController : ApiController
+    [ApiController]
+    [Route("api/[controller]")]
+    public class EdificioController : ControllerBase
     {
-        private readonly EdificioAppService _edificioAppService;
+        private readonly IEdificioAppService _edificioAppService;
 
-        public EdificioController(
-            IEdificioAppService edificioAppService,
-            INotificationHandler<DomainNotification> notifications,
-            IMediatorHandler mediator)
-            : base(notifications, mediator)
+        public EdificioController(IEdificioAppService edificioAppService)
         {
             _edificioAppService = edificioAppService;
         }
 
         [HttpGet]
-        [AllowAnonymous]
-        public IActionResult Get()
+        public IActionResult GetAll()
         {
-            return Response(_edificioAppService.GetAll());
+            var edificios = _edificioAppService.GetAll();
+            return Ok(edificios);
         }
 
-        [HttpGet("{id:int}")]
-        [AllowAnonymous]
-        public IActionResult Get(int id)
+        [HttpGet("{id}")]
+        public IActionResult GetById(int id)
         {
-            var edificioViewModel = _edificioAppService.GetById(id);
-            return Response(edificioViewModel);
+            var edificio = _edificioAppService.GetById(id);
+            if (edificio == null)
+            {
+                return NotFound();
+            }
+            return Ok(edificio);
         }
 
         [HttpPost]
-        [Authorize(Policy = "CanWriteEdificioData", Roles = Roles.Admin)]
-        public IActionResult Post([FromBody] EdificioViewModel edificioViewModel)
+        public IActionResult Add(EdificioViewModel edificio)
         {
-            if (!ModelState.IsValid)
-            {
-                NotifyModelStateErrors();
-                return Response(edificioViewModel);
-            }
-
-            _edificioAppService.Register(edificioViewModel);
-            return Response(edificioViewModel);
+            _edificioAppService.Add(edificio);
+            return CreatedAtAction(nameof(GetById), new { id = edificio.Id }, edificio);
         }
 
-        [HttpPut]
-        [Authorize(Policy = "CanWriteEdificioData", Roles = Roles.Admin)]
-        public IActionResult Put([FromBody] EdificioViewModel edificioViewModel)
+        [HttpPut("{id}")]
+        public IActionResult Update(int id, EdificioViewModel edificio)
         {
-            if (!ModelState.IsValid)
+            if (id != edificio.Id)
             {
-                NotifyModelStateErrors();
-                return Response(edificioViewModel);
+                return BadRequest();
             }
-
-            _edificioAppService.Update(edificioViewModel);
-            return Response(edificioViewModel);
+            _edificioAppService.Update(edificio);
+            return NoContent();
         }
 
-        [HttpDelete("{id:int}")]
-        [Authorize(Policy = "CanRemoveEdificioData", Roles = Roles.Admin)]
+        [HttpDelete("{id}")]
         public IActionResult Delete(int id)
         {
-            _edificioAppService.Remove(id);
-            return Response();
+            _edificioAppService.Delete(id);
+            return NoContent();
+        }
+
+        [HttpGet("searchbyname/{name}")]
+        public IActionResult SearchByName(string name)
+        {
+            var edificios = _edificioAppService.SearchByName(name);
+            if (edificios == null || !edificios.Any())
+            {
+                return NotFound();
+            }
+            return Ok(edificios);
         }
     }
 }

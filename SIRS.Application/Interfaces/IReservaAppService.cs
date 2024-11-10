@@ -1,13 +1,18 @@
-﻿using System;
+﻿using SIRS.Application.ViewModels;
+using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace SIRS.Application.Interfaces
 {
-    public interface IReservaSalaAppService : IDisposable
+    public interface IReservaAppService
     {
-
+        ReservaViewModel GetById(int id);
+        void Add(ReservaViewModel reserva);
+        void Update(ReservaViewModel reserva);
+        void Delete(int id);
+        IEnumerable<ReservaViewModel> GetBySala(int salaId);
+        IEnumerable<ReservaViewModel> GetByUsuario(int usuarioId);
+        IEnumerable<ReservaViewModel> GetByFecha(DateTime fecha);
+        IEnumerable<ReservaViewModel> GetAll();
     }
 }

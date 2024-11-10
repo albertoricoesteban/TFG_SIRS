@@ -1,13 +1,14 @@
-﻿using System;
+﻿using SIRS.Application.ViewModels;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace SIRS.Application.Interfaces
 {
-    public interface IEstadoSalaAppService : IDisposable
+    public interface IEstadoSalaAppService
     {
-
+        EstadoSalaViewModel GetById(int id);
+        void Add(EstadoSalaViewModel estadoSala);
+        void Update(EstadoSalaViewModel estadoSala);
+        void Delete(int id);
+        IEnumerable<EstadoSalaViewModel> GetAllEstados();
     }
 }

@@ -9,4 +9,6 @@ public interface ISalaRepository : IRepository<Sala>
     void Add(Sala sala);
     void Update(Sala sala);
     void Delete(int id);
+    IEnumerable<Sala> SearchByDescripcion(string descripcion);
+    IEnumerable<Sala> GetByEstado(string estado);
 }

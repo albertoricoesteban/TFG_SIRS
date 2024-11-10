@@ -34,16 +34,11 @@ namespace SIRS.Controllers
             return Json(edificios);
         }
 
-        private List<Edificio> ObtenerTodosLosEdificios()
+        private readonly HttpClient _httpClient; public EdificioService(HttpClient httpClient) { _httpClient = httpClient; }
+        public async Task<IEnumerable<EdificioViewModel>> GetAllEdificiosAsync()
         {
-            // Datos simulados, reemplaza esto con tu lógica para obtener datos de la BD
-            return new List<Edificio>
-        {
-            new Edificio { Nombre = "Edificio Central", Direccion = "Calle Falsa 123", Latitud = "40.7128", Longitud = "-74.0060" },
-            new Edificio { Nombre = "Edificio Norte", Direccion = "Avenida Siempre Viva", Latitud = "34.0522", Longitud = "-118.2437" }
-        };
+            var response = await _httpClient.GetAsync("https://api-url/api/edificio"); response.EnsureSuccessStatusCode(); var responseBody = await response.Content.ReadAsStringAsync(); var edificios = JsonConvert.DeserializeObject<IEnumerable<EdificioViewModel>>(responseBody); return edificios;
         }
-    }
      
 }
 // Clase de ejemplo para los edificios

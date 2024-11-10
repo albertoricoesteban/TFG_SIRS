@@ -10,4 +10,5 @@ public interface IUsuarioRepository : IRepository<Usuario>
     void Update(Usuario usuario);
     void Delete(int id);
     IEnumerable<Usuario> GetByRol(string rolNombre);
+    IEnumerable<Usuario> SearchByName(string name);
 }

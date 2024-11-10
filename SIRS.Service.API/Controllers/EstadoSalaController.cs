@@ -1,80 +1,64 @@
 ﻿using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using SIRS.Services.Api.Controllers;
-using SIRS.Domain.Bus;
-using SIRS.Domain.Notifications;
-using MediatR;
+using SIRS.Application.Interfaces;
+using SIRS.Application.ViewModels;
+using System.Collections.Generic;
 
 namespace SIRS.Service.API.Controllers
 {
-        [Authorize]
-        [Route("api/v1/[controller]")]
-        public class EstadoSalaController : ApiController
+    [Authorize]
+    [ApiController]
+    [Route("api/[controller]")]
+    public class EstadoSalaController : ControllerBase
+    {
+        private readonly IEstadoSalaAppService _estadoSalaAppService;
+
+        public EstadoSalaController(IEstadoSalaAppService estadoSalaAppService)
         {
-            private readonly IEstadoSalaAppService _estadoSalaAppService;
+            _estadoSalaAppService = estadoSalaAppService;
+        }
 
-            public EstadoSalaController(IEstadoSalaAppService estadoSalaAppService, INotificationHandler<DomainNotification> notifications, IMediatorHandler mediator)
-                : base(notifications, mediator)
+        [HttpGet("{id}")]
+        public IActionResult GetById(int id)
+        {
+            var estadoSala = _estadoSalaAppService.GetById(id);
+            if (estadoSala == null)
             {
-                _estadoSalaAppService = estadoSalaAppService;
+                return NotFound();
             }
+            return Ok(estadoSala);
+        }
 
-            [HttpGet]
-            [AllowAnonymous]
-            [Route("all")]
-            public IActionResult GetAllEstadoSala()
+        [HttpPost]
+        public IActionResult Add(EstadoSalaViewModel estadoSala)
+        {
+            _estadoSalaAppService.Add(estadoSala);
+            return CreatedAtAction(nameof(GetById), new { id = estadoSala.Id }, estadoSala);
+        }
+
+        [HttpPut("{id}")]
+        public IActionResult Update(int id, EstadoSalaViewModel estadoSala)
+        {
+            if (id != estadoSala.Id)
             {
-                var estados = _estadoSalaAppService.GetAll();
-                return Response(estados);
+                return BadRequest();
             }
+            _estadoSalaAppService.Update(estadoSala);
+            return NoContent();
+        }
 
-            [HttpGet]
-            [AllowAnonymous]
-            [Route("{id:int}")]
-            public IActionResult GetEstadoSalaById(int id)
-            {
-                var estado = _estadoSalaAppService.GetById(id);
-                return Response(estado);
-            }
+        [HttpDelete("{id}")]
+        public IActionResult Delete(int id)
+        {
+            _estadoSalaAppService.Delete(id);
+            return NoContent();
+        }
 
-            [HttpPost]
-            [Authorize(Policy = "CanWriteEstadoSalaData", Roles = "Admin")]
-            [Route("create")]
-            public IActionResult CreateEstadoSala([FromBody] EstadoSalaViewModel estadoSalaViewModel)
-            {
-                if (!ModelState.IsValid)
-                {
-                    NotifyModelStateErrors();
-                    return Response(estadoSalaViewModel);
-                }
-
-                _estadoSalaAppService.Create(estadoSalaViewModel);
-                return Response(estadoSalaViewModel);
-            }
-
-            [HttpPut]
-            [Authorize(Policy = "CanWriteEstadoSalaData", Roles = "Admin")]
-            [Route("update")]
-            public IActionResult UpdateEstadoSala([FromBody] EstadoSalaViewModel estadoSalaViewModel)
-            {
-                if (!ModelState.IsValid)
-                {
-                    NotifyModelStateErrors();
-                    return Response(estadoSalaViewModel);
-                }
-
-                _estadoSalaAppService.Update(estadoSalaViewModel);
-                return Response(estadoSalaViewModel);
-            }
-
-            [HttpDelete]
-            [Authorize(Policy = "CanRemoveEstadoSalaData", Roles = "Admin")]
-            [Route("delete/{id:int}")]
-            public IActionResult DeleteEstadoSala(int id)
-            {
-                _estadoSalaAppService.Delete(id);
-                return Response();
-            }
+        [HttpGet]
+        public IActionResult GetAllEstados()
+        {
+            var estadosSala = _estadoSalaAppService.GetAllEstados();
+            return Ok(estadosSala);
         }
     }
+}
