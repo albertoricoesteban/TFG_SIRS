@@ -14,6 +14,5 @@ public class EstadoSalaViewModel
     [MaxLength(100, ErrorMessage = "Description cannot exceed 100 characters")]
     [DisplayName("Description")]
     public string Descripcion { get; set; }
-
-    public ICollection<Sala> Salas { get; set; }
+     
 }

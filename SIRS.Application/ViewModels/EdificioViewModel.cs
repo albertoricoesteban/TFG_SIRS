@@ -28,5 +28,6 @@ public class EdificioViewModel
     [DisplayName("Longitude")]
     public decimal? Longitud { get; set; }
 
-    public ICollection<Sala> Salas { get; set; }
+    public ICollection<Sala> Salas { get; set; } = new List<Sala>(); // Inicializamos como una lista vacía si no hay salas
+
 }

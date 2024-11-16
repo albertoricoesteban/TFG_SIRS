@@ -15,6 +15,7 @@ public class SalaViewModel
     [DisplayName("Role Name")]
     public string Nombre { get; set; }
 
-    public ICollection<UsuarioViewModel> Usuarios { get; set; }
+    public ICollection<Reserva> Reservas { get; set; } = new List<Reserva>();
+
 
 }

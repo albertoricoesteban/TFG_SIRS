@@ -19,7 +19,8 @@ namespace SIRS.Domain.Models
         public int EdificioId { get; set; }
         public Edificio Edificio { get; set; }
 
-        public ICollection<Reserva> Reservas { get; set; }
+        public ICollection<Reserva> Reservas { get; set; } = new List<Reserva>();
+
 
     }
 }

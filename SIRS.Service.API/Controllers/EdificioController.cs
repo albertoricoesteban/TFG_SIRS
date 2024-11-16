@@ -30,7 +30,7 @@ namespace SIRS.Service.API.Controllers
             return Ok(edificios);
         }
 
-        [HttpGet("{id}")]
+        [HttpGet("GetById/{id}")]
         public IActionResult GetById(int id)
         {
             var edificio = _edificioAppService.GetById(id);
@@ -41,14 +41,14 @@ namespace SIRS.Service.API.Controllers
             return Ok(edificio);
         }
 
-        [HttpPost]
+        [HttpPost("Add")]
         public IActionResult Add(EdificioViewModel edificio)
         {
             _edificioAppService.Add(edificio);
             return CreatedAtAction(nameof(GetById), new { id = edificio.Id }, edificio);
         }
 
-        [HttpPut("{id}")]
+        [HttpPut("Update/{id}")]
         public IActionResult Update(int id, EdificioViewModel edificio)
         {
             if (id != edificio.Id)
@@ -59,14 +59,14 @@ namespace SIRS.Service.API.Controllers
             return NoContent();
         }
 
-        [HttpDelete("{id}")]
+        [HttpDelete("Delete/{id}")]
         public IActionResult Delete(int id)
         {
             _edificioAppService.Delete(id);
             return NoContent();
         }
 
-        [HttpGet("searchbyname/{name}")]
+        [HttpGet("Searchbyname/{name}")]
         public IActionResult SearchByName(string name)
         {
             var edificios = _edificioAppService.SearchByName(name);

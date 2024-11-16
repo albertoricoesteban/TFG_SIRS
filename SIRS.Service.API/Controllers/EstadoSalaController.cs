@@ -6,7 +6,7 @@ using System.Collections.Generic;
 
 namespace SIRS.Service.API.Controllers
 {
-    [Authorize]
+    //[Authorize]
     [ApiController]
     [Route("api/[controller]")]
     public class EstadoSalaController : ControllerBase
@@ -18,7 +18,7 @@ namespace SIRS.Service.API.Controllers
             _estadoSalaAppService = estadoSalaAppService;
         }
 
-        [HttpGet("{id}")]
+        [HttpGet("GetById/{id}")]
         public IActionResult GetById(int id)
         {
             var estadoSala = _estadoSalaAppService.GetById(id);
@@ -29,14 +29,14 @@ namespace SIRS.Service.API.Controllers
             return Ok(estadoSala);
         }
 
-        [HttpPost]
+        [HttpPost("Add")]
         public IActionResult Add(EstadoSalaViewModel estadoSala)
         {
             _estadoSalaAppService.Add(estadoSala);
             return CreatedAtAction(nameof(GetById), new { id = estadoSala.Id }, estadoSala);
         }
 
-        [HttpPut("{id}")]
+        [HttpPut("Update/{id}")]
         public IActionResult Update(int id, EstadoSalaViewModel estadoSala)
         {
             if (id != estadoSala.Id)
@@ -47,14 +47,14 @@ namespace SIRS.Service.API.Controllers
             return NoContent();
         }
 
-        [HttpDelete("{id}")]
+        [HttpDelete("Delete/{id}")]
         public IActionResult Delete(int id)
         {
             _estadoSalaAppService.Delete(id);
             return NoContent();
         }
 
-        [HttpGet]
+        [HttpGet("GetAllEstados")]
         public IActionResult GetAllEstados()
         {
             var estadosSala = _estadoSalaAppService.GetAllEstados();

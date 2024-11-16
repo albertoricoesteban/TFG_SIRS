@@ -18,7 +18,7 @@ namespace SIRS.Service.API.Controllers
             _reservaAppService = reservaAppService;
         }
 
-        [HttpGet("{id}")]
+        [HttpGet("GetById/{id}")]
         public IActionResult GetById(int id)
         {
             var reserva = _reservaAppService.GetById(id);
@@ -29,14 +29,14 @@ namespace SIRS.Service.API.Controllers
             return Ok(reserva);
         }
 
-        [HttpPost]
+        [HttpPost("Add")]
         public IActionResult Add(ReservaViewModel reserva)
         {
             _reservaAppService.Add(reserva);
             return CreatedAtAction(nameof(GetById), new { id = reserva.Id }, reserva);
         }
 
-        [HttpPut("{id}")]
+        [HttpPut("Update/{id}")]
         public IActionResult Update(int id, ReservaViewModel reserva)
         {
             if (id != reserva.Id)
@@ -47,35 +47,35 @@ namespace SIRS.Service.API.Controllers
             return NoContent();
         }
 
-        [HttpDelete("{id}")]
+        [HttpDelete("Delete/{id}")]
         public IActionResult Delete(int id)
         {
             _reservaAppService.Delete(id);
             return NoContent();
         }
 
-        [HttpGet("sala/{salaId}")]
+        [HttpGet("GetBySalaId/{salaId}")]
         public IActionResult GetBySala(int salaId)
         {
             var reservas = _reservaAppService.GetBySala(salaId);
             return Ok(reservas);
         }
 
-        [HttpGet("usuario/{usuarioId}")]
+        [HttpGet("GetByUsuario/{usuarioId}")]
         public IActionResult GetByUsuario(int usuarioId)
         {
             var reservas = _reservaAppService.GetByUsuario(usuarioId);
             return Ok(reservas);
         }
 
-        [HttpGet("fecha")]
+        [HttpGet("GetByFecha/{fecha}")]
         public IActionResult GetByFecha([FromQuery] DateTime fecha)
         {
             var reservas = _reservaAppService.GetByFecha(fecha);
             return Ok(reservas);
         }
 
-        [HttpGet]
+        [HttpGet("GetAll")]
         public IActionResult GetAll()
         {
             var reservas = _reservaAppService.GetAll();

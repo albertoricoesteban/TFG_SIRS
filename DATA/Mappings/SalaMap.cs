@@ -39,10 +39,6 @@ namespace SIRS.Data.Mappings
                 .IsRequired();
 
             builder.HasKey(s => s.Id);
-            builder.HasOne(s => s.EstadoSala)
-                .WithMany(e => e.Salas)
-                .HasForeignKey(s => s.EstadoSalaId)
-                .OnDelete(DeleteBehavior.Restrict);
 
             builder.HasOne(s => s.Edificio)
                 .WithMany(e => e.Salas)

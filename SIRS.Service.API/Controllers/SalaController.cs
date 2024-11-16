@@ -18,7 +18,7 @@ namespace SIRS.Service.API.Controllers
             _salaAppService = salaAppService;
         }
 
-        [HttpGet("{id}")]
+        [HttpGet("GetById/{id}")]
         public IActionResult GetById(int id)
         {
             var sala = _salaAppService.GetById(id);
@@ -29,14 +29,14 @@ namespace SIRS.Service.API.Controllers
             return Ok(sala);
         }
 
-        [HttpPost]
+        [HttpPost("Add")]
         public IActionResult Add(SalaViewModel sala)
         {
             _salaAppService.Add(sala);
             return CreatedAtAction(nameof(GetById), new { id = sala.Id }, sala);
         }
 
-        [HttpPut("{id}")]
+        [HttpPut("Update/{id}")]
         public IActionResult Update(int id, SalaViewModel sala)
         {
             if (id != sala.Id)
@@ -47,28 +47,28 @@ namespace SIRS.Service.API.Controllers
             return NoContent();
         }
 
-        [HttpDelete("{id}")]
+        [HttpDelete("Delete/{id}")]
         public IActionResult Delete(int id)
         {
             _salaAppService.Delete(id);
             return NoContent();
         }
 
-        [HttpGet("search/{descripcion}")]
+        [HttpGet("SearchByDescripcion/{descripcion}")]
         public IActionResult SearchByDescripcion(string descripcion)
         {
             var salas = _salaAppService.SearchByDescripcion(descripcion);
             return Ok(salas);
         }
 
-        [HttpGet("estado/{estado}")]
+        [HttpGet("GetByEstado/{estado}")]
         public IActionResult GetByEstado(string estado)
         {
             var salas = _salaAppService.GetByEstado(estado);
             return Ok(salas);
         }
 
-        [HttpGet]
+        [HttpGet("GetAllSalas")]
         public IActionResult GetAllSalas()
         {
             var salas = _salaAppService.GetAllSalas();

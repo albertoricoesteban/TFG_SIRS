@@ -9,10 +9,10 @@ public class DomainToViewModelMappingProfile : Profile
 {
     public DomainToViewModelMappingProfile()
     {
-        CreateMap<Edificio, EdificioViewModel>();
-        CreateMap<Sala, SalaViewModel>();
-        CreateMap<Reserva, ReservaViewModel>();
-        CreateMap<Usuario, UsuarioViewModel>();
-        CreateMap<EstadoSala, EstadoSalaViewModel>();
+        CreateMap<Edificio, EdificioViewModel>().ReverseMap();
+        CreateMap<Sala, SalaViewModel>().ReverseMap();
+        CreateMap<Reserva, ReservaViewModel>().ReverseMap();
+        CreateMap<Usuario, UsuarioViewModel>().ReverseMap();
+        CreateMap<EstadoSala, EstadoSalaViewModel>().ReverseMap();
     }
 }

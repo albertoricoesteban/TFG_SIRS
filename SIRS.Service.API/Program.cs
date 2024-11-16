@@ -1,12 +1,37 @@
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
 using SIRS.Application.Interfaces;
 using SIRS.Application.Services;
 using SIRS.Data.Context;
 using SIRS.Data.Repository;
 using SIRS.Domain.Interfaces;
+using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
+
+
+// Configura la autenticación JWT
+
+builder.Services.AddAuthentication(options =>
+{
+    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+})
+.AddJwtBearer(options =>
+{
+    options.TokenValidationParameters = new TokenValidationParameters
+    {
+        ValidateIssuer = true,
+        ValidateAudience = true,
+        ValidateLifetime = true,
+        ValidateIssuerSigningKey = true,
+        ValidIssuer = "tu_issuer",
+        ValidAudience = "tu_audience",
+        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes("tu_clave_secreta"))
+    };
+});
 
 // Add services to the container.
 
@@ -23,7 +48,15 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
 builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 
 builder.Services.AddScoped<IEdificioRepository, EdificioRepository>();
+builder.Services.AddScoped<IEstadoSalaRepository, EstadoSalaRepository>();
+builder.Services.AddScoped<IReservaRepository, ReservaRepository>();
+builder.Services.AddScoped<ISalaRepository, SalaRepository>();
+builder.Services.AddScoped<IUsuarioRepository, UsuarioRepository>();
 builder.Services.AddScoped<IEdificioAppService, EdificioAppService>();
+builder.Services.AddScoped<IUsuarioAppService, UsuarioAppService>();
+builder.Services.AddScoped<IEstadoSalaAppService, EstadoSalaAppService>();
+builder.Services.AddScoped<IReservaAppService, ReservaAppService>();
+builder.Services.AddScoped<ISalaAppService, SalaAppService>();
 
 var app = builder.Build();
 
