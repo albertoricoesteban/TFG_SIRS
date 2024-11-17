@@ -1,0 +1,6 @@
+@SIRS.Web_HostAddress = http://localhost:5225
+
+GET {{SIRS.Web_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###

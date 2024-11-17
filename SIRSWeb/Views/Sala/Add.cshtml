@@ -1,0 +1,74 @@
+﻿@{
+    ViewData["Title"] = "Alta de Sala";
+}
+
+<div class="content-wrapper">
+    <div class="content">
+        <div class="container-fluid">
+
+            <!-- Título de sección -->
+            <div class="row mb-4">
+                <div class="col-12">
+                    <h3>Datos de la sala</h3>
+                </div>
+            </div>
+
+            <!-- Formulario para el alta de salas -->
+            <form method="post" action="/Sala/Create">
+                <div class="row">
+                    <!-- Nombre de la Sala -->
+                    <div class="col-md-6">
+                        <label for="nombreSala">Nombre de la sala</label>
+                        <input type="text" class="form-control" id="nombreSala" name="nombreSala" required placeholder="Nombre de la sala">
+                    </div>
+
+                    <!-- Descripción -->
+                    <div class="col-md-6">
+                        <label for="descripcion">Descripción</label>
+                        <input type="text" class="form-control" id="descripcion" name="descripcion" required placeholder="Descripción de la sala">
+                    </div>
+                </div>
+
+                <div class="row mt-3">
+                    <!-- Capacidad -->
+                    <div class="col-md-6">
+                        <label for="capacidad">Capacidad</label>
+                        <input type="number" class="form-control" id="capacidad" name="capacidad" required placeholder="Capacidad">
+                    </div>
+
+                    <!-- Estado -->
+                    <div class="col-md-6">
+                        <label for="estado">Estado</label>
+                        <select class="form-control" id="estado" name="estado" required>
+                            <option value="">Seleccione un estado</option>
+                            <option value="Disponible">Disponible</option>
+                            <option value="No Disponible">No Disponible</option>
+                            <option value="Mantenimiento">En Mantenimiento</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="row mt-3">
+                    <!-- Edificio -->
+                    <div class="col-md-6">
+                        <label for="edificio">Edificio</label>
+                        <select class="form-control" id="edificio" name="edificio" required>
+                            <option value="">Seleccione un edificio</option>
+                            <!-- Opciones de edificios - Se deben llenar dinámicamente en el servidor -->
+                            <option value="Edificio1">Edificio Central</option>
+                            <option value="Edificio2">Edificio Norte</option>
+                            <option value="Edificio3">Edificio Sur</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Botón de Guardar -->
+                <div class="row mt-4">
+                    <div class="col-12 text-right">
+                        <button type="submit" class="btn btn-primary">Guardar</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,68 @@
+﻿@{
+    ViewData["Title"] = "Mi perfil";
+}
+<div class="content-wrapper">
+    <div class="content">
+        <div class="container-fluid">
+            <!-- Título de la sección -->
+            <div class="row mb-4">
+                <div class="col-12">
+                    <h3>Datos del usuario</h3>
+                </div>
+            </div>
+
+            <div class="row">
+                <!-- Columna izquierda: Foto de perfil -->
+                <div class="col-md-2 text-center">
+                    <img src="~/adminlte/dist/img/avatar.png" alt="Foto de perfil" class="img-fluid rounded-circle mb-3" style="max-width: 150px;">
+                    <p><strong>Foto de Perfil</strong></p>
+                </div>
+
+                <!-- Columna derecha: Campos de información de usuario -->
+                <div class="col-md-10">
+                    <form>
+                        <div class="row">
+                            <!-- Primer par de campos: Nombre de usuario y Nombre -->
+                            <div class="col-md-6 mb-3">
+                                <label for="username">Nombre de Usuario</label>
+                                <input type="text" class="form-control" id="username" placeholder="Nombre de usuario" value="">
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="firstName">Nombre</label>
+                                <input type="text" class="form-control" id="firstName" placeholder="Nombre" value="">
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <!-- Segundo par de campos: Apellido 1 y Apellido 2 -->
+                            <div class="col-md-6 mb-3">
+                                <label for="lastName1">Apellido 1</label>
+                                <input type="text" class="form-control" id="lastName1" placeholder="Primer apellido" value="">
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="lastName2">Apellido 2</label>
+                                <input type="text" class="form-control" id="lastName2" placeholder="Segundo apellido" value="">
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <!-- Campo único: Email -->
+                            <div class="col-md-12 mb-3">
+                                <label for="email">Correo Electrónico</label>
+                                <input type="email" class="form-control" id="email" placeholder="Correo electrónico" value="">
+                            </div>
+                        </div>
+
+                        <!-- Botón Guardar -->
+                        <!-- Botón Guardar -->
+                        <div class="row">
+                            <div class="col-md-12 text-right">
+                                <button type="submit" class="btn btn-primary">Guardar</button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

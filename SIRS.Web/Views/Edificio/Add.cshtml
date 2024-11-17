@@ -4,10 +4,6 @@
     ViewData["Title"] = "Alta de edificios";
 }
 
-<link href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css" rel="stylesheet" />
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
-
 <div class="content-wrapper">
     <div class="content">
         <div class="container-fluid">
@@ -21,14 +17,16 @@
 
             <!-- Formulario para agregar un edificio -->
             <div class="col-md-12">
-                <form asp-action="Create" method="post">
+                <!-- Usa un form helper de ASP.NET Core -->
+                <form asp-action="Create" asp-controller="Edificio" method="post">
+                    @* Incluir antifalsificación de tokens para proteger el formulario *@
                     @Html.AntiForgeryToken()
 
                     <div class="row">
                         <!-- Primer par de campos: Nombre de edificio y Dirección -->
                         <div class="col-md-6 mb-3">
                             <label for="Nombre">Nombre de Edificio</label>
-                            <input type="text" class="form-control" id="Descripcion" name="Descripcion" placeholder="Descripcion del edificio" value="@Model.Descripcion" required>
+                            <input type="text" class="form-control" id="Nombre" name="Nombre" placeholder="Nombre del edificio" value="@Model.Descripcion" required>
                         </div>
                         <div class="col-md-6 mb-3">
                             <label for="Direccion">Dirección</label>
@@ -59,18 +57,3 @@
         </div>
     </div>
 </div>
-
-<script>
-    $(document).ready(function () {
-        var successMessage = '@TempData["SuccessMessage"]';
-        var errorMessage = '@TempData["ErrorMessage"]';
-
-        if (successMessage) {
-            toastr.success(successMessage);
-        }
-
-        if (errorMessage) {
-            toastr.error(errorMessage);
-        }
-    });
-</script>

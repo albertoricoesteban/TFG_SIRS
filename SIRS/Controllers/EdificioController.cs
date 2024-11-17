@@ -1,6 +1,9 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using SIRS.ApliClient;
 using SIRS.Application.ViewModels;
+using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace SIRS.Controllers
@@ -13,43 +16,16 @@ namespace SIRS.Controllers
         {
             _apiClientService = apiClientService;
         }
+
         public ActionResult Index()
         {
             return View();
         }
-        // GET: /Edificio/GetAll
-        public async Task<IActionResult> GetAll()
-        {
-            try
-            {
-                var edificios = await _apiClientService.GetAsync<List<EdificioViewModel>>("edificio/GetAll");
-                return View(edificios);
-            }
-            catch (Exception ex)
-            {
-                // Log the exception and display an error message to the user
-                ViewBag.ErrorMessage = "Error al obtener los edificios: " + ex.Message;
-                return View("Error");
-            }
-        }
 
-        // GET: /Edificio/Details/5
-        public async Task<IActionResult> Details(int id)
+        public ActionResult Add()
         {
-            try
-            {
-                var edificio = await _apiClientService.GetAsync<EdificioViewModel>($"edificio/GetById/{id}");
-                if (edificio == null)
-                {
-                    return NotFound();
-                }
-                return View(edificio);
-            }
-            catch (Exception ex)
-            {
-                ViewBag.ErrorMessage = "Error al obtener los detalles del edificio: " + ex.Message;
-                return View("Error");
-            }
+            var model = new EdificioViewModel();
+            return View(model);
         }
 
         // POST: /Edificio/Create
@@ -61,117 +37,37 @@ namespace SIRS.Controllers
             {
                 if (ModelState.IsValid)
                 {
-                    await _apiClientService.PostAsync("edificio/Add", edificio);
-                    return RedirectToAction(nameof(GetAll));
+                    edificio.Salas = new List<SalaViewModel>();
+                    await _apiClientService.PostAsync("http://localhost:5237/api/Edificio/Add", edificio);
+
+                    TempData["SuccessMessage"] = "El edificio se ha creado correctamente.";
+                    return RedirectToAction(nameof(Add)); // Redirigir a 'Add' para una nueva inserción
                 }
-                return View(edificio);
+                TempData["ErrorMessage"] = "Ocurrió un error al crear el edificio.";
+                return View("Add", edificio); // Redirigir a la vista 'Add' si hay errores
             }
             catch (Exception ex)
             {
-                ViewBag.ErrorMessage = "Error al crear el edificio: " + ex.Message;
-                return View("Error");
+                TempData["ErrorMessage"] = "Error al crear el edificio: " + ex.Message;
+                return RedirectToAction(nameof(Add)); // Redirigir a 'Add' en caso de excepción
             }
         }
 
-        // GET: /Edificio/Edit/5
-        public async Task<IActionResult> Edit(int id)
+        // GET: /Edificio/GetAll
+        public async Task<IActionResult> GetAll()
         {
             try
             {
-                var edificio = await _apiClientService.GetAsync<EdificioViewModel>($"edificio/GetById/{id}");
-                if (edificio == null)
-                {
-                    return NotFound();
-                }
-                return View(edificio);
-            }
-            catch (Exception ex)
-            {
-                ViewBag.ErrorMessage = "Error al obtener el edificio para editar: " + ex.Message;
-                return View("Error");
-            }
-        }
-
-        // POST: /Edificio/Edit/5
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, EdificioViewModel edificio)
-        {
-            try
-            {
-                if (id != edificio.Id)
-                {
-                    return BadRequest();
-                }
-
-                if (ModelState.IsValid)
-                {
-                    await _apiClientService.PutAsync($"edificio/Update/{id}", edificio);
-                    return RedirectToAction(nameof(GetAll));
-                }
-                return View(edificio);
-            }
-            catch (Exception ex)
-            {
-                ViewBag.ErrorMessage = "Error al actualizar el edificio: " + ex.Message;
-                return View("Error");
-            }
-        }
-
-        // GET: /Edificio/Delete/5
-        public async Task<IActionResult> Delete(int id)
-        {
-            try
-            {
-                var edificio = await _apiClientService.GetAsync<EdificioViewModel>($"edificio/GetById/{id}");
-                if (edificio == null)
-                {
-                    return NotFound();
-                }
-                return View(edificio);
-            }
-            catch (Exception ex)
-            {
-                ViewBag.ErrorMessage = "Error al obtener el edificio para eliminar: " + ex.Message;
-                return View("Error");
-            }
-        }
-
-        // POST: /Edificio/Delete/5
-        [HttpPost, ActionName("Delete")]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> DeleteConfirmed(int id)
-        {
-            try
-            {
-                await _apiClientService.DeleteAsync($"edificio/Delete/{id}");
-                return RedirectToAction(nameof(GetAll));
-            }
-            catch (Exception ex)
-            {
-                ViewBag.ErrorMessage = "Error al eliminar el edificio: " + ex.Message;
-                return View("Error");
-            }
-        }
-
-        // GET: /Edificio/SearchByName
-        public async Task<IActionResult> SearchByName(string name)
-        {
-            try
-            {
-                var edificios = await _apiClientService.GetAsync<List<EdificioViewModel>>($"edificio/Searchbyname/{name}");
-                if (edificios == null || !edificios.Any())
-                {
-                    ViewBag.WarningMessage = "No se encontraron edificios con ese nombre.";
-                    return View(new List<EdificioViewModel>());
-                }
+                var edificios = await _apiClientService.GetAsync<List<EdificioViewModel>>("edificio/GetAll");
                 return View(edificios);
             }
             catch (Exception ex)
             {
-                ViewBag.ErrorMessage = "Error al buscar edificios: " + ex.Message;
+                ViewBag.ErrorMessage = "Error al obtener los edificios: " + ex.Message;
                 return View("Error");
             }
         }
+
+        // Otros métodos del controlador...
     }
 }

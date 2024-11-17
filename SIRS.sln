@@ -9,9 +9,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SIRS.Domain", "SIRS.Domain\
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SIRS.Data", "DATA\SIRS.Data.csproj", "{42BA3D4F-C188-4AE7-BF71-6329B090420A}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SIRS.Service.API", "SIRS.Service.API\SIRS.Service.API.csproj", "{46E27237-EAD5-4A44-AC1A-4A6E2B6ACA53}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SIRS.Service.API", "SIRS.Service.API\SIRS.Service.API.csproj", "{46E27237-EAD5-4A44-AC1A-4A6E2B6ACA53}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SIRS.Application", "SIRS.Application\SIRS.Application.csproj", "{20925926-4C30-4CBD-A731-9D717B14AD81}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SIRS.Application", "SIRS.Application\SIRS.Application.csproj", "{20925926-4C30-4CBD-A731-9D717B14AD81}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

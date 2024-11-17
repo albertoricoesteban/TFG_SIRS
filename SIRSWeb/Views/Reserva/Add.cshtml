@@ -1,0 +1,100 @@
+﻿@{
+    ViewData["Title"] = "Alta de Reserva";
+}
+
+<div class="content-wrapper">
+    <div class="content">
+        <div class="container-fluid">
+
+            <!-- Título de sección -->
+            <div class="row mb-4">
+                <div class="col-12">
+                    <h3>Datos de la reserva</h3>
+                </div>
+            </div>
+
+            <!-- Formulario para el alta de reservas -->
+            <form method="post" action="/Reserva/Create">
+                <div class="row">
+                    <!-- Nombre de la Reserva -->
+                    <div class="col-md-6">
+                        <label for="nombreReserva">Nombre de la reserva</label>
+                        <input type="text" class="form-control" id="nombreReserva" name="nombreReserva" required placeholder="Nombre de la reserva">
+                    </div>
+
+                    <!-- Fecha de Inicio de Reserva -->
+                    <div class="col-md-3">
+                        <label for="fechaInicio">Fecha de inicio</label>
+                        <input type="date" class="form-control" id="fechaInicio" name="fechaInicio" required>
+                    </div>
+
+                    <!-- Fecha de Fin de Reserva -->
+                    <div class="col-md-3">
+                        <label for="fechaFin">Fecha de fin</label>
+                        <input type="date" class="form-control" id="fechaFin" name="fechaFin" required>
+                    </div>
+                </div>
+
+                <div class="row mt-3">
+                    <!-- Edificio -->
+                    <div class="col-md-6">
+                        <label for="edificio">Edificio</label>
+                        <select class="form-control" id="edificio" name="edificio" required>
+                            <option value="">Seleccione un edificio</option>
+                            <!-- Opciones de edificios - Se deben llenar dinámicamente en el servidor -->
+                            <option value="Edificio1">Edificio Central</option>
+                            <option value="Edificio2">Edificio Norte</option>
+                            <option value="Edificio3">Edificio Sur</option>
+                        </select>
+                    </div>
+
+                    <!-- Sala -->
+                    <div class="col-md-6">
+                        <label for="sala">Sala</label>
+                        <select class="form-control" id="sala" name="sala" required>
+                            <option value="">Seleccione una sala</option>
+                            <!-- Opciones de salas - Deben llenarse dinámicamente según el edificio seleccionado -->
+                        </select>
+                    </div>
+                </div>
+
+                <div class="row mt-3">
+                    <!-- Observaciones / Indicaciones -->
+                    <div class="col-md-12">
+                        <label for="observaciones">Observaciones / Indicaciones</label>
+                        <textarea class="form-control" id="observaciones" name="observaciones" rows="3" placeholder="Escriba cualquier observación o indicación especial"></textarea>
+                    </div>
+                </div>
+
+                <!-- Botón de Guardar -->
+                <div class="row mt-4">
+                    <div class="col-12 text-right">
+                        <button type="submit" class="btn btn-primary">Guardar</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+    $(document).ready(function () {
+        // Al cambiar el edificio, cargar las salas asociadas a ese edificio
+        $('#edificio').on('change', function () {
+            var edificioId = $(this).val();
+            $('#sala').empty().append('<option value="">Seleccione una sala</option>');
+
+            if (edificioId) {
+                $.ajax({
+                    url: `/Reserva/GetSalasByEdificio/${edificioId}`, // Ruta al controlador que devuelve las salas según el edificio
+                    type: 'GET',
+                    success: function (data) {
+                        $.each(data, function (index, sala) {
+                            $('#sala').append(`<option value="${sala.id}">${sala.nombre}</option>`);
+                        });
+                    }
+                });
+            }
+        });
+    });
+</script>
