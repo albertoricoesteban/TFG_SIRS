@@ -49,6 +49,7 @@ var app = builder.Build();
 //}
 
 app.UseHttpsRedirection();
+app.UseStaticFiles(); // Esto asegura que los archivos estáticos se sirvan correctamente
 
 app.UseAuthorization();
 app.MapControllerRoute(

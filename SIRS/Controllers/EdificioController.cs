@@ -38,7 +38,7 @@ namespace SIRS.Controllers
                 if (ModelState.IsValid)
                 {
                     edificio.Salas = new List<SalaViewModel>();
-                    await _apiClientService.PostAsync("http://localhost:5237/api/Edificio/Add", edificio);
+                    await _apiClientService.PostAsync($"{Constantes.Constantes.ApiBaseUrl}{Constantes.Constantes.EdificioControlador}Add", edificio);
 
                     TempData["SuccessMessage"] = "El edificio se ha creado correctamente.";
                     return RedirectToAction(nameof(Add)); // Redirigir a 'Add' para una nueva inserción
@@ -58,7 +58,7 @@ namespace SIRS.Controllers
         {
             try
             {
-                var edificios = await _apiClientService.GetAsync<List<EdificioViewModel>>("edificio/GetAll");
+                var edificios = await _apiClientService.GetAsync<List<EdificioViewModel>>($"{Constantes.Constantes.ApiBaseUrl}{Constantes.Constantes.EdificioControlador}GetAll");
                 return View(edificios);
             }
             catch (Exception ex)
@@ -68,6 +68,21 @@ namespace SIRS.Controllers
             }
         }
 
-        // Otros métodos del controlador...
+        // GET: /Edificio/GetByFilter 
+        public async Task<IActionResult> GetByFilter(string nombre, string direccion)
+        {
+            try
+            {
+                var query = $"nombre={nombre}&direccion={direccion}";
+                var edificios = await _apiClientService.GetAsync<List<EdificioViewModel>>($"{Constantes.Constantes.ApiBaseUrl}{Constantes.Constantes.EdificioControlador}GetByFilter?{query}");
+                return Json(edificios);
+            }
+            catch (Exception ex)
+            { // Manejo de errores
+
+                TempData["ErrorMessage"] = "Error al buscar el edificio con el filtro indicado: " + ex.Message;
+                return RedirectToAction(nameof(Index)); // Redirigir a 'Add' en caso de excepción
+            }
+        }
     }
 }

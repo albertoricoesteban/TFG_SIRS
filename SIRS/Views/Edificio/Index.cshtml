@@ -53,35 +53,32 @@
     </div>
 </div>
 
-<!-- Scripts de DataTables y jQuery -->
-<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-<script src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.min.js"></script>
-<link rel="stylesheet" href="https://cdn.datatables.net/1.11.5/css/jquery.dataTables.min.css">
+@section Scripts {
+    <script>
+        $(function () {
+            // Inicializar DataTable
+            var table = $('#edificiosTable').DataTable({
+                "ajax": {
+                    "url": "/Edificio/GetAll", // Ruta de la acción para obtener los datos de edificios
+                    "dataSrc": ""
+                },
+                "columns": [
+                    { "data": "nombre" },
+                    { "data": "direccion" },
+                    { "data": "latitud" },
+                    { "data": "longitud" }
+                ]
+            });
 
-<script>
-    $(document).ready(function () {
-        // Inicializar DataTable
-        var table = $('#edificiosTable').DataTable({
-            "ajax": {
-                "url": "/Edificios/GetEdificios", // Ruta de la acción para obtener los datos de edificios
-                "dataSrc": ""
-            },
-            "columns": [
-                { "data": "nombre" },
-                { "data": "direccion" },
-                { "data": "latitud" },
-                { "data": "longitud" }
-            ]
+            // Filtro de búsqueda personalizado
+            $('#searchButton').on('click', function () {
+                // Capturar los valores de los filtros
+                var nombre = $('#searchName').val();
+                var direccion = $('#searchAddress').val();
+
+                // Configurar parámetros de filtro para enviar al servidor
+                table.ajax.url('/Edificio/GetByFilter?nombre=${nombre}&direccion=${direccion}').load();
+            });
         });
-
-        // Filtro de búsqueda personalizado
-        $('#searchButton').on('click', function () {
-            // Capturar los valores de los filtros
-            var nombre = $('#searchName').val();
-            var direccion = $('#searchAddress').val();
-
-            // Configurar parámetros de filtro para enviar al servidor
-            table.ajax.url(`/Edificios/GetEdificios?nombre=${nombre}&direccion=${direccion}`).load();
-        });
-    });
-</script>
+    </script>
+}

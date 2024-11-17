@@ -22,10 +22,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Identity\" />
-  </ItemGroup>
-
-  <ItemGroup>
     <ProjectReference Include="..\DATA\SIRS.Data.csproj" />
     <ProjectReference Include="..\SIRS.Application\SIRS.Application.csproj" />
   </ItemGroup>
