@@ -1,4 +1,6 @@
-﻿@{
+﻿@model SIRS.Application.ViewModels.EdificioViewModel
+
+@{
     ViewData["Title"] = "Alta de edificios";
 }
 
@@ -12,30 +14,35 @@
                     <h3>Alta de edificio</h3>
                 </div>
             </div>
-            <!-- Columna derecha: Campos de información del edificio -->
+
+            <!-- Formulario para agregar un edificio -->
             <div class="col-md-12">
-                <form>
+                <!-- Usa un form helper de ASP.NET Core -->
+                <form asp-action="Create" asp-controller="Edificio" method="post">
+                    @* Incluir antifalsificación de tokens para proteger el formulario *@
+                    @Html.AntiForgeryToken()
+
                     <div class="row">
                         <!-- Primer par de campos: Nombre de edificio y Dirección -->
                         <div class="col-md-6 mb-3">
-                            <label for="buildingName">Nombre de Edificio</label>
-                            <input type="text" class="form-control" id="buildingName" placeholder="Nombre del edificio">
+                            <label for="Nombre">Nombre de Edificio</label>
+                            <input type="text" class="form-control" id="Nombre" name="Nombre" placeholder="Nombre del edificio" value="@Model.Descripcion" required>
                         </div>
                         <div class="col-md-6 mb-3">
-                            <label for="address">Dirección</label>
-                            <input type="text" class="form-control" id="address" placeholder="Dirección">
+                            <label for="Direccion">Dirección</label>
+                            <input type="text" class="form-control" id="Direccion" name="Direccion" placeholder="Dirección" value="@Model.Direccion" required>
                         </div>
                     </div>
 
                     <div class="row">
                         <!-- Segundo par de campos: Longitud y Latitud -->
                         <div class="col-md-6 mb-3">
-                            <label for="longitude">Longitud</label>
-                            <input type="text" class="form-control" id="longitude" placeholder="Longitud">
+                            <label for="Longitud">Longitud</label>
+                            <input type="text" class="form-control" id="Longitud" name="Longitud" placeholder="Longitud" value="@Model.Longitud" required>
                         </div>
                         <div class="col-md-6 mb-3">
-                            <label for="latitude">Latitud</label>
-                            <input type="text" class="form-control" id="latitude" placeholder="Latitud">
+                            <label for="Latitud">Latitud</label>
+                            <input type="text" class="form-control" id="Latitud" name="Latitud" placeholder="Latitud" value="@Model.Latitud" required>
                         </div>
                     </div>
 
@@ -49,5 +56,4 @@
             </div>
         </div>
     </div>
-</div>
 </div>

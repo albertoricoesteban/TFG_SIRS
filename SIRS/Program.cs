@@ -20,6 +20,12 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
 // Registrar servicios
 builder.Services.AddScoped<IEdificioAppService, EdificioAppService>();
 builder.Services.AddScoped<IEdificioRepository, EdificioRepository>();
+builder.Services.AddScoped<ISalaAppService, SalaAppService>();
+builder.Services.AddScoped<IEstadoSalaAppService, EstadoSalaAppService>();
+builder.Services.AddScoped<IReservaAppService, ReservaAppService>();
+builder.Services.AddScoped<IReservaRepository, ReservaRepository>();
+builder.Services.AddScoped<IUsuarioAppService, UsuarioAppService>();
+builder.Services.AddScoped<IUsuarioRepository, UsuarioRepository>();
 builder.Services.AddAutoMapper(typeof(Program));
 
 var app = builder.Build();
