@@ -16,5 +16,6 @@ namespace SIRS.Application.Interfaces
         void Update(EdificioViewModel edificio);
         void Delete(int id);
         IEnumerable<EdificioViewModel> SearchByName(string name);
+        IEnumerable<EdificioViewModel> GetEdificiosByFilter(string nombre, string direccion);
     }
 }

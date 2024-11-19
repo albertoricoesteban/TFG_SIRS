@@ -49,13 +49,17 @@ namespace SIRS.Service.API.Controllers
         }
 
         [HttpPut("Update/{id}")]
-        public IActionResult Update(int id, EdificioViewModel edificio)
+        public IActionResult Update(int id, [FromBody] EdificioViewModel edificio)
         {
             if (id != edificio.Id)
             {
-                return BadRequest();
+                return BadRequest("El ID de la URL no coincide con el ID del objeto.");
             }
+
+            // Actualizar el recurso usando la capa de servicio
             _edificioAppService.Update(edificio);
+
+            // Respuesta 204 No Content, que es apropiada para una actualización exitosa sin contenido adicional
             return NoContent();
         }
 
@@ -70,6 +74,18 @@ namespace SIRS.Service.API.Controllers
         public IActionResult SearchByName(string name)
         {
             var edificios = _edificioAppService.SearchByName(name);
+            if (edificios == null || !edificios.Any())
+            {
+                return NotFound();
+            }
+            return Ok(edificios);
+        }
+
+
+        [HttpGet("GetEdificiosByFilter")]
+        public IActionResult GetEdificiosByFilter(string nombre=null, string direccion=null)
+        {
+            var edificios = _edificioAppService.GetEdificiosByFilter(nombre, direccion);
             if (edificios == null || !edificios.Any())
             {
                 return NotFound();

@@ -54,5 +54,9 @@ namespace SIRS.Application.Services
         {
             return _mapper.Map<IEnumerable<EdificioViewModel>>(_edificioRepository.SearchByName(name));
         }
+        public IEnumerable<EdificioViewModel> GetEdificiosByFilter(string descripcion, string direccion)
+        {
+            return _mapper.Map<IEnumerable<EdificioViewModel>>(_edificioRepository.GetEdificiosByFilter(descripcion,direccion));
+        }
     }
 }

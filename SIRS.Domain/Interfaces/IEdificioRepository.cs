@@ -10,4 +10,6 @@ public interface IEdificioRepository : IRepository<Edificio>
     void Update(Edificio edificio);
     void Delete(int id);
     IEnumerable<Edificio> SearchByName(string name);
+
+    IEnumerable<Edificio> GetEdificiosByFilter(string descripcion, string direccion);
 }
