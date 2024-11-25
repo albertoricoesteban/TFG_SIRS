@@ -11,6 +11,6 @@ namespace SIRS.Application.Interfaces
         void Delete(int id);
         IEnumerable<SalaViewModel> SearchByDescripcion(string descripcion);
         IEnumerable<SalaViewModel> GetByEstado(string estado);
-        IEnumerable<SalaViewModel> GetAllSalas();
+        IEnumerable<SalaViewModel> GetAll();
     }
 }

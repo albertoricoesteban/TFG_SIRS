@@ -19,10 +19,6 @@
                     <label for="buildingSelect">Edificio</label>
                     <select class="form-control" id="buildingSelect">
                         <option value="">Seleccione un edificio</option>
-                        <!-- Opciones de edificios (puedes rellenarlos dinámicamente) -->
-                        <option value="Edificio1">Edificio Central</option>
-                        <option value="Edificio2">Edificio Norte</option>
-                        <option value="Edificio3">Edificio Sur</option>
                     </select>
                 </div>
                 <div class="col-md-4">
@@ -75,51 +71,77 @@
         // Inicializar DataTable
         var table = $('#roomsTable').DataTable({
             "ajax": {
-                "url": "/Salas/GetSalas", // Ruta de la acción para obtener los datos de salas
+                "url": "/Sala/GetAll",
                 "dataSrc": ""
             },
             "columns": [
-                { "data": "nombreSala" },
+                { "data": "NombreCorto" },
                 { "data": "descripcion" },
-                { "data": "capacidad" },
-                { "data": "edificio" },
-            //     {
-            //         "data": null,
-            //         "render": function (data, type, row) {
-            //             return '
-            //     <button class="btn btn-sm btn-warning editBtn" data-id="${row.id}">Editar</button>
-            //     <button class="btn btn-sm btn-danger deleteBtn" data-id="${row.id}">Eliminar</button>
-            // ';
-            //         },
-            //         "orderable": false
-            //     }
+                { "data": "capacidad" }
             ]
         });
+        // Evento de doble clic en las filas de la tabla
+        $('#roomsTable tbody').on('dblclick', 'tr', function () {
+            var data = table.row(this).data();
+            if (data && data.id) {
+                // Redirigir a la vista 'add' con el parámetro 'id'
+                window.location.href = '/Sala/Update/' + data.id;
+            }
+        });
+        // Cargar opciones de edificios dinámicamente
+        function cargarEdificios() {
+            $.ajax({
+                url: '/Sala/GetEdificios',
+                type: 'GET',
+                success: function (data) {
+                    var buildingSelect = $('#buildingSelect');
+                    buildingSelect.empty().append('<option value="">Seleccione un edificio</option>');
+                    data.forEach(function (edificio) {
+                        if (edificio && edificio.id && edificio.descripcion) { // Valida antes de usar
+                            buildingSelect.append('<option value="' + edificio.id + '">' + edificio.descripcion + '</option>');
+                        }
+                    });
+                },
+                error: function () {
+                    alert("Error al cargar los edificios.");
+                }
+            });
+        }
 
-        // Filtro de búsqueda personalizado
+        cargarEdificios(); // Llamar al cargar la página.
+
+        // Filtrar salas según el edificio seleccionado
+        $('#buildingSelect').on('change', function () {
+            var edificio = $(this).val();
+            var nombreSala = $('#roomName').val();
+            var capacidad = $('#capacity').val();
+
+            // Recargar la tabla con los filtros
+            table.ajax.url(`/Salas/GetSalas?edificio=${edificio}&nombreSala=${nombreSala}&capacidad=${capacidad}`).load();
+        });
+
+        // Botón de búsqueda
         $('#searchButton').on('click', function () {
-            // Capturar los valores de los filtros
             var edificio = $('#buildingSelect').val();
             var nombreSala = $('#roomName').val();
             var capacidad = $('#capacity').val();
 
-            // Configurar parámetros de filtro para enviar al servidor
-            table.ajax.url("/SalaContoller/GetSalas?edificio=${edificio}&nombreSala=${nombreSala}&capacidad=${capacidad}).load();
+            // Configurar la URL del DataTable para incluir los parámetros de búsqueda
+            table.ajax.url(`/Salas/GetSalas?edificio=${edificio}&nombreSala=${nombreSala}&capacidad=${capacidad}`).load();
         });
 
         // Evento para el botón Editar
         $('#roomsTable').on('click', '.editBtn', function () {
             var salaId = $(this).data('id');
-            window.location.href = '/Sala/Edit/${salaId}'; // Redirige a la página de edición
+            window.location.href = `/Sala/Edit/${salaId}`; // Redirige a la página de edición
         });
 
         // Evento para el botón Eliminar
         $('#roomsTable').on('click', '.deleteBtn', function () {
             var salaId = $(this).data('id');
             if (confirm("¿Está seguro de que desea eliminar esta sala?")) {
-                // Lógica para eliminar la sala (puede ser una llamada AJAX o redirigir a una acción de eliminación)
                 $.ajax({
-                    url: '/Sala/Delete/${salaId}',
+                    url: `/Sala/Delete/${salaId}`,
                     type: 'POST',
                     success: function () {
                         table.ajax.reload(); // Recargar la tabla después de eliminar
@@ -128,4 +150,5 @@
             }
         });
     });
+
 </script>

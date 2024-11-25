@@ -1,60 +1,97 @@
-﻿using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
+using SIRS.ApliClient;
+using SIRS.Application.ViewModels;
+using SIRS.Domain.Models;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace SIRS.Controllers
 {
     public class SalaController : Controller
     {
-        // GET: SalaController
+        private readonly ApiClientService _apiSalaClientService;
+
+        public SalaController(ApiClientService apiSalaClientService)
+        {
+            _apiSalaClientService = apiSalaClientService;
+        }
         public ActionResult Index()
         {
             return View();
         }
 
-        // GET: SalaController/Add
         public ActionResult Add()
         {
-            return View();
+            var model = new EdificioViewModel();
+            return View(model);
         }
-        public IActionResult GetSalas(string edificio, string nombreSala, int? capacidad)
+
+
+        public async Task<IActionResult> GetAll()
         {
-            // Aquí iría la consulta a la base de datos, ejemplo:
-            var salas = ObtenerTodasLasSalas(); // Método ficticio para obtener datos
-
-            // Filtrar según el edificio, nombre y capacidad
-            if (!string.IsNullOrEmpty(edificio))
-            {
-                salas = salas.Where(s => s.Edificio == edificio).ToList();
-            }
-            if (!string.IsNullOrEmpty(nombreSala))
-            {
-                salas = salas.Where(s => s.NombreSala.Contains(nombreSala)).ToList();
-            }
-            if (capacidad.HasValue)
-            {
-                salas = salas.Where(s => s.Capacidad == capacidad.Value).ToList();
-            }
-
+            var salas = _apiSalaClientService.GetAsync<List<EdificioViewModel>>($"{Constantes.Constantes.ApiBaseUrl}{Constantes.Constantes.SalaControlador}GetAll");
             return Json(salas);
         }
 
-        private List<Sala> ObtenerTodasLasSalas()
+        // GET: /Sala/Create
+        public async Task<IActionResult> Create()
         {
-            // Datos simulados, reemplaza con lógica para obtener datos de la BD
-            return new List<Sala>
+            try
+            {
+                // Llamada al servicio para obtener la lista de edificios
+                var edificios = await _apiSalaClientService.GetAsync<List<EdificioViewModel>>($"{Constantes.Constantes.ApiBaseUrl}{Constantes.Constantes.EdificioControlador}GetAll");
+
+                // Pasar la lista de edificios a la vista
+                ViewBag.Edificios = edificios.Select(e => new SelectListItem
+                {
+                    Value = e.Id.ToString(),
+                    Text = e.Descripcion
+                }).ToList();
+
+                return View();
+            }
+            catch (Exception ex)
+            {
+                TempData["ErrorMessage"] = "Error al obtener los edificios: " + ex.Message;
+                return View("Error");
+            }
+        }
+
+        // POST: /Sala/Create
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Create(SalaViewModel sala)
         {
-            new Sala { Id = 1, NombreSala = "Sala A", Descripcion = "Sala de reuniones", Capacidad = 20, Edificio = "Edificio Central" },
-            new Sala { Id = 2, NombreSala = "Sala B", Descripcion = "Auditorio", Capacidad = 100, Edificio = "Edificio Norte" }
-        };
+            try
+            {
+                if (ModelState.IsValid)
+                {
+                    // Aquí iría el código para guardar la sala, por ejemplo llamando a un servicio para guardar la sala
+                     //await _apiClientService.PostAsync(...);
+
+                    TempData["SuccessMessage"] = "La sala ha sido creada correctamente.";
+                    return RedirectToAction(nameof(Create)); // Redirigir a la vista 'Create' para una nueva inserción
+                }
+
+                // Si hay errores en el modelo, devolver la vista con los datos actuales
+                TempData["ErrorMessage"] = "Ocurrió un error al crear la sala.";
+                return View(sala);
+            }
+            catch (Exception ex)
+            {
+                TempData["ErrorMessage"] = "Error al crear la sala: " + ex.Message;
+                return View(sala); // Redirigir a la vista 'Create' en caso de excepción
+            }
+        }
+        [HttpGet]
+        public async Task<IActionResult> GetEdificios()
+        {
+            // Llama a la API REST y obtiene la lista de edificios.
+            var edificios = await _apiSalaClientService.GetAsync<List<EdificioViewModel>>($"{Constantes.Constantes.ApiBaseUrl}{Constantes.Constantes.EdificioControlador}GetAll");
+            return Json(edificios); // Devuelve la lista en formato JSON.
         }
     }
-
-}
-public class Sala
-{
-    public int Id { get; set; }
-    public string NombreSala { get; set; }
-    public string Descripcion { get; set; }
-    public int Capacidad { get; set; }
-    public string Edificio { get; set; }
 }

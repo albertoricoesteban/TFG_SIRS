@@ -6,7 +6,6 @@ using System.Collections.Generic;
 
 namespace SIRS.Service.API.Controllers
 {
-    [Authorize]
     [ApiController]
     [Route("api/[controller]")]
     public class SalaController : ControllerBase
@@ -68,10 +67,10 @@ namespace SIRS.Service.API.Controllers
             return Ok(salas);
         }
 
-        [HttpGet("GetAllSalas")]
-        public IActionResult GetAllSalas()
+        [HttpGet("GetAll")]
+        public IActionResult GetAll()
         {
-            var salas = _salaAppService.GetAllSalas();
+            var salas = _salaAppService.GetAll();
             return Ok(salas);
         }
     }

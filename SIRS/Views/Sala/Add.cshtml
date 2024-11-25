@@ -54,13 +54,14 @@
                         <label for="edificio">Edificio</label>
                         <select class="form-control" id="edificio" name="edificio" required>
                             <option value="">Seleccione un edificio</option>
-                            <!-- Opciones de edificios - Se deben llenar dinámicamente en el servidor -->
-                            <option value="Edificio1">Edificio Central</option>
-                            <option value="Edificio2">Edificio Norte</option>
-                            <option value="Edificio3">Edificio Sur</option>
+                            @foreach (var edificio in ViewBag.Edificios)
+                            {
+                                <option value="@edificio.Value">@edificio.Text</option>
+                            }
                         </select>
                     </div>
                 </div>
+
 
                 <!-- Botón de Guardar -->
                 <div class="row mt-4">

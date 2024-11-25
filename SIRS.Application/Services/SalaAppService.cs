@@ -55,7 +55,7 @@ namespace SIRS.Application.Services
             return _mapper.Map<IEnumerable<SalaViewModel>>(salas);
         }
 
-        public IEnumerable<SalaViewModel> GetAllSalas()
+        public IEnumerable<SalaViewModel> GetAll()
         {
             var salas = _salaRepository.GetAllSalas();
             return _mapper.Map<IEnumerable<SalaViewModel>>(salas);
