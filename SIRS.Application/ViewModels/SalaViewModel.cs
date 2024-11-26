@@ -13,9 +13,16 @@ public class SalaViewModel
     [Required(ErrorMessage = "The Role Name is Required")]
     [MaxLength(100, ErrorMessage = "Role name cannot exceed 100 characters")]
     [DisplayName("Role Name")]
-    public string Nombre { get; set; }
+    public string NombreCorto { get; set; }
 
-    public ICollection<Reserva> Reservas { get; set; } = new List<Reserva>();
+    public string Descripcion { get; set; }
+
+    public int Capacidad { get; set; }
+
+    public int EstadoSalaId { get; set; }
+
+    public int EdificioId { get; set; } 
+    public ICollection<ReservaViewModel> Reservas { get; set; } = new List<ReservaViewModel>();
 
 
 }

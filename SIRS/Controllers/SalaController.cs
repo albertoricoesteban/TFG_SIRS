@@ -25,7 +25,7 @@ namespace SIRS.Controllers
 
         public ActionResult Add()
         {
-            var model = new EdificioViewModel();
+            var model = new SalaViewModel();
             return View(model);
         }
 
@@ -36,62 +36,67 @@ namespace SIRS.Controllers
             return Json(salas);
         }
 
-        // GET: /Sala/Create
-        public async Task<IActionResult> Create()
-        {
-            try
-            {
-                // Llamada al servicio para obtener la lista de edificios
-                var edificios = await _apiSalaClientService.GetAsync<List<EdificioViewModel>>($"{Constantes.Constantes.ApiBaseUrl}{Constantes.Constantes.EdificioControlador}GetAll");
-
-                // Pasar la lista de edificios a la vista
-                ViewBag.Edificios = edificios.Select(e => new SelectListItem
-                {
-                    Value = e.Id.ToString(),
-                    Text = e.Descripcion
-                }).ToList();
-
-                return View();
-            }
-            catch (Exception ex)
-            {
-                TempData["ErrorMessage"] = "Error al obtener los edificios: " + ex.Message;
-                return View("Error");
-            }
-        }
-
-        // POST: /Sala/Create
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create(SalaViewModel sala)
-        {
-            try
-            {
-                if (ModelState.IsValid)
-                {
-                    // Aquí iría el código para guardar la sala, por ejemplo llamando a un servicio para guardar la sala
-                     //await _apiClientService.PostAsync(...);
-
-                    TempData["SuccessMessage"] = "La sala ha sido creada correctamente.";
-                    return RedirectToAction(nameof(Create)); // Redirigir a la vista 'Create' para una nueva inserción
-                }
-
-                // Si hay errores en el modelo, devolver la vista con los datos actuales
-                TempData["ErrorMessage"] = "Ocurrió un error al crear la sala.";
-                return View(sala);
-            }
-            catch (Exception ex)
-            {
-                TempData["ErrorMessage"] = "Error al crear la sala: " + ex.Message;
-                return View(sala); // Redirigir a la vista 'Create' en caso de excepción
-            }
-        }
         [HttpGet]
         public async Task<IActionResult> GetEdificios()
         {
             // Llama a la API REST y obtiene la lista de edificios.
             var edificios = await _apiSalaClientService.GetAsync<List<EdificioViewModel>>($"{Constantes.Constantes.ApiBaseUrl}{Constantes.Constantes.EdificioControlador}GetAll");
             return Json(edificios); // Devuelve la lista en formato JSON.
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> GetEstadosSala()
+        {
+            var estadosSala = await _apiSalaClientService.GetAsync<List<EstadoSalaViewModel>>($"{Constantes.Constantes.ApiBaseUrl}{Constantes.Constantes.EstadoSalaControlador}GetAllEstados");
+            return Json(estadosSala); // Devuelve la lista en formato JSON
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> Create(SalaViewModel model)
+        {
+            // Validar que el modelo está completo
+            //    if (!ModelState.IsValid)
+            //    {
+            //        // Si el modelo no es válido, cargar datos necesarios y devolver la vista
+            //        var salas = await _apiSalaClientService.GetAsync<List<EdificioViewModel>>($"{Constantes.Constantes.ApiBaseUrl}{Constantes.Constantes.SalaControlador}Add");
+            //        ViewBag.Edificios = salas.Select(e => new SelectListItem
+            //        {
+            //            Value = e.Id.ToString(),
+            //            Text = e.Descripcion
+            //        }).ToList();
+
+            //        ViewBag.Estados = new List<SelectListItem>
+            //{
+            //    new SelectListItem { Value = "Disponible", Text = "Disponible" },
+            //    new SelectListItem { Value = "No Disponible", Text = "No Disponible" },
+            //    new SelectListItem { Value = "Mantenimiento", Text = "En Mantenimiento" }
+            //};
+
+            //        return View(model); // Retornar el formulario con los errores
+            //    }
+
+            // Preparar los datos para enviar a la API
+            var nuevaSala = new SalaViewModel
+            {
+                NombreCorto = model.NombreCorto,
+                Descripcion = model.Descripcion,
+                Capacidad = model.Capacidad,
+                EstadoSalaId = model.EstadoSalaId,
+                EdificioId = model.EdificioId,
+                Reservas = new List<ReservaViewModel>()
+            };
+
+            // Enviar los datos a la API
+
+            if (ModelState.IsValid)
+            { 
+                await _apiSalaClientService.PostAsync($"{Constantes.Constantes.ApiBaseUrl}{Constantes.Constantes.SalaControlador}Add", nuevaSala);
+
+                TempData["SuccessMessage"] = "La sala se ha creado correctamente en el edificio seleccionado.";
+                return RedirectToAction(nameof(Add)); // Redirigir a 'Add' para una nueva inserción
+            }
+            TempData["ErrorMessage"] = "Ocurrió un error al crear la sala en el edificio.";
+            return View("Add", nuevaSala); // Redirigir a la vista 'Add' si hay errores
         }
     }
 }

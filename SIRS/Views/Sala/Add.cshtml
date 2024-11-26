@@ -1,6 +1,9 @@
 ﻿@{
     ViewData["Title"] = "Alta de Sala";
 }
+<link href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css" rel="stylesheet" />
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
 
 <div class="content-wrapper">
     <div class="content">
@@ -19,7 +22,7 @@
                     <!-- Nombre de la Sala -->
                     <div class="col-md-6">
                         <label for="nombreSala">Nombre de la sala</label>
-                        <input type="text" class="form-control" id="nombreSala" name="nombreSala" required placeholder="Nombre de la sala">
+                        <input type="text" class="form-control" id="nombreSala" name="NombreCorto" required placeholder="Nombre de la sala">
                     </div>
 
                     <!-- Descripción -->
@@ -39,11 +42,8 @@
                     <!-- Estado -->
                     <div class="col-md-6">
                         <label for="estado">Estado</label>
-                        <select class="form-control" id="estado" name="estado" required>
+                        <select class="form-control" id="estado" name="EstadoSalaId" required>
                             <option value="">Seleccione un estado</option>
-                            <option value="Disponible">Disponible</option>
-                            <option value="No Disponible">No Disponible</option>
-                            <option value="Mantenimiento">En Mantenimiento</option>
                         </select>
                     </div>
                 </div>
@@ -52,12 +52,8 @@
                     <!-- Edificio -->
                     <div class="col-md-6">
                         <label for="edificio">Edificio</label>
-                        <select class="form-control" id="edificio" name="edificio" required>
+                        <select class="form-control" id="edificio" name="EdificioId" required>
                             <option value="">Seleccione un edificio</option>
-                            @foreach (var edificio in ViewBag.Edificios)
-                            {
-                                <option value="@edificio.Value">@edificio.Text</option>
-                            }
                         </select>
                     </div>
                 </div>
@@ -73,3 +69,65 @@
         </div>
     </div>
 </div>
+
+<script>
+    $(document).ready(function () {
+
+        function mostrarMensaje() {
+            // Mostrar mensajes de éxito o error si existen
+            var successMessage = '@TempData["SuccessMessage"]';
+            var errorMessage = '@TempData["ErrorMessage"]';
+
+            if (successMessage) {
+                toastr.success(successMessage);
+            }
+
+            if (errorMessage) {
+                toastr.error(errorMessage);
+            }
+        }
+        // Función para cargar edificios
+        function cargarEdificios() {
+            $.ajax({
+                url: '/Sala/GetEdificios',
+                type: 'GET',
+                dataType: 'json',
+                success: function (data) {
+                    var edificioSelect = $('#edificio');
+                    edificioSelect.empty().append('<option value="">Seleccione un edificio</option>');
+                    data.forEach(function (edificio) {
+                        edificioSelect.append('<option value="' + edificio.id + '">' + edificio.descripcion + '</option>');
+                    });
+                },
+                error: function () {
+                    alert("Error al cargar los edificios.");
+                }
+            });
+        }
+
+        // Función para cargar estados de sala
+        function cargarEstados() {
+            $.ajax({
+                url: '/Sala/GetEstadosSala',
+                type: 'GET',
+                dataType: 'json',
+                success: function (data) {
+                    var estadoSelect = $('#estado');
+                    estadoSelect.empty().append('<option value="">Seleccione un estado</option>');
+                    data.forEach(function (estado) {
+                        estadoSelect.append('<option value="' + estado.id + '">' + estado.descripcion + '</option>');
+                    });
+                },
+                error: function () {
+                    alert("Error al cargar los estados de sala.");
+                }
+            });
+        }
+
+        // Llamar a las funciones de carga al iniciar
+        mostrarMensaje();
+        cargarEdificios();
+        cargarEstados();
+
+    });
+</script>
