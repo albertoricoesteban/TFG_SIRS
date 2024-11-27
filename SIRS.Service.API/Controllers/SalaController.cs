@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using SIRS.Application.Interfaces;
 using SIRS.Application.ViewModels;
+using SIRS.Service.API.DTO;
 using System.Collections.Generic;
 
 namespace SIRS.Service.API.Controllers
@@ -70,7 +71,13 @@ namespace SIRS.Service.API.Controllers
         [HttpGet("GetAll")]
         public IActionResult GetAll()
         {
-            var salas = _salaAppService.GetAll();
+            var salas = _salaAppService.GetAll().Select(s => new SalaDTO
+            {
+                Id = s.Id,
+                NombreCorto = s.NombreCorto,
+                Descripcion = s.Descripcion,
+                Capacidad = s.Capacidad
+            }).ToList(); ;
             return Ok(salas);
         }
     }

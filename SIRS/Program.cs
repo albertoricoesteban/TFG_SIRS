@@ -18,6 +18,13 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("SIRSDBConnection")));
 
+
+builder.Services.AddControllersWithViews()
+    .AddDataAnnotationsLocalization()
+    .AddJsonOptions(options => {
+        options.JsonSerializerOptions.PropertyNamingPolicy = null;
+    });
+
 // Registrar servicios
 builder.Services.AddScoped<IEdificioAppService, EdificioAppService>();
 builder.Services.AddScoped<IEdificioRepository, EdificioRepository>();

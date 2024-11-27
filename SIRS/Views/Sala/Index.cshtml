@@ -46,9 +46,7 @@
                             <tr>
                                 <th>Nombre de Sala</th>
                                 <th>Descripción</th>
-                                <th>Capacidad</th>
-                                <th>Edificio</th>
-                                <th>Acciones</th>
+                                <th>Capacidad (personas)</th> 
                             </tr>
                         </thead>
                         <tbody>
@@ -69,17 +67,19 @@
 <script>
     $(document).ready(function () {
         // Inicializar DataTable
+       
         var table = $('#roomsTable').DataTable({
             "ajax": {
-                "url": "/Sala/GetAll",
+                "url": "/Sala/GetAll", // Ruta de la acción para obtener los datos de edificios
                 "dataSrc": ""
             },
             "columns": [
-                { "data": "NombreCorto" },
+                { "data": "nombreCorto" },
                 { "data": "descripcion" },
-                { "data": "capacidad" }
+                { "data": "capacidad" } 
             ]
         });
+
         // Evento de doble clic en las filas de la tabla
         $('#roomsTable tbody').on('dblclick', 'tr', function () {
             var data = table.row(this).data();
@@ -97,13 +97,13 @@
                     var buildingSelect = $('#buildingSelect');
                     buildingSelect.empty().append('<option value="">Seleccione un edificio</option>');
                     data.forEach(function (edificio) {
-                        if (edificio && edificio.id && edificio.descripcion) { // Valida antes de usar
+                        if (edificio && edificio.id && edificio.descripcion) {
                             buildingSelect.append('<option value="' + edificio.id + '">' + edificio.descripcion + '</option>');
                         }
                     });
                 },
-                error: function () {
-                    alert("Error al cargar los edificios.");
+                error: function (xhr, status, error) {
+                    alert("Error al cargar los edificios: " + error);
                 }
             });
         }

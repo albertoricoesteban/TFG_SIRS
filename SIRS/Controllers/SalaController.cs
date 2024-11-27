@@ -7,6 +7,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
 
 namespace SIRS.Controllers
 {
@@ -32,10 +33,18 @@ namespace SIRS.Controllers
 
         public async Task<IActionResult> GetAll()
         {
-            var salas = _apiSalaClientService.GetAsync<List<EdificioViewModel>>($"{Constantes.Constantes.ApiBaseUrl}{Constantes.Constantes.SalaControlador}GetAll");
-            return Json(salas);
-        }
+            try
+            {
+                var salas = await _apiSalaClientService.GetAsync<List<SalaViewModel>>($"{Constantes.Constantes.ApiBaseUrl}{Constantes.Constantes.SalaControlador}GetAll");
 
+                return Json(salas);
+            }
+            catch (Exception ex)
+            {
+                ViewBag.ErrorMessage = "Error al obtener las salas: " + ex.Message;
+                return View("Error");
+            }
+        }
         [HttpGet]
         public async Task<IActionResult> GetEdificios()
         {
@@ -54,27 +63,6 @@ namespace SIRS.Controllers
         [HttpPost]
         public async Task<IActionResult> Create(SalaViewModel model)
         {
-            // Validar que el modelo está completo
-            //    if (!ModelState.IsValid)
-            //    {
-            //        // Si el modelo no es válido, cargar datos necesarios y devolver la vista
-            //        var salas = await _apiSalaClientService.GetAsync<List<EdificioViewModel>>($"{Constantes.Constantes.ApiBaseUrl}{Constantes.Constantes.SalaControlador}Add");
-            //        ViewBag.Edificios = salas.Select(e => new SelectListItem
-            //        {
-            //            Value = e.Id.ToString(),
-            //            Text = e.Descripcion
-            //        }).ToList();
-
-            //        ViewBag.Estados = new List<SelectListItem>
-            //{
-            //    new SelectListItem { Value = "Disponible", Text = "Disponible" },
-            //    new SelectListItem { Value = "No Disponible", Text = "No Disponible" },
-            //    new SelectListItem { Value = "Mantenimiento", Text = "En Mantenimiento" }
-            //};
-
-            //        return View(model); // Retornar el formulario con los errores
-            //    }
-
             // Preparar los datos para enviar a la API
             var nuevaSala = new SalaViewModel
             {
@@ -97,6 +85,60 @@ namespace SIRS.Controllers
             }
             TempData["ErrorMessage"] = "Ocurrió un error al crear la sala en el edificio.";
             return View("Add", nuevaSala); // Redirigir a la vista 'Add' si hay errores
+        }
+
+        // POST: /Edificio/Create
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Actualizar(SalaViewModel sala)
+        {
+            try
+            {
+                if (ModelState.IsValid)
+                {
+                    sala.Reservas = new List<ReservaViewModel>();
+                    await _apiSalaClientService.PutAsync($"{Constantes.Constantes.ApiBaseUrl}{Constantes.Constantes.SalaControlador}Update/{sala.Id}", sala);
+
+                    TempData["SuccessMessage"] = "El edificio se ha actualizado correctamente.";
+                    return RedirectToAction(nameof(Update), new { id = sala.Id }); // Redirigir a 'Update' en caso de excepción
+                }
+                TempData["ErrorMessage"] = "Ocurrió un error al actualizar el edificio.";
+                return View("Update", sala); // Redirigir a la vista 'Update' si hay errores
+            }
+            catch (Exception ex)
+            {
+                TempData["ErrorMessage"] = "Error al actualizar el edificio: " + ex.Message;
+                return RedirectToAction(nameof(Update), new { id = sala.Id }); // Redirigir a 'Update' en caso de excepción
+            }
+        }
+        // Método para mostrar la vista 'Add' con el parámetro 'id'
+        [HttpGet]
+        [Route("Sala/Update/{id}")] // Ruta para el método con parámetro 'id'
+        public ActionResult Update(int id)
+        {
+            SalaViewModel sala;
+
+            if (id > 0)
+            {
+                sala = _apiSalaClientService
+                    .GetAsync<SalaViewModel>($"{Constantes.Constantes.ApiBaseUrl}{Constantes.Constantes.SalaControlador}GetById/{id}")
+                    .Result;
+                //se cargan los edificios y estados en los viewbag
+
+                ViewBag.Edificios = _apiSalaClientService.GetAsync<List<EdificioViewModel>>($"{Constantes.Constantes.ApiBaseUrl}{Constantes.Constantes.EdificioControlador}GetAll");
+                ViewBag.EstadosSala = _apiSalaClientService.GetAsync<List<EstadoSalaViewModel>>($"{Constantes.Constantes.ApiBaseUrl}{Constantes.Constantes.EstadoSalaControlador}GetAllEstados");
+
+                if (sala == null)
+                {
+                    return NotFound();
+                }
+            }
+            else
+            {
+                sala = new SalaViewModel();
+            }
+
+            return View(sala);
         }
     }
 }
