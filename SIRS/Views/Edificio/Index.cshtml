@@ -63,10 +63,10 @@
                     "dataSrc": ""
                 },
                 "columns": [
-                    { "data": "descripcion" },
-                    { "data": "direccion" },
-                    { "data": "latitud" },
-                    { "data": "longitud" }
+                    { "data": "Descripcion" },
+                    { "data": "Direccion" },
+                    { "data": "Latitud" },
+                    { "data": "Longitud" }
                 ]
             });
 
@@ -85,9 +85,9 @@
             // Evento de doble clic en las filas de la tabla
             $('#edificiosTable tbody').on('dblclick', 'tr', function () {
                 var data = table.row(this).data();
-                if (data && data.id) {
+                if (data && data.Id) {
                     // Redirigir a la vista 'add' con el parámetro 'id'
-                    window.location.href = '/Edificio/Update/' + data.id;
+                    window.location.href = '/Edificio/Update/' + data.Id;
                 }
             });
         });

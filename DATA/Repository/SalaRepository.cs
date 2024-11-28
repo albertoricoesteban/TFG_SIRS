@@ -69,5 +69,14 @@ namespace SIRS.Data.Repository
         {
             return _dbSet.AsNoTracking().ToList();
         }
+
+        public IEnumerable<Sala> GetSalasByFilter(string nombreCorto, int capacidad, int edificioId)
+        {
+            var query = _dbSet.AsQueryable(); if (!string.IsNullOrEmpty(nombreCorto)) { query = query.Where(e => e.Descripcion.Contains(nombreCorto)); }
+            if (capacidad>0) { query = query.Where(e => e.Capacidad.Equals(capacidad)); }
+            if (edificioId> 0) { query = query.Where(e => e.EdificioId.Equals(edificioId)); }
+            return query.ToList();
+        }
+
     }
 } 

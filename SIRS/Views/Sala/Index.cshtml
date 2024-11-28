@@ -1,6 +1,14 @@
 ﻿@{
     ViewData["Title"] = "Gestión de Salas";
 }
+<!-- Scripts de DataTables y jQuery -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.min.js"></script>
+<link rel="stylesheet" href="https://cdn.datatables.net/1.11.5/css/jquery.dataTables.min.css">
+
+<!-- Toastr CSS y JS -->
+<link href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css" rel="stylesheet" />
+<script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
 
 <div class="content-wrapper">
     <div class="content">
@@ -16,18 +24,18 @@
             <!-- Filtro de búsqueda -->
             <div class="row mb-4">
                 <div class="col-md-4">
-                    <label for="buildingSelect">Edificio</label>
-                    <select class="form-control" id="buildingSelect">
+                    <label for="edificio">Edificio</label>
+                    <select class="form-control" id="edificio">
                         <option value="">Seleccione un edificio</option>
                     </select>
                 </div>
                 <div class="col-md-4">
-                    <label for="roomName">Nombre de Sala</label>
-                    <input type="text" class="form-control" id="roomName" placeholder="Nombre de la sala">
+                    <label for="nombreCorto">Nombre de Sala</label>
+                    <input type="text" class="form-control" id="nombrecorto" placeholder="Nombre de la sala">
                 </div>
                 <div class="col-md-4">
-                    <label for="capacity">Capacidad</label>
-                    <input type="number" class="form-control" id="capacity" placeholder="Capacidad">
+                    <label for="capacidad">Capacidad</label>
+                    <input type="number" class="form-control" id="capacidad" placeholder="Capacidad">
                 </div>
             </div>
 
@@ -41,12 +49,12 @@
             <!-- Tabla de resultados -->
             <div class="row">
                 <div class="col-12">
-                    <table id="roomsTable" class="table table-striped table-bordered">
+                    <table id="roomsTable" name="roomsTable" class="table table-striped table-bordered">
                         <thead>
                             <tr>
                                 <th>Nombre de Sala</th>
                                 <th>Descripción</th>
-                                <th>Capacidad (personas)</th> 
+                                <th>Capacidad (personas)</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -59,46 +67,58 @@
     </div>
 </div>
 
-<!-- Scripts de DataTables y jQuery -->
-<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-<script src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.min.js"></script>
-<link rel="stylesheet" href="https://cdn.datatables.net/1.11.5/css/jquery.dataTables.min.css">
-
 <script>
     $(document).ready(function () {
         // Inicializar DataTable
-       
         var table = $('#roomsTable').DataTable({
             "ajax": {
-                "url": "/Sala/GetAll", // Ruta de la acción para obtener los datos de edificios
-                "dataSrc": ""
+                "url": "/Sala/GetAll", // Asegúrate de que esta ruta devuelva el JSON esperado
+                "type": "GET",
+                "dataSrc": "" // Se espera un array simple en el JSON recibido
             },
             "columns": [
-                { "data": "nombreCorto" },
-                { "data": "descripcion" },
-                { "data": "capacidad" } 
+                { "data": "NombreCorto", "title": "Nombre de Sala" }, // Mapea con "nombreCorto"
+                { "data": "Descripcion", "title": "Descripción" },    // Mapea con "descripcion"
+                { "data": "Capacidad", "title": "Capacidad (personas)" } // Mapea con "capacidad"
             ]
         });
 
-        // Evento de doble clic en las filas de la tabla
-        $('#roomsTable tbody').on('dblclick', 'tr', function () {
+        // Acción de doble clic en una fila
+        $('#roomsTable').on('dblclick', 'tbody tr', function () {
+            $(this).toggleClass('selected'); // Añade una clase para marcar la fila
             var data = table.row(this).data();
-            if (data && data.id) {
-                // Redirigir a la vista 'add' con el parámetro 'id'
-                window.location.href = '/Sala/Update/' + data.id;
+            if (data && data.Id) {
+                window.location.href = '/Sala/Update/' + data.Id;
             }
         });
+
+        function mostrarMensaje() {
+            // Mostrar mensajes de éxito o error si existen
+            var successMessage = '@TempData["SuccessMessage"]';
+            var errorMessage = '@TempData["ErrorMessage"]';
+
+            if (successMessage) {
+                toastr.success(successMessage);  // Mostrar mensaje de éxito
+            }
+
+            if (errorMessage) {
+                toastr.error(errorMessage);  // Mostrar mensaje de error
+            }
+        }
+
+        mostrarMensaje();
+
         // Cargar opciones de edificios dinámicamente
         function cargarEdificios() {
             $.ajax({
                 url: '/Sala/GetEdificios',
                 type: 'GET',
                 success: function (data) {
-                    var buildingSelect = $('#buildingSelect');
+                    var buildingSelect = $('#edificio');
                     buildingSelect.empty().append('<option value="">Seleccione un edificio</option>');
                     data.forEach(function (edificio) {
-                        if (edificio && edificio.id && edificio.descripcion) {
-                            buildingSelect.append('<option value="' + edificio.id + '">' + edificio.descripcion + '</option>');
+                        if (edificio && edificio.Id && edificio.Descripcion) {
+                            buildingSelect.append('<option value="' + edificio.Id + '">' + edificio.Descripcion + '</option>');
                         }
                     });
                 },
@@ -110,30 +130,17 @@
 
         cargarEdificios(); // Llamar al cargar la página.
 
-        // Filtrar salas según el edificio seleccionado
-        $('#buildingSelect').on('change', function () {
-            var edificio = $(this).val();
-            var nombreSala = $('#roomName').val();
-            var capacidad = $('#capacity').val();
-
-            // Recargar la tabla con los filtros
-            table.ajax.url(`/Salas/GetSalas?edificio=${edificio}&nombreSala=${nombreSala}&capacidad=${capacidad}`).load();
-        });
 
         // Botón de búsqueda
         $('#searchButton').on('click', function () {
-            var edificio = $('#buildingSelect').val();
-            var nombreSala = $('#roomName').val();
-            var capacidad = $('#capacity').val();
+            var edificio = $('#edificio').val();
+            var nombre = $('#nombrecorto').val();
+            var capacidad = $('#capacidad').val();
 
+            // Configurar correctamente los parámetros de filtro para enviar al servidor
+            var url = '/Sala/GetByFilter?nombre=' + encodeURIComponent(nombre) + '&capacidad=' + encodeURIComponent(capacidad) + '&edificioId=' + encodeURIComponent(edificio);
             // Configurar la URL del DataTable para incluir los parámetros de búsqueda
-            table.ajax.url(`/Salas/GetSalas?edificio=${edificio}&nombreSala=${nombreSala}&capacidad=${capacidad}`).load();
-        });
-
-        // Evento para el botón Editar
-        $('#roomsTable').on('click', '.editBtn', function () {
-            var salaId = $(this).data('id');
-            window.location.href = `/Sala/Edit/${salaId}`; // Redirige a la página de edición
+            table.ajax.url(url).load();
         });
 
         // Evento para el botón Eliminar
@@ -150,5 +157,4 @@
             }
         });
     });
-
 </script>

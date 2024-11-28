@@ -8,90 +8,128 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
 
-<div asp-validation-summary="All" class="text-danger"></div>
-
 <div class="content-wrapper">
     <div class="content">
         <div class="container-fluid">
 
-            <h2>Editar Sala</h2>
-
-            <form asp-action="Update" method="post">
-                <input type="hidden" asp-for="Id" />
-
-                <div class="form-group">
-                    <label asp-for="NombreCorto"></label>
-                    <input asp-for="NombreCorto" class="form-control" maxlength="200" />
-                    <span asp-validation-for="NombreCorto" class="text-danger"></span>
+            <!-- Título de la sección -->
+            <div class="row mb-4">
+                <div class="col-12">
+                    <h3>Actualización de Sala</h3>
                 </div>
+            </div>
 
-                <div class="form-group">
-                    <label asp-for="Descripcion"></label>
-                    <input asp-for="Descripcion" class="form-control" maxlength="200" />
-                    <span asp-validation-for="Descripcion" class="text-danger"></span>
-                </div>
+            <!-- Formulario para actualizar una sala -->
+            <div class="col-md-12">
+                <form asp-action="Actualizar" method="post">
+                    @Html.AntiForgeryToken()
 
-                <div class="form-group">
-                    <label asp-for="Capacidad"></label>
-                    <input asp-for="Capacidad" class="form-control" type="number" />
-                    <span asp-validation-for="Capacidad" class="text-danger"></span>
-                </div>
+                    <!-- Campo oculto para el Id -->
+                    <input type="hidden" asp-for="Id" />
 
-                <div class="form-group">
-                    <label asp-for="EdificioId">Edificio</label>
-                    <select asp-for="EdificioId" class="form-control">
-                        <option value="">Seleccione un edificio</option>
-                        @foreach (var edificio in ViewBag.Edificios)
-                        {
-                            <option value="@edificio.Id">
-                                @edificio.Descripcion
-                            </option>
+                    <div class="row">
+                        <!-- Primer par de campos: Nombre corto y Descripción -->
+                        <div class="col-md-6 mb-3">
+                            <label for="NombreCorto">Nombre Corto</label>
+                            <input type="text" class="form-control" id="NombreCorto" name="NombreCorto" placeholder="Nombre corto de la sala" value="@Model.NombreCorto" required maxlength="200" />
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="Descripcion">Descripción</label>
+                            <input type="text" class="form-control" id="Descripcion" name="Descripcion" placeholder="Descripción de la sala" value="@Model.Descripcion" required maxlength="200" />
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <!-- Segundo par de campos: Capacidad y Estado -->
+                        <div class="col-md-6 mb-3">
+                            <label for="Capacidad">Capacidad</label>
+                            <input type="number" class="form-control" id="Capacidad" name="Capacidad" placeholder="Capacidad de la sala" value="@Model.Capacidad" required />
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="EstadoSalaId">Estado de la Sala</label>
+                            @Html.DropDownListFor(model => model.EstadoSalaId,
+                                     new SelectList(ViewBag.EstadosSala as IEnumerable<SelectListItem>, "Value", "Text", Model.EstadoSalaId),
+                                     "Seleccione el estado",
+                                     new { @class = "form-control", required = "required" })
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <!-- Tercer par de campos: Edificio -->
+                        <div class="col-md-6 mb-3">
+                            <label for="EdificioId">Edificio</label>
+                            @Html.DropDownListFor(model => model.EdificioId,
+                                     new SelectList(ViewBag.Edificios as IEnumerable<SelectListItem>, "Value", "Text", Model.EdificioId),
+                                     "Seleccione el edificio",
+                                     new { @class = "form-control", required = "required" })
+                        </div>
+                    </div>
+
+                    <!-- Botones Guardar y Eliminar -->
+                    <div class="row">
+                        <div class="col-md-12 text-right">
+                            <button type="submit" class="btn btn-primary">Guardar</button>
+                            <button type="button" class="btn btn-danger" id="btnEliminar">Eliminar</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    $(document).ready(function () {
+        var successMessage = '@TempData["SuccessMessage"]';
+        var errorMessage = '@TempData["ErrorMessage"]';
+
+        if (successMessage) {
+            toastr.success(successMessage);
+        }
+
+        if (errorMessage) {
+            toastr.error(errorMessage);
+        }
+
+        // Manejo del botón de eliminar
+        $("#btnEliminar").click(function () {
+            // Confirmar eliminación
+            if (confirm("¿Estás seguro de que deseas eliminar esta sala?")) {
+                var id = "@Model.Id"; // Id de la sala a eliminar
+                // Comprobar si la sala tiene reservas antes de eliminar
+                $.ajax({
+                    url: '/Sala/TieneReservas', // URL del método para comprobar reservas
+                    type: 'GET',
+                    data: { salaId: id },
+                    success: function (response) {
+                        if (response.tieneReservas) {
+                            toastr.error("No se puede eliminar la sala porque tiene reservas asociadas.");
+                        } else {
+                            // Si no tiene reservas, proceder a eliminar la sala
+                            $.ajax({
+                                url: '/Sala/Borrar', // URL del método Eliminar
+                                type: 'POST',
+                                data: { id: id },
+                                headers: {
+                                    'RequestVerificationToken': $('input[name="__RequestVerificationToken"]').val() // Token CSRF
+                                },
+                                success: function () {
+                                    toastr.success("La sala ha sido eliminada con éxito.");
+                                    window.location.href = '/Sala/Index'; // Redirigir a la lista de salas
+                                },
+                                error: function () {
+                                    toastr.error("Ocurrió un error al intentar eliminar la sala.");
+                                }
+                            });
                         }
-                    </select>
-                </div>
-
-                <div class="form-group">
-                    <label asp-for="EstadoSalaId">Estado</label>
-                    <select asp-for="EstadoSalaId" class="form-control">
-                        <option value="">Seleccione un estado</option>
-                        @foreach (var estado in ViewBag.EstadosSala)
-                        {
-                            <option value="@estado.Id">
-                                @estado.Descripcion
-                            </option>
-                        }
-                    </select>
-                </div>
-
-                <button type="submit" class="btn btn-primary">Guardar Cambios</button>
-            </form>
-
-            <hr />
-
-            <h3>Eliminar Sala</h3>
-            <button id="deleteButton" class="btn btn-danger">Eliminar Sala</button>
-
-            <script>
-                document.getElementById("deleteButton").addEventListener("click", function () {
-                    if (confirm("¿Está seguro de que desea eliminar esta sala?")) {
-                        fetch('@Url.Action("Delete")', {
-                            method: 'POST',
-                            headers: { 'Content-Type': 'application/json' },
-                            body: JSON.stringify({ id: @Model.Id })
-                        })
-                        .then(response => response.json())
-                        .then(data => {
-                            if (data.success) {
-                                alert(data.message);
-                                window.location.href = '@Url.Action("Index")';
-                            } else {
-                                alert(data.message);
-                            }
-                        });
+                    },
+                    error: function () {
+                        toastr.error("Ocurrió un error al comprobar las reservas.");
                     }
                 });
-            </script>
-
-        </div> <!-- /.container-fluid -->
-    </div> <!-- /.content -->
-</div> <!-- /.content-wrapper -->
+            } else {
+                toastr.info("Eliminación cancelada por el usuario.");
+            }
+        });
+    });
+</script>

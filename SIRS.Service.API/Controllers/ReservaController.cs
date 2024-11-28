@@ -6,7 +6,6 @@ using System;
 
 namespace SIRS.Service.API.Controllers
 {
-    [Authorize]
     [ApiController]
     [Route("api/[controller]")]
     public class ReservaController : ControllerBase
