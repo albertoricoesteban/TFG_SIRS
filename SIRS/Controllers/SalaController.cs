@@ -205,7 +205,7 @@ namespace SIRS.Controllers
                 else
                 {
                     // Si no hay resultados de la API, asignar una lista vacía
-                    ViewBag.EstadosSala = new List<SelectListItem>();
+                    ViewBag.Edificios = new List<SelectListItem>();
                 }
 
                 var estadosSala = _apiSalaClientService.GetAsync<List<EstadoSalaViewModel>>($"{Constantes.Constantes.ApiBaseUrl}{Constantes.Constantes.EstadoSalaControlador}GetAllEstados").Result;

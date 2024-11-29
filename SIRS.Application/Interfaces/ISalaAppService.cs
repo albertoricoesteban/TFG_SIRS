@@ -13,5 +13,6 @@ namespace SIRS.Application.Interfaces
         IEnumerable<SalaViewModel> GetByEstado(string estado);
         IEnumerable<SalaViewModel> GetAll();
         IEnumerable<SalaViewModel> GetSalasByFilter(string nombreCorto, int capacidad, int edificioId);
+        IEnumerable<SalaViewModel> GetByEdificioId(int edificioId);
     }
 }

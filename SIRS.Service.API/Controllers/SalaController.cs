@@ -86,5 +86,13 @@ namespace SIRS.Service.API.Controllers
             var salas = _salaAppService.GetSalasByFilter(nombreCorto,capacidad,edificioId);
             return Ok(salas);
         }
+
+        [HttpGet("GetByEdificioId/{edificioId}")]
+        public IActionResult GetByEdificioId(int edificioId)
+        {
+            var salas = _salaAppService.GetByEdificioId(edificioId);
+            return Ok(salas);
+        }
+
     }
 }

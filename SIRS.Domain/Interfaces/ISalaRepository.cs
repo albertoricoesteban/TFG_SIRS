@@ -12,4 +12,5 @@ public interface ISalaRepository : IRepository<Sala>
     IEnumerable<Sala> SearchByDescripcion(string descripcion);
     IEnumerable<Sala> GetByEstado(string estado);
     IEnumerable<Sala> GetSalasByFilter(string nombreCorto, int capacidad, int edificioId);
+    IEnumerable<Sala> GetByEdificioId(int EdificioId);
 }

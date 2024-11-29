@@ -77,6 +77,14 @@ namespace SIRS.Data.Repository
             if (edificioId> 0) { query = query.Where(e => e.EdificioId.Equals(edificioId)); }
             return query.ToList();
         }
-
+        // Método personalizado para obtener Salas por edificio
+        public IEnumerable<Sala> GetByEdificioId(int EdificioId)
+        {
+            return _dbSet.AsNoTracking()
+                     .Include(s => s.EstadoSala) // Incluye la relación con EstadoSala
+                     .Where(s => s.EstadoSala.Id == 1 && s.EdificioId== EdificioId) // Filtra por sala disponible y edificioId
+                     
+                     .ToList();
+        }
     }
 } 

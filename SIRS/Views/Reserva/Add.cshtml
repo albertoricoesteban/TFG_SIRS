@@ -1,6 +1,9 @@
 ﻿@{
     ViewData["Title"] = "Alta de Reserva";
 }
+<link href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css" rel="stylesheet" />
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
 
 <div class="content-wrapper">
     <div class="content">
@@ -19,53 +22,61 @@
                     <!-- Nombre de la Reserva -->
                     <div class="col-md-6">
                         <label for="nombreReserva">Nombre de la reserva</label>
-                        <input type="text" class="form-control" id="nombreReserva" name="nombreReserva" required placeholder="Nombre de la reserva">
+                        <input type="text" class="form-control" id="nombreReserva" name="nombreReserva" maxlength="500" required placeholder="Nombre de la reserva">
                     </div>
 
-                    <!-- Fecha de Inicio de Reserva -->
-                    <div class="col-md-3">
-                        <label for="fechaInicio">Fecha de inicio</label>
-                        <input type="date" class="form-control" id="fechaInicio" name="fechaInicio" required>
+                    <!-- Observaciones -->
+                    <div class="col-md-6">
+                        <label for="observaciones">Observaciones</label>
+                        <textarea class="form-control" id="observaciones" name="observaciones" maxlength="1000" rows="2" placeholder="Opcional"></textarea>
+                    </div>
+                </div>
+
+                <div class="row mt-3">
+                    <!-- Fecha de la Reserva -->
+                    <div class="col-md-4">
+                        <label for="fechaReserva">Fecha de la reserva</label>
+                        <input type="date" class="form-control" id="fechaReserva" name="fechaReserva" required>
                     </div>
 
-                    <!-- Fecha de Fin de Reserva -->
-                    <div class="col-md-3">
-                        <label for="fechaFin">Fecha de fin</label>
-                        <input type="date" class="form-control" id="fechaFin" name="fechaFin" required>
+                    <!-- Hora de Inicio -->
+                    <div class="col-md-4">
+                        <label for="horaInicio">Hora de inicio</label>
+                        <input type="time" class="form-control" id="horaInicio" name="horaInicio" required>
+                    </div>
+
+                    <!-- Tiempo Total -->
+                    <div class="col-md-4">
+                        <label for="tiempoTotal">Tiempo total (en minutos)</label>
+                        <input type="number" class="form-control" id="tiempoTotal" name="tiempoTotal" min="1" required placeholder="Duración en minutos">
                     </div>
                 </div>
 
                 <div class="row mt-3">
                     <!-- Edificio -->
+
+                        <div class="col-md-6">
+                            <label for="edificio">Edificio</label>
+                        <select class="form-control" id="edificioId" name="edificioId" required>
+                                <option value="">Seleccione un edificio</option>
+                                @foreach (var edificio in ViewBag.Edificios)
+                                {
+                                    <option value="@edificio.Value">@edificio.Text</option>
+                                }
+                            </select>
+                        </div>
+
+                    <!-- Estado -->
                     <div class="col-md-6">
-                        <label for="edificio">Edificio</label>
-                        <select class="form-control" id="edificio" name="edificio" required>
-                            <option value="">Seleccione un edificio</option>
-                            <!-- Opciones de edificios - Se deben llenar dinámicamente en el servidor -->
-                            <option value="Edificio1">Edificio Central</option>
-                            <option value="Edificio2">Edificio Norte</option>
-                            <option value="Edificio3">Edificio Sur</option>
+                        <label for="estado">Sala</label>
+                        <select class="form-control" id="salaId" name="salaId" required>
+                            <option value="">Seleccione una sala</option>
                         </select>
                     </div>
 
                     <!-- Sala -->
-                    <div class="col-md-6">
-                        <label for="sala">Sala</label>
-                        <select class="form-control" id="sala" name="sala" required>
-                            <option value="">Seleccione una sala</option>
-                            <!-- Opciones de salas - Deben llenarse dinámicamente según el edificio seleccionado -->
-                        </select>
-                    </div>
+                   
                 </div>
-
-                <div class="row mt-3">
-                    <!-- Observaciones / Indicaciones -->
-                    <div class="col-md-12">
-                        <label for="observaciones">Observaciones / Indicaciones</label>
-                        <textarea class="form-control" id="observaciones" name="observaciones" rows="3" placeholder="Escriba cualquier observación o indicación especial"></textarea>
-                    </div>
-                </div>
-
                 <!-- Botón de Guardar -->
                 <div class="row mt-4">
                     <div class="col-12 text-right">
@@ -79,22 +90,27 @@
 
 <script>
     $(document).ready(function () {
-        // Al cambiar el edificio, cargar las salas asociadas a ese edificio
-        $('#edificio').on('change', function () {
-            var edificioId = $(this).val();
-            $('#sala').empty().append('<option value="">Seleccione una sala</option>');
+        // Cambiar salas según el edificio seleccionado
+        $('#edificioId').on('change', function () {
+            var Id = $(this).val(); // Obtener el ID del edificio seleccionado
+            $('#salaId').empty().append('<option value="">Seleccione una sala</option>'); // Reiniciar las opciones
 
-            if (edificioId) {
+            if (Id && !isNaN(Id)) { // Verificar que el ID no esté vacío y sea un número válido
                 $.ajax({
-                    url: `/Reserva/GetSalasByEdificio/${edificioId}`, // Ruta al controlador que devuelve las salas según el edificio
+                    url: '/Reserva/GetSalasByEdificio', // Endpoint para obtener las salas
                     type: 'GET',
+                    data: { edificioId: Id }, // Parámetros enviados al servidor
                     success: function (data) {
                         $.each(data, function (index, sala) {
-                            $('#sala').append(`<option value="${sala.id}">${sala.nombre}</option>`);
+                            $('#salaId').append('<option value="' + sala.Id + '">' + sala.NombreCorto + '</option>');
                         });
+                    },
+                    error: function () {
+                        alert('No se pudieron cargar las salas. Intente nuevamente.');
                     }
                 });
             }
         });
     });
 </script>
+
