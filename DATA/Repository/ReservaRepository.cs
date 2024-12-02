@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
 using SIRS.Data.Context;
 using SIRS.Domain.Interfaces;
 using SIRS.Domain.Models;
@@ -79,6 +80,35 @@ namespace SIRS.Data.Repository
                          .Where(r => r.FechaReserva == fecha.Date)
                          .ToList();
         }
+
+        public IEnumerable<Reserva> GetReservasByFilters( int salaId, DateTime? fechaReserva, TimeSpan? horaInicio)
+        {
+            var query = _dbSet
+                .Include(r => r.Sala) // Incluye los datos de la sala
+                .AsQueryable();
+
+            
+            // Filtrar por sala si salaId es mayor que 0
+            if (salaId > 0)
+            {
+                query = query.Where(r => r.Sala.Id == salaId);
+            }
+
+            // Filtrar por FechaReserva si está presente
+            if (fechaReserva.HasValue)
+            {
+                query = query.Where(r => r.FechaReserva == fechaReserva.Value);
+            }
+
+            // Filtrar por HoraInicio si está presente
+            if (horaInicio.HasValue)
+            {
+                query = query.Where(r => r.HoraInicio == horaInicio.Value);
+            }
+
+            return query.ToList();
+        }
+
 
     }
 }

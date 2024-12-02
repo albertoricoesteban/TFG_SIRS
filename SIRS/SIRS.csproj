@@ -24,6 +24,7 @@
   <ItemGroup>
     <ProjectReference Include="..\DATA\SIRS.Data.csproj" />
     <ProjectReference Include="..\SIRS.Application\SIRS.Application.csproj" />
+    <ProjectReference Include="..\SIRS.Service.API\SIRS.Service.API.csproj" />
   </ItemGroup>
 
   <ItemGroup>

@@ -1,129 +1,166 @@
 ﻿@{
     ViewData["Title"] = "Gestión de Reservas";
 }
+<!-- Scripts de DataTables y jQuery -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.min.js"></script>
+<link rel="stylesheet" href="https://cdn.datatables.net/1.11.5/css/jquery.dataTables.min.css">
+
+<!-- Toastr CSS y JS -->
+<link href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css" rel="stylesheet" />
+<script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
 
 <div class="content-wrapper">
-  <div class="content"> 
-    <div class="container-fluid">
-      
-      <!-- Título de sección -->
-      <div class="row mb-4">
-          <div class="col-12">
-              <h3>Gestión de Reservas</h3>
-          </div>
-      </div>
+    <div class="content">
+        <div class="container-fluid">
 
-      <!-- Formulario de búsqueda -->
-      <form id="searchForm">
-        <div class="row">
-            <!-- Selección de Edificio -->
-            <div class="col-md-4">
-                <label for="edificio">Edificio</label>
-                <select class="form-control" id="edificio" name="edificio">
-                    <option value="">Seleccione un edificio</option>
-                    <!-- Opciones de edificios - Estas opciones deben llenarse dinámicamente desde el servidor -->
-                    <option value="Edificio1">Edificio Central</option>
-                    <option value="Edificio2">Edificio Norte</option>
-                    <option value="Edificio3">Edificio Sur</option>
-                </select>
+            <!-- Título de sección -->
+            <div class="row mb-4">
+                <div class="col-12">
+                    <h3>Gestión de Reservas</h3>
+                </div>
             </div>
 
-            <!-- Fecha de Inicio de Reserva -->
-            <div class="col-md-4">
-                <label for="fechaInicio">Fecha de Inicio</label>
-                <input type="date" class="form-control" id="fechaInicio" name="fechaInicio" required>
-            </div>
+            <!-- Formulario de búsqueda -->
+            <form id="searchForm">
+                <div class="row">
+                    <!-- Selección de Edificio -->
+                    <div class="col-md-3">
+                        <label for="edificio">Edificio</label>
+                        <select class="form-control" id="edificio" name="edificio">
+                            <option value="">Seleccione un edificio</option>
+                        </select>
+                    </div>
 
-            <!-- Fecha de Fin de Reserva -->
-            <div class="col-md-4">
-                <label for="fechaFin">Fecha de Fin</label>
-                <input type="date" class="form-control" id="fechaFin" name="fechaFin" required>
+                    <!-- Selección de Sala -->
+                    <div class="col-md-3">
+                        <label for="sala">Sala</label>
+                        <select class="form-control" id="sala" name="sala" disabled>
+                            <option value="">Seleccione un edificio primero</option>
+                        </select>
+                    </div>
+
+                    <!-- Fecha de Reserva -->
+                    <div class="col-md-3">
+                        <label for="fechaReserva">Fecha de Reserva</label>
+                        <input type="date" class="form-control" id="fechaReserva" name="fechaReserva" required>
+                    </div>
+
+                    <!-- Hora de Inicio -->
+                    <div class="col-md-3 ">
+                        <label for="horaInicio">Hora de Inicio</label>
+                        <input type="time" class="form-control" id="horaInicio" name="horaInicio" required>
+                    </div>
+                </div>
+
+                <!-- Botón de búsqueda -->
+                <div class="row mt-3">
+                    <div class="col-12 text-right">
+                        <button type="button" id="searchButton" class="btn btn-primary">Buscar</button>
+                    </div>
+                </div>
+            </form>
+
+            <!-- Tabla de resultados -->
+            <div class="row mt-4">
+                <div class="col-12">
+                    <table id="reservasTable" class="table table-bordered table-striped">
+                        <thead>
+                            <tr>
+                                <th>Nombre de Reserva</th>
+                                <th>Sala</th>
+                                <th>Edificio</th>
+                                <th>Fecha Reserva</th>
+                                <th>Hora Inicio</th>
+                                <th>Hora Fin</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <!-- Las filas se llenarán dinámicamente con DataTables -->
+                        </tbody>
+                    </table>
+                </div>
             </div>
         </div>
-
-        <!-- Botón de búsqueda -->
-        <div class="row mt-3">
-            <div class="col-12 text-right">
-                <button type="button" id="searchButton" class="btn btn-primary">Buscar</button>
-            </div>
-        </div>
-      </form>
-
-      <!-- Tabla de resultados -->
-      <div class="row mt-4">
-          <div class="col-12">
-              <table id="reservasTable" class="table table-bordered table-striped">
-                  <thead>
-                      <tr>
-                          <th>Nombre de Sala</th>
-                          <th>Fecha</th>
-                          <th>Hora Inicio</th>
-                          <th>Hora Fin</th>
-                          <th>Acciones</th>
-                      </tr>
-                  </thead>
-                  <tbody>
-                      <!-- Las filas se llenarán dinámicamente con DataTables -->
-                  </tbody>
-              </table>
-          </div>
-      </div>
     </div>
-  </div>
 </div>
 
 <script>
-$(document).ready(function() {
-    // Inicializar DataTable
-    var table = $('#reservasTable').DataTable({
-        "ajax": {
-            "url": "/Reserva/GetReservas", // Ruta del método GetReservas en el controlador ReservaController
-            "dataSrc": ""
-        },
-        "columns": [
-            { "data": "nombreSala" },
-            { "data": "fecha" },
-            { "data": "horaInicio" },
-            { "data": "horaFin" },
-            {
-                "data": null,
-                "render": function (data, type, row) {
-                    return `
-                        <button class="btn btn-sm btn-warning editBtn" data-id="${row.id}">Editar</button>
-                        <button class="btn btn-sm btn-danger deleteBtn" data-id="${row.id}">Eliminar</button>
-                    `;
-                },
-                "orderable": false // Desactiva el orden en la columna de acciones
-            }
-        ]
-    });
-
-    // Filtro de búsqueda personalizado
-    $('#searchButton').on('click', function() {
-        var edificio = $('#edificio').val();
-        var fechaInicio = $('#fechaInicio').val();
-        var fechaFin = $('#fechaFin').val();
-        table.ajax.url(`/Reserva/GetReservas?edificio=${edificio}&fechaInicio=${fechaInicio}&fechaFin=${fechaFin}`).load();
-    });
-
-    // Evento para el botón Editar
-    $('#reservasTable').on('click', '.editBtn', function() {
-        var reservaId = $(this).data('id');
-        window.location.href = `/Reserva/Edit/${reservaId}`; // Redirige a la página de edición
-    });
-
-    // Evento para el botón Eliminar
-    $('#reservasTable').on('click', '.deleteBtn', function() {
-        var reservaId = $(this).data('id');
-        if (confirm("¿Está seguro de que desea eliminar esta reserva?")) {
+    $(document).ready(function () {
+        // Inicializar DataTable-
+        var table = $('#reservasTable').DataTable({
+            "ajax": {
+                "url": "/Reserva/GetReservasByFilters", 
+                "type": "GET",
+                "dataSrc": "" // Se espera un array simple en el JSON recibido
+            },
+            "columns": [
+                { "data": "Nombre" },
+                { "data": "NombreSala" },
+                { "data": "NombreEdificio" },
+                { "data": "FechaReserva" },
+                { "data": "HoraInicio" },
+                { "data": "HoraFin" }
+            ]
+        });
+        // Función para cargar edificios
+        function cargarEdificios() {
             $.ajax({
-                url: `/Reserva/Delete/${reservaId}`,
-                type: 'POST',
-                success: function() {
-                    table.ajax.reload(); // Recargar la tabla después de eliminar
+                url: '/Edificio/GetAll',
+                type: 'GET',
+                success: function (data) {
+                    var buildingSelect = $('#edificio');
+                    buildingSelect.empty().append('<option value="">Seleccione un edificio</option>');
+                    data.forEach(function (edificio) {
+                        buildingSelect.append('<option value="' + edificio.Id + '">' + edificio.Descripcion + '</option>');
+                    });
+                },
+                error: function () {
+                    alert("Error al cargar los edificios.");
                 }
             });
         }
+
+        // Función para cargar salas basadas en el edificio seleccionado
+        function cargarSalas(edificioId) {
+            $.ajax({
+                url: '/Sala/GetByEdificio?edificioId=' + edificioId,
+                type: 'GET',
+                success: function (data) {
+                    var salaSelect = $('#sala');
+                    salaSelect.empty().append('<option value="">Seleccione una sala</option>');
+                    data.forEach(function (sala) {
+                        salaSelect.append('<option value="' + sala.Id + '">' + sala.NombreCorto + '</option>');
+                    });
+                    salaSelect.prop('disabled', false);
+                },
+                error: function () {
+                    alert("Error al cargar las salas.");
+                }
+            });
+        }
+
+        // Evento de cambio en el selector de edificio
+        $('#edificio').on('change', function () {
+            var edificioId = $(this).val();
+            if (edificioId) {
+                cargarSalas(edificioId);
+            } else {
+                $('#sala').empty().append('<option value="">Seleccione un edificio primero</option>').prop('disabled', true);
+            }
+        });
+
+        // Botón de búsqueda
+        $('#searchButton').on('click', function () {
+            var edificio = $('#edificio').val();
+            var sala = $('#sala').val();
+            var fechaReserva = $('#fechaReserva').val();
+            var horaInicio = $('#horaInicio').val();
+
+            table.ajax.url(`/Reserva/GetReservasByFilters?edificioId=${edificio}&salaId=${sala}&fechaReserva=${fechaReserva}&horaInicio=${horaInicio}`).load();
+        });
+
+        // Inicializar datos al cargar la página
+        cargarEdificios();
     });
-});
 </script>

@@ -77,7 +77,7 @@ namespace SIRS.Service.API.Controllers
                 NombreCorto = s.NombreCorto,
                 Descripcion = s.Descripcion,
                 Capacidad = s.Capacidad
-            }).ToList(); ;
+            }).ToList(); 
             return Ok(salas);
         }
         [HttpGet("GetSalasByFilter")]

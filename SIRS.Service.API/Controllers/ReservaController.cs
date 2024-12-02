@@ -1,7 +1,9 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using SIRS.Application.Interfaces;
+using SIRS.Application.Services;
 using SIRS.Application.ViewModels;
+using SIRS.Service.API.DTO;
 using System;
 
 namespace SIRS.Service.API.Controllers
@@ -80,5 +82,22 @@ namespace SIRS.Service.API.Controllers
             var reservas = _reservaAppService.GetAll();
             return Ok(reservas);
         }
+        [HttpGet("GetReservasByFilters")]
+        public IActionResult GetReservasByFilters( int salaId, DateTime? fechaReserva, TimeSpan? horaInicio)
+        {
+            var reservas = _reservaAppService.GetReservasByFilters(salaId,fechaReserva,horaInicio);
+            var reservasDTO = reservas.Select(s => new ReservaDTO
+            {
+                Id = s.Id,
+                Nombre = s.Nombre,
+                Observaciones = s.Observaciones,
+                NombreSala = s.Sala?.NombreCorto ?? "Sin sala",
+                FechaReserva = s.FechaReserva ?? DateTime.MinValue, // Maneja fechas nulas con un valor por defecto
+                HoraInicio = s.HoraInicio ?? TimeSpan.Zero, // Maneja tiempos nulos con un valor por defecto
+                HoraFin = (s.HoraInicio ?? TimeSpan.Zero).Add(TimeSpan.FromMinutes(s.TiempoTotal ?? 0)) // Calcula HoraFin
+            }).ToList();
+            return Ok(reservasDTO);
+        }
+
     }
 }

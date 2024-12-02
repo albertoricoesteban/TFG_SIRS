@@ -14,5 +14,6 @@ namespace SIRS.Application.Interfaces
         IEnumerable<ReservaViewModel> GetByUsuario(int usuarioId);
         IEnumerable<ReservaViewModel> GetByFecha(DateTime fecha);
         IEnumerable<ReservaViewModel> GetAll();
+        IEnumerable<ReservaViewModel> GetReservasByFilters(int salaId, DateTime? fechaReserva, TimeSpan? horaInicio);
     }
 }

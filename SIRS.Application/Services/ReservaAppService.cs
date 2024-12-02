@@ -65,7 +65,18 @@ namespace SIRS.Application.Services
         public IEnumerable<ReservaViewModel> GetAll()
         {
             var reservas = _reservaRepository.GetAll();
+
+
+            return _mapper.Map<IEnumerable<ReservaViewModel>>(reservas);
+        }
+
+        public IEnumerable<ReservaViewModel> GetReservasByFilters(int salaId, DateTime? fechaReserva, TimeSpan? horaInicio)
+        {
+            var reservas = _reservaRepository.GetReservasByFilters(salaId, fechaReserva, horaInicio);
+
+
             return _mapper.Map<IEnumerable<ReservaViewModel>>(reservas);
         }
     }
 }
+

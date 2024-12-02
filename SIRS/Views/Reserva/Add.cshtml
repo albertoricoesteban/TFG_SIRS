@@ -22,13 +22,13 @@
                     <!-- Nombre de la Reserva -->
                     <div class="col-md-6">
                         <label for="nombreReserva">Nombre de la reserva</label>
-                        <input type="text" class="form-control" id="nombreReserva" name="nombreReserva" maxlength="500" required placeholder="Nombre de la reserva">
+                        <input type="text" class="form-control" id="Nombre" name="Nombre" maxlength="500" required placeholder="Nombre de la reserva">
                     </div>
 
                     <!-- Observaciones -->
                     <div class="col-md-6">
                         <label for="observaciones">Observaciones</label>
-                        <textarea class="form-control" id="observaciones" name="observaciones" maxlength="1000" rows="2" placeholder="Opcional"></textarea>
+                        <textarea class="form-control" id="Observaciones" name="Observaciones" maxlength="1000" rows="2" placeholder="Opcional"></textarea>
                     </div>
                 </div>
 
@@ -36,46 +36,46 @@
                     <!-- Fecha de la Reserva -->
                     <div class="col-md-4">
                         <label for="fechaReserva">Fecha de la reserva</label>
-                        <input type="date" class="form-control" id="fechaReserva" name="fechaReserva" required>
+                        <input type="date" class="form-control" id="FechaReserva" name="FechaReserva" required>
                     </div>
 
                     <!-- Hora de Inicio -->
                     <div class="col-md-4">
                         <label for="horaInicio">Hora de inicio</label>
-                        <input type="time" class="form-control" id="horaInicio" name="horaInicio" required>
+                        <input type="time" class="form-control" id="HoraInicio" name="HoraInicio" required>
                     </div>
 
                     <!-- Tiempo Total -->
                     <div class="col-md-4">
                         <label for="tiempoTotal">Tiempo total (en minutos)</label>
-                        <input type="number" class="form-control" id="tiempoTotal" name="tiempoTotal" min="1" required placeholder="Duración en minutos">
+                        <input type="number" class="form-control" id="TiempoTotal" name="TiempoTotal" min="1" required placeholder="Duración en minutos">
                     </div>
                 </div>
 
                 <div class="row mt-3">
                     <!-- Edificio -->
 
-                        <div class="col-md-6">
-                            <label for="edificio">Edificio</label>
+                    <div class="col-md-6">
+                        <label for="edificio">Edificio</label>
                         <select class="form-control" id="edificioId" name="edificioId" required>
-                                <option value="">Seleccione un edificio</option>
-                                @foreach (var edificio in ViewBag.Edificios)
-                                {
-                                    <option value="@edificio.Value">@edificio.Text</option>
-                                }
-                            </select>
-                        </div>
+                            <option value="">Seleccione un edificio</option>
+                            @foreach (var edificio in ViewBag.Edificios)
+                            {
+                                <option value="@edificio.Value">@edificio.Text</option>
+                            }
+                        </select>
+                    </div>
 
                     <!-- Estado -->
                     <div class="col-md-6">
                         <label for="estado">Sala</label>
-                        <select class="form-control" id="salaId" name="salaId" required>
+                        <select class="form-control" id="SalaId" name="SalaId" required>
                             <option value="">Seleccione una sala</option>
                         </select>
                     </div>
 
                     <!-- Sala -->
-                   
+
                 </div>
                 <!-- Botón de Guardar -->
                 <div class="row mt-4">
@@ -93,7 +93,7 @@
         // Cambiar salas según el edificio seleccionado
         $('#edificioId').on('change', function () {
             var Id = $(this).val(); // Obtener el ID del edificio seleccionado
-            $('#salaId').empty().append('<option value="">Seleccione una sala</option>'); // Reiniciar las opciones
+            $('#SalaId').empty().append('<option value="">Seleccione una sala</option>'); // Reiniciar las opciones
 
             if (Id && !isNaN(Id)) { // Verificar que el ID no esté vacío y sea un número válido
                 $.ajax({
@@ -102,7 +102,7 @@
                     data: { edificioId: Id }, // Parámetros enviados al servidor
                     success: function (data) {
                         $.each(data, function (index, sala) {
-                            $('#salaId').append('<option value="' + sala.Id + '">' + sala.NombreCorto + '</option>');
+                            $('#SalaId').append('<option value="' + sala.Id + '">' + sala.NombreCorto + '</option>');
                         });
                     },
                     error: function () {
@@ -111,6 +111,23 @@
                 });
             }
         });
+
+
+        function mostrarMensaje() {
+            // Mostrar mensajes de éxito o error si existen
+            var successMessage = '@TempData["SuccessMessage"]';
+            var errorMessage = '@TempData["ErrorMessage"]';
+
+            if (successMessage) {
+                toastr.success(successMessage);
+            }
+
+            if (errorMessage) {
+                toastr.error(errorMessage);
+            }
+        }
+
+        mostrarMensaje();
     });
 </script>
 

@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using SIRS.ApliClient;
 using SIRS.Application.ViewModels;
 using SIRS.Domain.Models;
+using SIRS.Service.API.DTO;
 
 namespace SIRS.Controllers
 {
@@ -92,20 +93,21 @@ namespace SIRS.Controllers
                 return View();
             }
         }
-         
+
         [HttpGet]
         public IActionResult GetSalasByEdificio(int edificioId)
         {
             var edificios = _apiReservaClientService.GetAsync<List<SalaViewModel>>($"{Constantes.Constantes.ApiBaseUrl}{Constantes.Constantes.SalaControlador}GetByEdificioId/{edificioId}").Result;
-            return Json(edificios); 
+            return Json(edificios);
         }
         [HttpPost]
         public async Task<IActionResult> Create(ReservaViewModel reserva)
         {
-            
+
 
             // Enviar los datos a la API
-
+            //todo quitar este usuario para coger el que está logado
+            reserva.UsuarioId = 2;
             if (ModelState.IsValid)
             {
                 await _apiReservaClientService.PostAsync($"{Constantes.Constantes.ApiBaseUrl}{Constantes.Constantes.ReservaControlador}Add", reserva);
@@ -115,6 +117,39 @@ namespace SIRS.Controllers
             }
             TempData["ErrorMessage"] = "Ocurrió un error al crear la reserva.";
             return View("Add", reserva); // Redirigir a la vista 'Add' si hay errores
+        }
+
+
+        public async Task<IActionResult> GetReservasByFilters(int edificioId, int salaId, DateTime? fechaReserva, TimeSpan? horaInicio)
+        {
+            try
+            {
+                var query = new List<string>();
+
+                if (edificioId > 0)
+                    query.Add($"edificioId={edificioId}");
+
+                if (salaId > 0)
+                    query.Add($"salaId={salaId}");
+
+                if (fechaReserva.HasValue)
+                    query.Add($"fechaReserva={fechaReserva.Value.ToString("yyyy-MM-dd")}");
+
+                if (horaInicio.HasValue)
+                    query.Add($"horaInicio={horaInicio.Value.ToString(@"hh\:mm\:ss")}");
+
+                var queryString = string.Join("&", query);
+
+
+                var reservas = await _apiReservaClientService.GetAsync<List<ReservaDTO>>($"{Constantes.Constantes.ApiBaseUrl}{Constantes.Constantes.ReservaControlador}GetReservasByFilters?{query}");
+                return Json(reservas);
+            }
+            catch (Exception ex)
+            { // Manejo de errores
+
+                TempData["ErrorMessage"] = "Error al buscar el edificio con el filtro indicado: " + ex.Message;
+                return RedirectToAction(nameof(Index)); // Redirigir a 'Add' en caso de excepción
+            }
         }
     }
 }

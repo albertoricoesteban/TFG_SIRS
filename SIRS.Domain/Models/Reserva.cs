@@ -18,9 +18,8 @@ namespace SIRS.Domain.Models
 
  
         public int SalaId { get; set; }
-        public Sala Sala { get; set; }
+        public Sala Sala { get; set; 
 
-      
         public int UsuarioId { get; set; }
         public Usuario Usuario { get; set; }
     }
