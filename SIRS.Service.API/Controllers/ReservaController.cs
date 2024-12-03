@@ -83,9 +83,9 @@ namespace SIRS.Service.API.Controllers
             return Ok(reservas);
         }
         [HttpGet("GetReservasByFilters")]
-        public IActionResult GetReservasByFilters( int salaId, DateTime? fechaReserva, TimeSpan? horaInicio)
+        public IActionResult GetReservasByFilters(int? salaId = null, DateTime? fechaReserva = null, TimeSpan? horaInicio = null)
         {
-            var reservas = _reservaAppService.GetReservasByFilters(salaId,fechaReserva,horaInicio);
+            var reservas = _reservaAppService.GetReservasByFilters(salaId ?? 0, fechaReserva, horaInicio);
             var reservasDTO = reservas.Select(s => new ReservaDTO
             {
                 Id = s.Id,

@@ -125,10 +125,6 @@ namespace SIRS.Controllers
             try
             {
                 var query = new List<string>();
-
-                if (edificioId > 0)
-                    query.Add($"edificioId={edificioId}");
-
                 if (salaId > 0)
                     query.Add($"salaId={salaId}");
 
@@ -138,13 +134,14 @@ namespace SIRS.Controllers
                 if (horaInicio.HasValue)
                     query.Add($"horaInicio={horaInicio.Value.ToString(@"hh\:mm\:ss")}");
 
+
                 var queryString = string.Join("&", query);
 
 
-                var reservas = await _apiReservaClientService.GetAsync<List<ReservaDTO>>($"{Constantes.Constantes.ApiBaseUrl}{Constantes.Constantes.ReservaControlador}GetReservasByFilters?{query}");
+                var reservas = await _apiReservaClientService.GetAsync<List<ReservaDTO>>($"{Constantes.Constantes.ApiBaseUrl}{Constantes.Constantes.ReservaControlador}GetReservasByFilters?{queryString}");
                 return Json(reservas);
             }
-            catch (Exception ex)
+             catch (Exception ex)
             { // Manejo de errores
 
                 TempData["ErrorMessage"] = "Error al buscar el edificio con el filtro indicado: " + ex.Message;

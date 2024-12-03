@@ -69,7 +69,6 @@
                             <tr>
                                 <th>Nombre de Reserva</th>
                                 <th>Sala</th>
-                                <th>Edificio</th>
                                 <th>Fecha Reserva</th>
                                 <th>Hora Inicio</th>
                                 <th>Hora Fin</th>
@@ -97,7 +96,6 @@
             "columns": [
                 { "data": "Nombre" },
                 { "data": "NombreSala" },
-                { "data": "NombreEdificio" },
                 { "data": "FechaReserva" },
                 { "data": "HoraInicio" },
                 { "data": "HoraFin" }
@@ -123,8 +121,10 @@
 
         // Función para cargar salas basadas en el edificio seleccionado
         function cargarSalas(edificioId) {
+
+            var url = '/Sala/GetByFilter?nombre=&capacidad=&edificioId=' + encodeURIComponent(edificioId);
             $.ajax({
-                url: '/Sala/GetByEdificio?edificioId=' + edificioId,
+                url: url,
                 type: 'GET',
                 success: function (data) {
                     var salaSelect = $('#sala');
