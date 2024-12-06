@@ -58,7 +58,56 @@ namespace SIRS.Data.Repository
                          .Where(u => u.Nombre.Contains(name))
                          .ToList();
         }
+        public IEnumerable<Usuario> SearchByFilter(string? username = null, string? nombre = null, string? apellido1 = null, string? apellido2 = null, string? email = null, DateTime? fechaRegistro = null, int? rolId = null)
+        {
+            var query = _dbSet.AsNoTracking().AsQueryable();
 
+            // Filtro por username, si es proporcionado
+            if (!string.IsNullOrEmpty(username))
+            {
+                query = query.Where(u => u.Username.Contains(username));
+            }
+
+            // Filtro por apellido1, si es proporcionado
+            if (!string.IsNullOrEmpty(apellido1))
+            {
+                query = query.Where(u => u.Apellido1.Contains(apellido1));
+            }
+
+            // Filtro por apellido2, si es proporcionado
+            if (!string.IsNullOrEmpty(apellido2))
+            {
+                query = query.Where(u => u.Apellido2.Contains(apellido2));
+            }
+
+            // Filtro por email, si es proporcionado
+            if (!string.IsNullOrEmpty(email))
+            {
+                query = query.Where(u => u.Email.Contains(email));
+            }
+
+            // Filtro por fecha de registro, si es proporcionada
+            if (fechaRegistro.HasValue)
+            {
+                query = query.Where(u => u.FechaRegistro == fechaRegistro.Value);
+            }
+
+            // Filtro por rolId, si es proporcionado
+            if (rolId.HasValue)
+            {
+                query = query.Where(u => u.RolId == rolId.Value);
+            }
+
+            return query.ToList();
+        }
+        public bool UserExistsByUsername(string username)
+        {
+            return _dbSet.AsNoTracking().Any(u => u.Username.Equals(username, StringComparison.OrdinalIgnoreCase));
+        }
+        public bool UserExistsByEmail(string email)
+        {
+            return _dbSet.AsNoTracking().Any(u => u.Email.Equals(email, StringComparison.OrdinalIgnoreCase));
+        }
         // Método para obtener Usuarios por Rol
         public IEnumerable<Usuario> GetByRol(string rolNombre)
         {

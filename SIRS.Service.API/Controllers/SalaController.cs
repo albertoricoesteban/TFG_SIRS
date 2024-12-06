@@ -68,6 +68,14 @@ namespace SIRS.Service.API.Controllers
             return Ok(salas);
         }
 
+        [HttpGet("GetSalasByFilterWithEdificioNombre")]
+        public IActionResult GetSalasByFilterWithEdificioNombre()
+        {
+            var salas = _salaAppService.GetSalasByFilterWithEdificioNombre();
+            return Ok(salas);
+        }
+
+
         [HttpGet("GetAll")]
         public IActionResult GetAll()
         {

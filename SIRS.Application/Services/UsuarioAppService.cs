@@ -48,11 +48,28 @@ namespace SIRS.Application.Services
             var usuarios = _usuarioRepository.SearchByName(name);
             return _mapper.Map<IEnumerable<UsuarioViewModel>>(usuarios);
         }
+        public IEnumerable<UsuarioViewModel> SearchByFilters(string? username = null, string? nombre = null, string? apellido1 = null, string? apellido2 = null, string? email = null, DateTime? fechaRegistro = null, int? rolId = null)
+        {
+            // Llamamos al repositorio con los filtros proporcionados
+            var usuarios = _usuarioRepository.SearchByFilter(username,nombre, apellido1, apellido2, email, fechaRegistro, rolId);
 
+            // Mapeamos los usuarios a UsuarioViewModel
+            return _mapper.Map<IEnumerable<UsuarioViewModel>>(usuarios);
+        }
         public IEnumerable<UsuarioViewModel> GetByRol(string rolNombre)
         {
             var usuarios = _usuarioRepository.GetByRol(rolNombre);
             return _mapper.Map<IEnumerable<UsuarioViewModel>>(usuarios);
+        }
+        public bool UserExistsByUsername(string username)
+        {
+            var usuarios = _usuarioRepository.UserExistsByUsername(username);
+            return usuarios;
+        }
+        public bool UserExistsByEmail(string email)
+        {
+            var usuarios = _usuarioRepository.UserExistsByEmail(email);
+            return usuarios;
         }
 
         public IEnumerable<UsuarioViewModel> GetAllUsuarios()

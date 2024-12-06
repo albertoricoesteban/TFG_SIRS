@@ -2,69 +2,77 @@
     ViewData["Title"] = "Calendario";
 }
 
-<div class="content">
+<div class="content-wrapper">
     <div class="container-fluid">
-
-        <!-- Título de sección -->
-        <div class="row mb-4">
+        <div class="row mb-3">
             <div class="col-12">
                 <h3>Calendario de Reservas</h3>
             </div>
         </div>
         <div class="row">
-         
-            <!-- /.col -->
-            <div class="col-md-12">
+            <div class="col-12">
                 <div class="card card-primary">
                     <div class="card-body p-0">
-                        <!-- THE CALENDAR -->
                         <div id="calendar"></div>
                     </div>
-                    <!-- /.card-body -->
                 </div>
-                <!-- /.card -->
             </div>
-            <!-- /.col -->
         </div>
-
     </div>
 </div>
 
 @section Scripts {
-    <!-- Scripts necesarios para el calendario -->
     <script src="~/adminlte/plugins/moment/moment.min.js"></script>
     <script src="~/adminlte/plugins/fullcalendar/main.js"></script>
+    <script src="~/adminlte/plugins/fullcalendar/locales/es.js"></script>
     <link href="~/adminlte/plugins/fullcalendar/main.css" rel="stylesheet">
 
     <script>
         $(document).ready(function () {
-            /* initialize the calendar */
             var Calendar = FullCalendar.Calendar;
             var calendarEl = document.getElementById('calendar');
 
             if (calendarEl) {
                 var calendar = new Calendar(calendarEl, {
+                    locale: 'es', // Configura el idioma
                     headerToolbar: {
                         left: 'prev,next today',
                         center: 'title',
-                        right: 'dayGridMonth,timeGridWeek,timeGridDay'
+                        right: 'dayGridMonth'
                     },
+                    initialView: 'dayGridMonth',
                     themeSystem: 'bootstrap',
-                    events: [
-                        {
-                            title: 'All Day Event',
-                            start: new Date().setDate(1),
-                            backgroundColor: '#f56954',
-                            borderColor: '#f56954',
-                            allDay: true
-                        },
-                        // Resto de los eventos de ejemplo
-                    ],
-                    editable: true,
-                    droppable: true,
+                    events: '/Reserva/ObtenerReservasCalendario', // URL al método que devuelve las reservas
+                    editable: false,
+                    droppable: false,
+
+                    // Formato de la hora de los eventos
+                    eventTimeFormat: {
+                        hour: '2-digit',
+                        minute: '2-digit',
+                        meridiem: false, // Para usar formato de 24 horas (sin AM/PM)
+                    },
+                    // Evento al hacer doble clic sobre un evento
+                    // eventClick: function (info) {
+                    //     var reservaId = info.event.id; // Obtiene el ID de la reserva
+                    //     window.location.href = `/Reservas/Editar/${reservaId}`; // Redirige a la edición
+                    // }
                 });
                 calendar.render();
             }
         });
     </script>
 }
+
+
+<style>
+    #calendar {
+        width: 100%;
+        max-height: 800px;
+        margin: 0 auto;
+    }
+
+    .content-wrapper {
+        margin-left: 250px; /* Ajusta según el ancho del menú lateral */
+    }
+</style>

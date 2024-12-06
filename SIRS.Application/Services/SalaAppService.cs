@@ -54,7 +54,15 @@ namespace SIRS.Application.Services
             var salas = _salaRepository.GetByEstado(estado);
             return _mapper.Map<IEnumerable<SalaViewModel>>(salas);
         }
-
+        public IEnumerable<SalaViewModel> GetSalasByFilterWithEdificioNombre()
+        {
+            var salas = _salaRepository.GetSalasByFilterWithEdificioNombre();
+            foreach (var item in salas)
+            {
+                item.NombreCorto = $"{item.NombreCorto}  ({item.Edificio.Descripcion})";
+            }
+            return _mapper.Map<IEnumerable<SalaViewModel>>(salas);
+        }
         public IEnumerable<SalaViewModel> GetAll()
         {
             var salas = _salaRepository.GetAllSalas();

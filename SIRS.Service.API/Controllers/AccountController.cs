@@ -1,10 +1,18 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using SIRS.Application.Interfaces;
 
 namespace SIRS.Service.API.Controllers
 {
     public class AccountController : Controller
     {
+
+        private readonly IUsuarioAppService _usuarioAppService;
+
+        public AccountController(IUsuarioAppService usuarioAppService)
+        {
+            _usuarioAppService = usuarioAppService;
+        }
         // GET: AccountController
         public ActionResult Index()
         {
@@ -78,6 +86,17 @@ namespace SIRS.Service.API.Controllers
             {
                 return View();
             }
+        }
+
+        public bool UserExistsByUsername(string username)
+        {
+            var usuarios = _usuarioAppService.UserExistsByUsername(username);
+            return usuarios;
+        }
+        public bool UserExistsByEmail(string email)
+        {
+            var usuarios = _usuarioAppService.UserExistsByEmail(email);
+            return usuarios;
         }
     }
 }

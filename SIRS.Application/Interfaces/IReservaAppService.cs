@@ -1,4 +1,5 @@
 ﻿using SIRS.Application.ViewModels;
+using SIRS.Domain.Models;
 using System;
 using System.Collections.Generic;
 
@@ -15,5 +16,8 @@ namespace SIRS.Application.Interfaces
         IEnumerable<ReservaViewModel> GetByFecha(DateTime fecha);
         IEnumerable<ReservaViewModel> GetAll();
         IEnumerable<ReservaViewModel> GetReservasByFilters(int salaId, DateTime? fechaReserva, TimeSpan? horaInicio);
+
+        IEnumerable<ReservaViewModel> ObtenerReservasCalendario(DateTime fechaInicio, DateTime fechaFin);
+
     }
 }

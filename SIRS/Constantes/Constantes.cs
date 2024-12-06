@@ -11,6 +11,8 @@
 
         // Rutas de la API
         public const string ApiBaseUrl = "http://localhost:5237/api/";
+        public const string AuthControloador = "Auth/";
+        public const string AccountControloador = "Auth/";
         public const string EdificioControlador = "Edificio/";
         public const string SalaControlador = "Sala/";
         public const string EstadoSalaControlador = "EstadoSala/";

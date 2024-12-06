@@ -53,9 +53,29 @@ namespace SIRS.Controllers
         }
 
         // GET: ReservaController/Edit/5
-        public ActionResult Edit(int id)
+        [HttpGet]
+        [Route("Reserva/Update/{id}")] // Ruta para el método con parámetro 'id'
+        public ActionResult Update(int id)
         {
-            return View();
+            ReservaViewModel reserva;
+
+            if (id > 0)
+            {
+                reserva = _apiReservaClientService
+                    .GetAsync<ReservaViewModel>($"{Constantes.Constantes.ApiBaseUrl}{Constantes.Constantes.ReservaControlador}GetById/{id}")
+                    .Result;
+
+                if (reserva == null)
+                {
+                    return NotFound();
+                }
+            }
+            else
+            {
+                reserva = new ReservaViewModel();
+            }
+
+            return View(reserva);
         }
 
         // POST: ReservaController/Edit/5
@@ -120,10 +140,11 @@ namespace SIRS.Controllers
         }
 
 
-        public async Task<IActionResult> GetReservasByFilters(int edificioId, int salaId, DateTime? fechaReserva, TimeSpan? horaInicio)
+        public async Task<IActionResult> GetReservasByFilters( int salaId, DateTime? fechaReserva, TimeSpan? horaInicio)
         {
             try
             {
+                
                 var query = new List<string>();
                 if (salaId > 0)
                     query.Add($"salaId={salaId}");
@@ -142,6 +163,44 @@ namespace SIRS.Controllers
                 return Json(reservas);
             }
              catch (Exception ex)
+            { // Manejo de errores
+
+                TempData["ErrorMessage"] = "Error al buscar el edificio con el filtro indicado: " + ex.Message;
+                return RedirectToAction(nameof(Index)); // Redirigir a 'Add' en caso de excepción
+            }
+        }
+        [HttpGet]
+        public async Task<IActionResult> ObtenerReservasCalendario(DateTime start, DateTime end)
+        {
+            try
+            {
+
+                var query = new List<string>();
+     
+                    query.Add($"fechaInicio={start.ToString("yyyy-MM-dd")}");
+
+              
+                    query.Add($"fechaFin= {end.ToString("yyyy-MM-dd")}");
+
+
+                var queryString = string.Join("&", query);
+
+
+                var reservas = await _apiReservaClientService.GetAsync<List<ReservaDTO>>($"{Constantes.Constantes.ApiBaseUrl}{Constantes.Constantes.ReservaControlador}ObtenerReservasCalendario?{queryString}");
+                var eventosCalendario = reservas.Select(r => new
+                {
+                    title = r.Nombre, // Título del evento
+                    start = r.FechaReserva.Add(r.HoraInicio).ToString("yyyy-MM-ddTHH:mm:ss"), // Fecha y hora de inicio en formato ISO
+                    end = r.FechaReserva.Add(r.HoraFin).ToString("yyyy-MM-ddTHH:mm:ss"), // Fecha y hora de fin en formato ISO
+                    allDay = r.HoraInicio == TimeSpan.Zero && r.HoraFin == TimeSpan.Zero, // Si es todo el día (ejemplo, cuando no hay horas específicas)
+                    color = "#007bff", // Color del evento, por defecto azul si no se define
+                    description = r.Observaciones // Observaciones como descripción
+                }).ToList();
+
+                // Devolver los datos en formato JSON
+                return Json(eventosCalendario);
+            }
+            catch (Exception ex)
             { // Manejo de errores
 
                 TempData["ErrorMessage"] = "Error al buscar el edificio con el filtro indicado: " + ex.Message;

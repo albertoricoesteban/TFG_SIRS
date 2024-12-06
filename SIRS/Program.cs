@@ -8,11 +8,23 @@ using SIRS.ApliClient; // Asegúrate de agregar esta línea para usar ApiClientSer
 
 var builder = WebApplication.CreateBuilder(args);
 
+// Habilitar la memoria de sesión (opcionalmente usar Redis o SQL Server)
+builder.Services.AddDistributedMemoryCache();
+
+// Configurar la sesión
+builder.Services.AddSession(options =>
+{
+    options.IdleTimeout = TimeSpan.FromMinutes(30); // Duración de la sesión
+    options.Cookie.HttpOnly = true;
+    options.Cookie.IsEssential = true;
+});
+
 // Add services to the container.
 
 builder.Services.AddControllers();
 builder.Services.AddControllersWithViews();
 builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
 
 // Registrar ApplicationDbContext
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
@@ -57,6 +69,7 @@ var app = builder.Build();
 
 app.UseHttpsRedirection();
 app.UseStaticFiles(); // Esto asegura que los archivos estáticos se sirvan correctamente
+app.UseSession();
 
 app.UseAuthorization();
 app.MapControllerRoute(

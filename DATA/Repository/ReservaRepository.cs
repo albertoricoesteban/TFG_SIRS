@@ -81,13 +81,13 @@ namespace SIRS.Data.Repository
                          .ToList();
         }
 
-        public IEnumerable<Reserva> GetReservasByFilters( int salaId, DateTime? fechaReserva, TimeSpan? horaInicio)
+        public IEnumerable<Reserva> GetReservasByFilters(int salaId, DateTime? fechaReserva, TimeSpan? horaInicio)
         {
             var query = _dbSet
                 .Include(r => r.Sala) // Incluye los datos de la sala
                 .AsQueryable();
 
-            
+
             // Filtrar por sala si salaId es mayor que 0
             if (salaId > 0)
             {
@@ -108,7 +108,19 @@ namespace SIRS.Data.Repository
 
             return query.ToList();
         }
+        public IEnumerable<Reserva> ObtenerReservasCalendario(DateTime fechaInicio, DateTime fechaFin)
+        {
+            var query = _dbSet
+                .AsQueryable();
 
+
+            // Filtramos por el intervalo de fechas
+
+            query = query.Where(r => r.FechaReserva >= fechaInicio && r.FechaReserva <= fechaFin);
+
+
+            return query.ToList();
+        }
 
     }
 }

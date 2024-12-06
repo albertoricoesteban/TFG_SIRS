@@ -24,19 +24,11 @@
             <!-- Formulario de búsqueda -->
             <form id="searchForm">
                 <div class="row">
-                    <!-- Selección de Edificio -->
-                    <div class="col-md-3">
-                        <label for="edificio">Edificio</label>
-                        <select class="form-control" id="edificio" name="edificio">
-                            <option value="">Seleccione un edificio</option>
-                        </select>
-                    </div>
-
-                    <!-- Selección de Sala -->
+                   <!-- Selección de Sala -->
                     <div class="col-md-3">
                         <label for="sala">Sala</label>
-                        <select class="form-control" id="sala" name="sala" disabled>
-                            <option value="">Seleccione un edificio primero</option>
+                        <select class="form-control" id="sala" name="sala">
+                            <option value="">Seleccione una sala</option>
                         </select>
                     </div>
 
@@ -101,28 +93,12 @@
                 { "data": "HoraFin" }
             ]
         });
-        // Función para cargar edificios
-        function cargarEdificios() {
-            $.ajax({
-                url: '/Edificio/GetAll',
-                type: 'GET',
-                success: function (data) {
-                    var buildingSelect = $('#edificio');
-                    buildingSelect.empty().append('<option value="">Seleccione un edificio</option>');
-                    data.forEach(function (edificio) {
-                        buildingSelect.append('<option value="' + edificio.Id + '">' + edificio.Descripcion + '</option>');
-                    });
-                },
-                error: function () {
-                    alert("Error al cargar los edificios.");
-                }
-            });
-        }
+     
 
-        // Función para cargar salas basadas en el edificio seleccionado
-        function cargarSalas(edificioId) {
+        // Función para cargar salas
+        function cargarSalas() {
 
-            var url = '/Sala/GetByFilter?nombre=&capacidad=&edificioId=' + encodeURIComponent(edificioId);
+            var url = '/Sala/GetSalasByFilterWithEdificioNombre';
             $.ajax({
                 url: url,
                 type: 'GET',
@@ -139,28 +115,18 @@
                 }
             });
         }
-
-        // Evento de cambio en el selector de edificio
-        $('#edificio').on('change', function () {
-            var edificioId = $(this).val();
-            if (edificioId) {
-                cargarSalas(edificioId);
-            } else {
-                $('#sala').empty().append('<option value="">Seleccione un edificio primero</option>').prop('disabled', true);
-            }
-        });
+        cargarSalas();
+       
 
         // Botón de búsqueda
         $('#searchButton').on('click', function () {
-            var edificio = $('#edificio').val();
             var sala = $('#sala').val();
             var fechaReserva = $('#fechaReserva').val();
             var horaInicio = $('#horaInicio').val();
 
-            table.ajax.url(`/Reserva/GetReservasByFilters?edificioId=${edificio}&salaId=${sala}&fechaReserva=${fechaReserva}&horaInicio=${horaInicio}`).load();
+            table.ajax.url(`/Reserva/GetReservasByFilters?salaId=${sala}&fechaReserva=${fechaReserva}&horaInicio=${horaInicio}`).load();
         });
 
-        // Inicializar datos al cargar la página
-        cargarEdificios();
+   
     });
 </script>

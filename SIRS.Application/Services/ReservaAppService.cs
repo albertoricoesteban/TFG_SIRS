@@ -77,6 +77,15 @@ namespace SIRS.Application.Services
 
             return _mapper.Map<IEnumerable<ReservaViewModel>>(reservas);
         }
+
+        public IEnumerable<ReservaViewModel> ObtenerReservasCalendario(DateTime fechaInicio, DateTime fechaFin)
+
+        {
+            var reservas = _reservaRepository.ObtenerReservasCalendario(fechaInicio,fechaFin);
+
+
+            return _mapper.Map<IEnumerable<ReservaViewModel>>(reservas);
+        }
     }
 }
 

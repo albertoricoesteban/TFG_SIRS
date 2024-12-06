@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using SIRS.Application.Interfaces;
 using SIRS.Application.Services;
 using SIRS.Application.ViewModels;
+using SIRS.Domain.Models;
 using SIRS.Service.API.DTO;
 using System;
 
@@ -94,10 +95,17 @@ namespace SIRS.Service.API.Controllers
                 NombreSala = s.Sala?.NombreCorto ?? "Sin sala",
                 FechaReserva = s.FechaReserva ?? DateTime.MinValue, // Maneja fechas nulas con un valor por defecto
                 HoraInicio = s.HoraInicio ?? TimeSpan.Zero, // Maneja tiempos nulos con un valor por defecto
-                HoraFin = (s.HoraInicio ?? TimeSpan.Zero).Add(TimeSpan.FromMinutes(s.TiempoTotal ?? 0)) // Calcula HoraFin
+                HoraFin = (s.HoraInicio ?? TimeSpan.Zero).Add(TimeSpan.FromMinutes(s.TiempoTotal ?? 0)), // Calcula HoraFin
+
             }).ToList();
             return Ok(reservasDTO);
         }
 
+        [HttpGet("ObtenerReservasCalendario")]
+        public IActionResult ObtenerReservasCalendario(DateTime fechaInicio, DateTime fechaFin)
+        {
+            var reservasCalendario = _reservaAppService.ObtenerReservasCalendario(fechaInicio, fechaFin);
+            return Ok(reservasCalendario); 
+        }
     }
 }

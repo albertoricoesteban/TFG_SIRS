@@ -235,5 +235,11 @@ namespace SIRS.Controllers
 
             return View(sala);
         }
+        [HttpGet]
+        public async Task<IActionResult> GetSalasByFilterWithEdificioNombre()
+        {
+            var salasConEdificio = await _apiSalaClientService.GetAsync<List<SalaViewModel>>($"{Constantes.Constantes.ApiBaseUrl}{Constantes.Constantes.SalaControlador}GetSalasByFilterWithEdificioNombre");
+            return Json(salasConEdificio); // Devuelve la lista en formato JSON
+        }
     }
 }
