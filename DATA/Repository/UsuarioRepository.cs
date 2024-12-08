@@ -55,7 +55,7 @@ namespace SIRS.Data.Repository
         public IEnumerable<Usuario> SearchByName(string name)
         {
             return _dbSet.AsNoTracking()
-                         .Where(u => u.Nombre.Contains(name))
+                         .Where(u => u.Nombre.ToUpper().Contains(name.ToUpper()))
                          .ToList();
         }
         public IEnumerable<Usuario> SearchByFilter(string? username = null, string? nombre = null, string? apellido1 = null, string? apellido2 = null, string? email = null, DateTime? fechaRegistro = null, int? rolId = null)
@@ -65,25 +65,25 @@ namespace SIRS.Data.Repository
             // Filtro por username, si es proporcionado
             if (!string.IsNullOrEmpty(username))
             {
-                query = query.Where(u => u.Username.Contains(username));
+                query = query.Where(u => u.Username.ToUpper().Contains(username.ToUpper()));
             }
 
             // Filtro por apellido1, si es proporcionado
             if (!string.IsNullOrEmpty(apellido1))
             {
-                query = query.Where(u => u.Apellido1.Contains(apellido1));
+                query = query.Where(u => u.Apellido1.ToUpper().Contains(apellido1.ToUpper()));
             }
 
             // Filtro por apellido2, si es proporcionado
             if (!string.IsNullOrEmpty(apellido2))
             {
-                query = query.Where(u => u.Apellido2.Contains(apellido2));
+                query = query.Where(u => u.Apellido2.ToUpper().Contains(apellido2.ToUpper()));
             }
 
             // Filtro por email, si es proporcionado
             if (!string.IsNullOrEmpty(email))
             {
-                query = query.Where(u => u.Email.Contains(email));
+                query = query.Where(u => u.Email.ToUpper().Contains(email.ToUpper()));
             }
 
             // Filtro por fecha de registro, si es proporcionada
@@ -102,18 +102,18 @@ namespace SIRS.Data.Repository
         }
         public bool UserExistsByUsername(string username)
         {
-            return _dbSet.AsNoTracking().Any(u => u.Username.Equals(username, StringComparison.OrdinalIgnoreCase));
+            return _dbSet.AsNoTracking().Any(u => u.Username.ToUpper().Equals(username.ToUpper()));
         }
         public bool UserExistsByEmail(string email)
         {
-            return _dbSet.AsNoTracking().Any(u => u.Email.Equals(email, StringComparison.OrdinalIgnoreCase));
+            return _dbSet.AsNoTracking().Any(u => u.Email.ToUpper().Equals(email.ToUpper()));
         }
         // Método para obtener Usuarios por Rol
         public IEnumerable<Usuario> GetByRol(string rolNombre)
         {
             return _dbSet.AsNoTracking()
                          .Include(u => u.Rol) // Incluye la relación con Rol
-                         .Where(u => u.Rol.Nombre == rolNombre) // Filtra por el nombre del Rol
+                         .Where(u => u.Rol.Nombre.ToUpper() == rolNombre.ToUpper()) // Filtra por el nombre del Rol
                          .ToList();
         }
         // Método para obtener todos los usuarios
@@ -121,5 +121,6 @@ namespace SIRS.Data.Repository
         {
             return _dbSet.AsNoTracking().ToList();
         }
+
     }
 }

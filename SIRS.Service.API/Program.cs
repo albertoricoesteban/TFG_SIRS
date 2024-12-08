@@ -50,6 +50,7 @@ builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 builder.Services.AddScoped<IEdificioRepository, EdificioRepository>();
 builder.Services.AddScoped<IEstadoSalaRepository, EstadoSalaRepository>();
 builder.Services.AddScoped<IReservaRepository, ReservaRepository>();
+builder.Services.AddScoped<IRolRepository, RolRepository>();
 builder.Services.AddScoped<ISalaRepository, SalaRepository>();
 builder.Services.AddScoped<IUsuarioRepository, UsuarioRepository>();
 builder.Services.AddScoped<IEdificioAppService, EdificioAppService>();
@@ -57,7 +58,7 @@ builder.Services.AddScoped<IUsuarioAppService, UsuarioAppService>();
 builder.Services.AddScoped<IEstadoSalaAppService, EstadoSalaAppService>();
 builder.Services.AddScoped<IReservaAppService, ReservaAppService>();
 builder.Services.AddScoped<ISalaAppService, SalaAppService>();
-
+builder.Services.AddScoped<IRolAppService, RolAppService>();
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.

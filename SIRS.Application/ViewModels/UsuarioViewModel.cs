@@ -7,22 +7,33 @@ namespace SIRS.Application.ViewModels;
 public class UsuarioViewModel
 {
     [Key]
-    public Guid Id { get; set; }
+    public int Id { get; set; } 
 
-    [Required(ErrorMessage = "The Name is Required")]
-    [MinLength(2)]
-    [MaxLength(100)]
-    [DisplayName("Name")]
-    public string Name { get; set; }
+    [Required(ErrorMessage = "El DNI/NIE es obligatorio.")]
+    [RegularExpression(@"^[XYZ]?\d{5,8}[A-Z]$", ErrorMessage = "El DNI/NIE no es válido.")]
+    public string Username { get; set; }
 
-    [Required(ErrorMessage = "The E-mail is Required")]
-    [EmailAddress]
-    [DisplayName("E-mail")]
+
+    [Required(ErrorMessage = "El nombre es obligatorio.")]
+    public string Nombre { get; set; }
+
+    [Required(ErrorMessage = "El primer apellido es obligatorio.")]
+    public string Apellido1 { get; set; }
+
+    public string Apellido2 { get; set; } // Segundo apellido opcional
+
+    [Required(ErrorMessage = "El email es obligatorio.")]
+    [EmailAddress(ErrorMessage = "Por favor, introduce un email válido.")]
     public string Email { get; set; }
 
-    [Required(ErrorMessage = "The BirthDate is Required")]
-    [DisplayFormat(ApplyFormatInEditMode = true, DataFormatString = "{0:yyyy-MM-dd}")]
-    [DataType(DataType.Date, ErrorMessage = "Data em formato inválido")]
-    [DisplayName("Birth Date")]
-    public DateTime BirthDate { get; set; }
+    [Required(ErrorMessage = "La contraseña es obligatoria.")]
+    [DataType(DataType.Password)]
+    
+    public string Password { get; set; }
+
+    [Required(ErrorMessage = "El rol es obligatorio.")]
+    public int RolId { get; set; }
+    public DateTime FechaRegistro { get; set; }
+    // public IEnumerable<SelectListItem> Roles { get; set; } // Lista de roles para el dropdown
+
 }

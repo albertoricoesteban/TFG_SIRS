@@ -1,53 +1,217 @@
-﻿@{
-    ViewData["Title"] = "Alta de edificios";
+﻿@model SIRS.Application.ViewModels.UsuarioViewModel
+
+@{
+    ViewData["Title"] = "Registro de Usuario";
+    Layout = null;
 }
 
+<!-- Estilos CSS propios -->
+<style>
+    body {
+        font-family: Arial, sans-serif;
+        background-color: #f4f7fc;
+        margin: 0;
+        padding: 0;
+    }
+
+    .container {
+        max-width: 500px;
+        margin: 50px auto;
+        padding: 20px;
+        background-color: #fff;
+        border-radius: 10px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    h3 {
+        text-align: center;
+        color: #333;
+    }
+
+    .form-group {
+        margin-bottom: 15px;
+    }
+
+    .form-control {
+        width: 100%;
+        padding: 10px;
+        border-radius: 5px;
+        border: 1px solid #ddd;
+    }
+
+        .form-control.is-invalid {
+            border-color: red;
+        }
+
+    .btn-primary {
+        background-color: #007bff;
+        color: white;
+        padding: 10px 15px;
+        border-radius: 5px;
+        border: none;
+        cursor: pointer;
+        width: 100%;
+    }
+
+        .btn-primary:hover {
+            background-color: #0056b3;
+        }
+
+    .text-danger {
+        color: red;
+    }
+
+    .is-invalid {
+        border-color: red;
+    }
+
+    .container-fluid {
+        padding: 0;
+    }
+
+    .content-wrapper {
+        background-color: #f4f7fc;
+        padding: 20px;
+    }
+
+    .form-group span {
+        font-size: 0.875rem;
+        color: red;
+    }
+</style>
+
+<link href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css" rel="stylesheet" />
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
+
 <div class="content-wrapper">
-    <div class="content">
-        <div class="container-fluid">
+    <div class="container">
+        <h3>Registro de Usuario</h3>
 
-            <!-- Título de la sección -->
-            <div class="row mb-4">
-                <div class="col-12">
-                    <h3>Alta de edificio</h3>
-                </div>
+        <form asp-action="Registrar" method="post" class="form-horizontal" id="registrationForm">
+            <div class="form-group">
+                <label asp-for="Username" class="control-label">DNI/NIE</label>
+                <input asp-for="Username" class="form-control" id="Username" name="Username" />
+                <span asp-validation-for="Username" class="text-danger"></span>
+                <span id="usernameError" class="text-danger"></span>
             </div>
-            <!-- Columna derecha: Campos de información del edificio -->
-            <div class="col-md-12">
-                <form>
-                    <div class="row">
-                        <!-- Primer par de campos: Nombre de edificio y Dirección -->
-                        <div class="col-md-6 mb-3">
-                            <label for="buildingName">Nombre de Edificio</label>
-                            <input type="text" class="form-control" id="buildingName" placeholder="Nombre del edificio">
-                        </div>
-                        <div class="col-md-6 mb-3">
-                            <label for="address">Dirección</label>
-                            <input type="text" class="form-control" id="address" placeholder="Dirección">
-                        </div>
-                    </div>
 
-                    <div class="row">
-                        <!-- Segundo par de campos: Longitud y Latitud -->
-                        <div class="col-md-6 mb-3">
-                            <label for="longitude">Longitud</label>
-                            <input type="text" class="form-control" id="longitude" placeholder="Longitud">
-                        </div>
-                        <div class="col-md-6 mb-3">
-                            <label for="latitude">Latitud</label>
-                            <input type="text" class="form-control" id="latitude" placeholder="Latitud">
-                        </div>
-                    </div>
-
-                    <!-- Botón Guardar -->
-                    <div class="row">
-                        <div class="col-md-12 text-right">
-                            <button type="submit" class="btn btn-primary">Guardar</button>
-                        </div>
-                    </div>
-                </form>
+            <div class="form-group">
+                <label asp-for="Nombre" class="control-label">Nombre</label>
+                <input asp-for="Nombre" class="form-control" />
+                <span asp-validation-for="Nombre" class="text-danger"></span>
             </div>
-        </div>
+
+            <div class="form-group">
+                <label asp-for="Apellido1" class="control-label">Primer Apellido</label>
+                <input asp-for="Apellido1" class="form-control" />
+                <span asp-validation-for="Apellido1" class="text-danger"></span>
+            </div>
+
+            <div class="form-group">
+                <label asp-for="Apellido2" class="control-label">Segundo Apellido</label>
+                <input asp-for="Apellido2" class="form-control" />
+                <span asp-validation-for="Apellido2" class="text-danger"></span>
+            </div>
+
+            <div class="form-group">
+                <label asp-for="Email" class="control-label">Email</label>
+                <input asp-for="Email" class="form-control" />
+                <span asp-validation-for="Email" class="text-danger"></span>
+            </div>
+
+            <div class="form-group">
+                <label asp-for="Password" class="control-label">Contraseña</label>
+                <input asp-for="Password" type="password" class="form-control" id="Password" name="Password" />
+                <span asp-validation-for="Password" class="text-danger"></span>
+                <span id="passwordError" class="text-danger"></span>
+            </div>
+
+            <div class="form-group">
+                <label asp-for="RolId" class="control-label">Rol</label>
+                <select asp-for="RolId" class="form-control" id="RolId" required>
+                    <option value="">Seleccione un Rol</option>
+                </select>
+                <span asp-validation-for="RolId" class="text-danger"></span>
+            </div>
+
+            <div class="form-group">
+                <button type="submit" class="btn btn-primary">Registrarse</button>
+            </div>
+        </form>
     </div>
 </div>
-</div>
+
+<script>
+    // Validación para DNI/NIE
+    document.getElementById("Username").addEventListener("blur", function () {
+        const username = this.value;
+        const regexDni = /^[XYZ]?\d{5,8}[A-Z]$/;
+        const usernameError = document.getElementById("usernameError");
+
+        if (!regexDni.test(username)) {
+            usernameError.textContent = "El DNI/NIE no es válido.";
+            $("#Username").addClass("is-invalid");
+        } else {
+            usernameError.textContent = "";
+            $("#Username").removeClass("is-invalid");
+        }
+    });
+
+    // Validación al enviar el formulario
+    document.getElementById("registrationForm").addEventListener("submit", function (event) {
+        const usernameValid = /^[XYZ]?\d{5,8}[A-Z]$/.test(document.getElementById("Username").value);
+        const usernameError = document.getElementById("usernameError");
+
+        if (!usernameValid) {
+            usernameError.textContent = "El DNI/NIE no es válido.";
+            $("#Username").addClass("is-invalid");
+            event.preventDefault(); // Impide el envío si es inválido
+        }
+
+        // Asegurarse de que todos los campos requeridos son válidos
+        const requiredFields = document.querySelectorAll("[required]");
+        requiredFields.forEach(function (field) {
+            if (field.value === "") {
+                field.classList.add("is-invalid");
+                event.preventDefault(); // Impide el envío si algún campo requerido está vacío
+            } else {
+                field.classList.remove("is-invalid");
+            }
+        });
+    });
+
+    $(document).ready(function () {
+        // Mostrar mensajes de éxito o error
+        const successMessage = '@TempData["SuccessMessage"]';
+        const errorMessage = '@TempData["ErrorMessage"]';
+
+        if (successMessage) {
+            toastr.success(successMessage);
+        }
+        if (errorMessage) {
+            toastr.error(errorMessage);
+        }
+
+        // Cargar roles dinámicamente
+        function cargarRoles() {
+            $.ajax({
+                url: '/Account/GetAllRoles',
+                type: 'GET',
+                dataType: 'json',
+                success: function (data) {
+                    const RolSelect = $('#RolId');
+                    RolSelect.empty().append('<option value="">Seleccione un rol</option>');
+                    data.forEach(function (Rol) {
+                        RolSelect.append('<option value="' + Rol.Id + '">' + Rol.Nombre + '</option>');
+                    });
+                },
+                error: function () {
+                    toastr.error("Error al cargar los roles.");
+                }
+            });
+        }
+
+        cargarRoles();
+    });
+</script>

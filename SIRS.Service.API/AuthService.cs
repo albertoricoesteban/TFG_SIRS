@@ -23,8 +23,8 @@ namespace SIRS.Service.API
             var usuario = await _context.Usuario
                 .Include(u => u.Rol)  // Incluir el rol
                 .FirstOrDefaultAsync(u => u.Username == username);
-
-            if (usuario != null && usuario.Password == password) // Aquí debes usar un hash seguro de la contraseña
+            bool isPasswordValid = BCrypt.Net.BCrypt.Verify(password, usuario.Password);
+            if (usuario != null && isPasswordValid) // Aquí debes usar un hash seguro de la contraseña
             {
                 // Crear el token JWT
                 var claims = new[]

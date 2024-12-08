@@ -12,11 +12,12 @@
         // Rutas de la API
         public const string ApiBaseUrl = "http://localhost:5237/api/";
         public const string AuthControloador = "Auth/";
-        public const string AccountControloador = "Auth/";
+        public const string AccountControloador = "Account/";
         public const string EdificioControlador = "Edificio/";
         public const string SalaControlador = "Sala/";
         public const string EstadoSalaControlador = "EstadoSala/";
         public const string ReservaControlador = "Reserva/";
+        public const string RolControloador = "Rol/";
         // Mensajes de la Aplicación
         public const string SuccessMessage = "Operación completada con éxito";
         public const string ErrorMessage = "Ha ocurrido un error, inténtelo de nuevo";

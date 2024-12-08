@@ -61,20 +61,23 @@
     <div class="login-container">
         <div class="login-box">
             <h3>SIRS</h3>
-            <form asp-action="Login" method="post">
-                <!-- Campo usuario -->
+            <form asp-action="Loguear" method="post">
+                @Html.AntiForgeryToken()
+
+                <!-- Campo Usuario -->
                 <div class="form-group">
-                    <label for="username">Usuario</label>
-                    <input type="text" class="form-control" id="username" placeholder="Usuario" required>
+                    <label for="Username">Usuario</label>
+                    <input type="text" class="form-control" id="Username" name="Username" placeholder="Usuario" required>
                 </div>
-                <!-- Campo contraseña -->
+
+                <!-- Campo Contraseña -->
                 <div class="form-group">
-                    <label for="password">Contraseña</label>
-                    <input type="password" class="form-control" id="password" placeholder="Contraseña" required>
+                    <label for="Password">Contraseña</label>
+                    <input type="password" class="form-control" id="Password" name="Password" placeholder="Contraseña" required>
                 </div>
+
                 <!-- Botón Entrar -->
                 <button type="submit" class="btn btn-primary">Entrar</button>
-               
             </form>
         </div>
     </div>

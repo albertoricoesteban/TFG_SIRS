@@ -88,7 +88,40 @@ namespace SIRS.ApliClient
                 throw new Exception($"Ocurrió un error inesperado al realizar POST en {uri}: {ex.Message}", ex);
             }
         }
+        public async Task<T> PostAsync<T>(string uri, object data)
+        {
+            try
+            {
+                // Serializar los datos a JSON
+                var content = new StringContent(JsonConvert.SerializeObject(data), Encoding.UTF8, "application/json");
 
+                // Enviar la solicitud POST
+                var response = await _httpClient.PostAsync(uri, content);
+
+                // Verificar si la respuesta fue exitosa
+                response.EnsureSuccessStatusCode();
+
+                // Leer la respuesta y deserializarla en el tipo solicitado
+                var result = await response.Content.ReadAsStringAsync();
+                return JsonConvert.DeserializeObject<T>(result);
+            }
+            catch (HttpRequestException httpEx)
+            {
+                throw new Exception($"Error de conexión o solicitud HTTP fallida al realizar POST en {uri}: {httpEx.Message}", httpEx);
+            }
+            catch (TaskCanceledException timeoutEx)
+            {
+                throw new Exception($"La solicitud POST a {uri} se agotó. Por favor, verifica tu conexión de red o el servidor.", timeoutEx);
+            }
+            catch (JsonSerializationException jsonEx)
+            {
+                throw new Exception($"Error al serializar JSON al realizar POST en {uri}: {jsonEx.Message}", jsonEx);
+            }
+            catch (Exception ex)
+            {
+                throw new Exception($"Ocurrió un error inesperado al realizar POST en {uri}: {ex.Message}", ex);
+            }
+        }
 
         public async Task PutAsync(string uri, object data)
         {

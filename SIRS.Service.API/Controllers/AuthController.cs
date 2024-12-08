@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using SIRS.Application.ViewModels;
 
 namespace SIRS.Service.API.Controllers
 {
@@ -13,10 +14,10 @@ namespace SIRS.Service.API.Controllers
             _authService = authService;
         }
 
-        [HttpPost("login")]
-        public async Task<IActionResult> Login([FromBody] LoginRequest request)
+        [HttpPost("Login")]
+        public async Task<IActionResult> Login(LoginViewModel login)
         {
-            var token = await _authService.LoginAsync(request.Username, request.Password);
+            var token = await _authService.LoginAsync(login.Username, login.Password);
 
             if (string.IsNullOrEmpty(token))
             {
