@@ -9,11 +9,11 @@ namespace SIRS.Service.API.Controllers
     //[Authorize]
     [ApiController]
     [Route("api/[controller]")]
-    public class EstadoSalaController : ControllerBase
+    public class EstadoSalasController : ControllerBase
     {
         private readonly IEstadoSalaAppService _estadoSalaAppService;
 
-        public EstadoSalaController(IEstadoSalaAppService estadoSalaAppService)
+        public EstadoSalasController(IEstadoSalaAppService estadoSalaAppService)
         {
             _estadoSalaAppService = estadoSalaAppService;
         }

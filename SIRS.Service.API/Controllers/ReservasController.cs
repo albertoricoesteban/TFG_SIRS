@@ -11,11 +11,11 @@ namespace SIRS.Service.API.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
-    public class ReservaController : ControllerBase
+    public class ReservasController : ControllerBase
     {
         private readonly IReservaAppService _reservaAppService;
 
-        public ReservaController(IReservaAppService reservaAppService)
+        public ReservasController(IReservaAppService reservaAppService)
         {
             _reservaAppService = reservaAppService;
         }

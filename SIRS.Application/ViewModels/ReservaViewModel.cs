@@ -40,4 +40,6 @@ public class ReservaViewModel
     [Required]
     public int UsuarioId { get; set; }
     public UsuarioViewModel? Usuario { get; set; }
+
+    public bool Aprobada { get; set; }
 }

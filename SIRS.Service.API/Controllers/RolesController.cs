@@ -12,11 +12,11 @@ namespace SIRS.Service.API.Controllers
 
     [ApiController]
     [Route("api/[controller]")]
-    public class RolController: ControllerBase
+    public class RolesController: ControllerBase
     {
         private readonly IRolAppService _rolAppService;
 
-        public RolController(IRolAppService rolAppService)
+        public RolesController(IRolAppService rolAppService)
         {
             _rolAppService = rolAppService;
         }

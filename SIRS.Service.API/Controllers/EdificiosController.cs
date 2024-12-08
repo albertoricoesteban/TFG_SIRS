@@ -14,11 +14,11 @@ namespace SIRS.Service.API.Controllers
 
     [ApiController]
     [Route("api/[controller]")]
-    public class EdificioController : ControllerBase
+    public class EdificiosController : ControllerBase
     {
         private readonly IEdificioAppService _edificioAppService;
 
-        public EdificioController(IEdificioAppService edificioAppService)
+        public EdificiosController(IEdificioAppService edificioAppService)
         {
             _edificioAppService = edificioAppService;
         }

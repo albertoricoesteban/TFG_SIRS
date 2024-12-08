@@ -5,7 +5,7 @@ namespace SIRS.Domain.Models
 {
     public class Reserva
     {
-      
+
         public int Id { get; set; }
         public string Nombre { get; set; }
         public string Observaciones { get; set; }
@@ -16,11 +16,12 @@ namespace SIRS.Domain.Models
 
         public int? TiempoTotal { get; set; }
 
- 
         public int SalaId { get; set; }
         public Sala Sala { get; set; }
 
         public int UsuarioId { get; set; }
         public Usuario Usuario { get; set; }
+
+        public bool Aprobada { get; set; }
     }
 }

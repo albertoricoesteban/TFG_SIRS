@@ -9,12 +9,12 @@ namespace SIRS.Service.API.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
-    public class AccountController : ControllerBase
+    public class AccountsController : ControllerBase
     {
 
         private readonly IUsuarioAppService _usuarioAppService;
 
-        public AccountController(IUsuarioAppService usuarioAppService)
+        public AccountsController(IUsuarioAppService usuarioAppService)
         {
             _usuarioAppService = usuarioAppService;
         }

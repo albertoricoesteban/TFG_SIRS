@@ -20,10 +20,6 @@ builder.Services.AddSession(options =>
     options.Cookie.IsEssential = true;
 });
 
-// Add services to the container.
-builder.Services.AddControllers();
-builder.Services.AddControllersWithViews();
-
 // Registrar la autenticación con cookies
 builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
     .AddCookie(options =>
@@ -77,12 +73,12 @@ app.UseStaticFiles(); // Esto asegura que los archivos estáticos se sirvan corre
 app.UseSession(); // Necesario para manejar sesiones
 app.UseAuthentication(); // Usar autenticación
 app.UseAuthorization(); // Usar autorización
+app.MapControllers();
 
 // Definir rutas y controladores
 app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Home}/{action=Index}/{id?}");
-app.MapControllers();
 
 // Ejecutar la aplicación
 app.Run();

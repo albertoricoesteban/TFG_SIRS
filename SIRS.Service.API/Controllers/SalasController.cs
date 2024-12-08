@@ -9,11 +9,11 @@ namespace SIRS.Service.API.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
-    public class SalaController : ControllerBase
+    public class SalasController : ControllerBase
     {
         private readonly ISalaAppService _salaAppService;
 
-        public SalaController(ISalaAppService salaAppService)
+        public SalasController(ISalaAppService salaAppService)
         {
             _salaAppService = salaAppService;
         }

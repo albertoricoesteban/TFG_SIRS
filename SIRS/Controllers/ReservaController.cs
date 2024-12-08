@@ -6,6 +6,7 @@ using SIRS.ApliClient;
 using SIRS.Application.ViewModels;
 using SIRS.Domain.Models;
 using SIRS.Service.API.DTO;
+using System.Security.Claims;
 
 namespace SIRS.Controllers
 {
@@ -129,7 +130,15 @@ namespace SIRS.Controllers
 
             // Enviar los datos a la API
             //todo quitar este usuario para coger el que está logado
-            reserva.UsuarioId = 2;
+            var loggedInUserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            
+            if (User.IsInRole("Solicitante"))
+            {
+                reserva.UsuarioId = int.Parse(loggedInUserId.ToString());
+                reserva.Aprobada = false;
+            }
+            //todo reservar para otros
+
             if (ModelState.IsValid)
             {
                 await _apiReservaClientService.PostAsync($"{Constantes.Constantes.ApiBaseUrl}{Constantes.Constantes.ReservaControlador}Add", reserva);
