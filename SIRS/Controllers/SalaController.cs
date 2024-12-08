@@ -8,9 +8,11 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
+using Microsoft.AspNetCore.Authorization;
 
 namespace SIRS.Controllers
 {
+    [Authorize]  // Solo accesible para usuarios autenticados
     public class SalaController : Controller
     {
         private readonly ApiClientService _apiSalaClientService;

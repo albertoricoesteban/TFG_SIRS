@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using SIRS.ApliClient;
 using SIRS.Application.ViewModels;
 using System;
@@ -8,6 +9,7 @@ using System.Threading.Tasks;
 
 namespace SIRS.Controllers
 {
+    [Authorize]  // Solo accesible para usuarios autenticados
     public class EdificioController : Controller
     {
         private readonly ApiClientService _apiClientService;

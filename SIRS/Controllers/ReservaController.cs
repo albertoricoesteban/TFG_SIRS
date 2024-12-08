@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using SIRS.ApliClient;
@@ -8,6 +9,7 @@ using SIRS.Service.API.DTO;
 
 namespace SIRS.Controllers
 {
+    [Authorize]  // Solo accesible para usuarios autenticados
     public class ReservaController : Controller
     {
         private readonly ApiClientService _apiReservaClientService;

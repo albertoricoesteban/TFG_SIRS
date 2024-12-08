@@ -36,7 +36,7 @@ namespace SIRS
                 Password = password
             };
 
-            var response = await _httpClient.PostAsJsonAsync($"{Constantes.Constantes.ApiBaseUrl}{Constantes.Constantes.AuthControloador}login", loginRequest);
+            var response = await _httpClient.PostAsJsonAsync($"{Constantes.Constantes.ApiBaseUrl}{Constantes.Constantes.AuthControlador}login", loginRequest);
 
             if (response.IsSuccessStatusCode)
             {

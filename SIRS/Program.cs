@@ -4,7 +4,8 @@ using SIRS.Application.Services;
 using SIRS.Data.Context;
 using SIRS.Data.Repository;
 using SIRS.Domain.Interfaces;
-using SIRS.ApliClient; // Asegúrate de agregar esta línea para usar ApiClientService
+using SIRS.ApliClient;
+using Microsoft.AspNetCore.Authentication.Cookies;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -20,9 +21,17 @@ builder.Services.AddSession(options =>
 });
 
 // Add services to the container.
-
 builder.Services.AddControllers();
 builder.Services.AddControllersWithViews();
+
+// Registrar la autenticación con cookies
+builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
+    .AddCookie(options =>
+    {
+        options.LoginPath = "/Account/Login"; // Ruta de inicio de sesión
+        options.AccessDeniedPath = "/Account/UnAuthorize"; // Ruta de acceso denegado
+    });
+
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
 
@@ -30,7 +39,7 @@ builder.Services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("SIRSDBConnection")));
 
-
+// Configuración de MVC y JSON
 builder.Services.AddControllersWithViews()
     .AddDataAnnotationsLocalization()
     .AddJsonOptions(options => {
@@ -60,21 +69,20 @@ builder.Services.AddHttpClient<ApiClientService>();
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
-//if (app.Environment.IsDevelopment())
-//{
-//    app.UseSwagger();
-//    app.UseSwaggerUI();
-//}
-
+// Configurar el pipeline de solicitudes HTTP
 app.UseHttpsRedirection();
 app.UseStaticFiles(); // Esto asegura que los archivos estáticos se sirvan correctamente
-app.UseSession();
 
-app.UseAuthorization();
+// Usar sesión y autenticación
+app.UseSession(); // Necesario para manejar sesiones
+app.UseAuthentication(); // Usar autenticación
+app.UseAuthorization(); // Usar autorización
+
+// Definir rutas y controladores
 app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Home}/{action=Index}/{id?}");
 app.MapControllers();
 
+// Ejecutar la aplicación
 app.Run();

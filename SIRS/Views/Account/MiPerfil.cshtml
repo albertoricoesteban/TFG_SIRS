@@ -1,0 +1,98 @@
+﻿@model SIRS.Application.ViewModels.UsuarioPerfilViewModel
+
+@{
+    ViewData["Title"] = "Mi perfil";
+}
+
+<link href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css" rel="stylesheet" />
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
+
+<div class="content-wrapper">
+    <div class="content">
+        <div class="container-fluid">
+            <!-- Título de la sección -->
+            <div class="row mb-4">
+                <div class="col-12">
+                    <h3>Datos del usuario</h3>
+                </div>
+            </div>
+
+            <div class="row">
+                <!-- Columna izquierda: Foto de perfil -->
+                <div class="col-md-2 text-center">
+                    <img src="~/adminlte/dist/img/avatar.png" alt="Foto de perfil" class="img-fluid rounded-circle mb-3" style="max-width: 150px;">
+                    <p><strong>Foto de Perfil</strong></p>
+                </div>
+
+                <!-- Columna derecha: Campos de información de usuario -->
+                <div class="col-md-10">
+                    <form method="post" action="Update">
+                        <div class="row">
+                            <!-- Primer par de campos: Nombre de usuario y Nombre -->
+                            <div class="col-md-6 mb-3">
+                                <label for="username">Nombre de Usuario</label>
+                                <input type="text" class="form-control @((ViewData.ModelState["Username"]?.Errors.Count > 0) ? "is-invalid" : "")" id="username" name="Username" value="@Model.Username" />
+                                @Html.ValidationMessageFor(model => model.Username, "", new { @class = "text-danger" })
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="firstName">Nombre</label>
+                                <input type="text" class="form-control @((ViewData.ModelState["Nombre"]?.Errors.Count > 0) ? "is-invalid" : "")" id="firstName" name="Nombre" value="@Model.Nombre" />
+                                @Html.ValidationMessageFor(model => model.Nombre, "", new { @class = "text-danger" })
+                            </div>
+                        </div>
+                        <div class="row">
+                            <!-- Segundo par de campos: Apellido 1 y Apellido 2 -->
+                            <div class="col-md-6 mb-3">
+                                <label for="lastName1">Apellido 1</label>
+                                <input type="text" class="form-control @((ViewData.ModelState["Apellido1"]?.Errors.Count > 0) ? "is-invalid" : "")" id="lastName1" name="Apellido1" value="@Model.Apellido1" />
+                                @Html.ValidationMessageFor(model => model.Apellido1, "", new { @class = "text-danger" })
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="lastName2">Apellido 2</label>
+                                <input type="text" class="form-control" id="lastName2" name="Apellido2" value="@Model.Apellido2" />
+                            </div>
+                        </div>
+                        <div class="row">
+                            <!-- Campo único: Email -->
+                            <div class="col-md-12 mb-3">
+                                <label for="email">Correo Electrónico</label>
+                                <input type="email" class="form-control @((ViewData.ModelState["Email"]?.Errors.Count > 0) ? "is-invalid" : "")" id="email" name="Email" value="@Model.Email" />
+                                @Html.ValidationMessageFor(model => model.Email, "", new { @class = "text-danger" })
+                            </div>
+                        </div>
+                        <div class="row">
+                            <!-- Campo informativo: Fecha de Registro -->
+                            <div class="col-md-12 mb-3">
+                                <label for="fechaRegistro">Fecha de Registro</label>
+                                <input type="text" class="form-control" id="fechaRegistro" value="@Model.FechaRegistro.ToString("dd/MM/yyyy HH:mm")" readonly />
+                            </div>
+                        </div>
+
+                        <!-- Botón Guardar -->
+                        <div class="row">
+                            <div class="col-md-12 text-right">
+                                <button type="submit" class="btn btn-primary">Guardar</button>
+                            </div>
+                        </div>
+                    </form>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+    $(document).ready(function () {
+        // Mostrar mensajes de éxito o error
+        const successMessage = '@TempData["SuccessMessage"]';
+        const errorMessage = '@TempData["ErrorMessage"]';
+
+        if (successMessage) {
+            toastr.success(successMessage);
+        }
+        if (errorMessage) {
+            toastr.error(errorMessage);
+        }
+    });
+</script>

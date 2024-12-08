@@ -127,13 +127,17 @@
                 <span id="passwordError" class="text-danger"></span>
             </div>
 
-            <div class="form-group">
-                <label asp-for="RolId" class="control-label">Rol</label>
-                <select asp-for="RolId" class="form-control" id="RolId" required>
-                    <option value="">Seleccione un Rol</option>
-                </select>
-                <span asp-validation-for="RolId" class="text-danger"></span>
-            </div>
+            <!-- Mostrar combo de roles solo si el usuario está logueado y es administrador -->
+            @if (User.Identity.IsAuthenticated && User.IsInRole("Admin"))
+            {
+                <div class="form-group">
+                    <label asp-for="RolId" class="control-label">Rol</label>
+                    <select asp-for="RolId" class="form-control" id="RolId" required>
+                        <option value="">Seleccione un Rol</option>
+                    </select>
+                    <span asp-validation-for="RolId" class="text-danger"></span>
+                </div>
+            }
 
             <div class="form-group">
                 <button type="submit" class="btn btn-primary">Registrarse</button>
@@ -215,3 +219,4 @@
         cargarRoles();
     });
 </script>
+s

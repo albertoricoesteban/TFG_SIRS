@@ -1,4 +1,5 @@
 ﻿using SIRS.Application.ViewModels;
+using SIRS.Domain.Models;
 using System.Collections.Generic;
 
 namespace SIRS.Application.Interfaces
@@ -8,6 +9,7 @@ namespace SIRS.Application.Interfaces
         UsuarioViewModel GetById(int id);
         void Add(UsuarioViewModel usuario);
         void Update(UsuarioViewModel usuario);
+        
         void Delete(int id);
         IEnumerable<UsuarioViewModel> SearchByName(string name);
         IEnumerable<UsuarioViewModel> GetByRol(string rolNombre);
@@ -18,5 +20,6 @@ namespace SIRS.Application.Interfaces
         bool UserExistsByUsername(string username);
 
         bool UserExistsByEmail(string email);
+        void UpdateUsuarioPerfil(int id, UsuarioPerfilViewModel model);
     }
 }

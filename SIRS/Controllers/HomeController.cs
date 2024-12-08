@@ -1,9 +1,11 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using SIRS.Models;
 using System.Diagnostics;
 
 namespace SIRS.Controllers
 {
+    [Authorize]  // Solo accesible para usuarios autenticados
     public class HomeController : Controller
     {
         private readonly ILogger<HomeController> _logger;
@@ -21,6 +23,8 @@ namespace SIRS.Controllers
         {
             return View();
         }
+
+       
         public IActionResult Privacy()
         {
             return View();

@@ -39,6 +39,41 @@ namespace SIRS.Data.Repository
             _dbSet.Update(usuario);
             _db.SaveChanges(); // Guarda los cambios en la base de datos
         }
+        public void UpdateUsuarioPerfil(int id, Usuario model)
+        {
+            // Obtén el usuario de la base de datos por su ID
+            var usuario = _dbSet.Find(id); // Asume que _dbSet es tu DbSet<Usuario>
+
+            if (usuario != null)
+            {
+                // Solo actualiza los campos que están en el model
+                if (!string.IsNullOrEmpty(model.Username))
+                    usuario.Username = model.Username;
+
+                if (!string.IsNullOrEmpty(model.Nombre))
+                    usuario.Nombre = model.Nombre;
+
+                if (!string.IsNullOrEmpty(model.Apellido1))
+                    usuario.Apellido1 = model.Apellido1;
+
+                if (!string.IsNullOrEmpty(model.Apellido2))
+                    usuario.Apellido2 = model.Apellido2;
+
+                if (!string.IsNullOrEmpty(model.Email))
+                    usuario.Email = model.Email;
+
+                // La fecha de registro no se actualiza, ya que es informativa y solo se lee
+
+                // Actualiza el usuario en la base de datos
+                _dbSet.Update(usuario);
+                _db.SaveChanges(); // Guarda los cambios
+            }
+            else
+            {
+                // Si no se encuentra el usuario, se puede lanzar una excepción o manejarlo de otra forma
+                throw new KeyNotFoundException("Usuario no encontrado.");
+            }
+        }
 
         // Método para eliminar un Usuario por su Id
         public void Delete(int id)

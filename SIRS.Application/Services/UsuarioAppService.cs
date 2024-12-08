@@ -71,7 +71,11 @@ namespace SIRS.Application.Services
             var usuarios = _usuarioRepository.UserExistsByEmail(email);
             return usuarios;
         }
-
+        public void UpdateUsuarioPerfil(int id, UsuarioPerfilViewModel model) 
+        {
+            var usuario = _mapper.Map<Usuario>(model);
+            _usuarioRepository.UpdateUsuarioPerfil(id, usuario);
+        }
         public IEnumerable<UsuarioViewModel> GetAllUsuarios()
         {
             var usuarios = _usuarioRepository.GetAllUsuarios();

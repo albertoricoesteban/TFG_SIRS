@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using SIRS.Application.Interfaces;
 using SIRS.Application.Services;
 using SIRS.Application.ViewModels;
+using SIRS.Domain.Models;
 
 namespace SIRS.Service.API.Controllers
 {
@@ -52,5 +53,39 @@ namespace SIRS.Service.API.Controllers
                 return BadRequest(new { message = "No se pudo crear el usuario. Verifique los datos e intente nuevamente." });
             }
         }
+        [HttpGet("GetUserById/{Id}")]
+        public UsuarioViewModel GetUserById(int Id)
+        {
+            var usuario = _usuarioAppService.GetById(Id);
+            return usuario;
+        }
+
+
+        [HttpPut("UpdateUsuarioPerfil/{Id}")]
+        public IActionResult UpdateUsuarioPerfil(int Id, UsuarioPerfilViewModel model)
+        {
+          
+            try
+            {
+                // Verificar si el usuario existe
+                var usuario = _usuarioAppService.GetById(Id);
+                if (usuario == null)
+                {
+                    return NotFound(new { message = "El usuario no existe." });
+                }
+
+                // Llamamos al servicio para actualizar el perfil del usuario
+                _usuarioAppService.UpdateUsuarioPerfil(Id, model);
+
+                // Si todo fue bien, devolvemos un mensaje de éxito con el estado 200 (OK).
+                return Ok(new { message = "Usuario modificado exitosamente." });
+            }
+            catch (Exception ex)
+            {
+                // Si hay un error inesperado, devolvemos un error 500 con el mensaje de excepción.
+                return StatusCode(500, new { message = "No se pudo actualizar el usuario. Verifique los datos e intente nuevamente.", error = ex.Message });
+            }
+        }
+
     }
 }
