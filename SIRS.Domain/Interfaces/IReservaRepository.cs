@@ -11,6 +11,7 @@ public interface IReservaRepository : IRepository<Reserva>
     void Add(Reserva reserva);
     void Update(Reserva reserva);
     void Delete(int id);
-    IEnumerable<Reserva> GetReservasByFilters(int salaId, DateTime? fechaReserva, TimeSpan? horaInicio);
-    IEnumerable<Reserva> ObtenerReservasCalendario(DateTime fechaInicio, DateTime fechaFin);
+    IEnumerable<Reserva> GetReservasByFilters(int salaId, DateTime? fechaReserva, TimeSpan? horaInicio, int? usuarioId = null);
+    IEnumerable<Reserva> ObtenerReservasCalendario(DateTime fechaInicio, DateTime fechaFin, int? usuarioId = null);
+    void CancelarReserva(int id);
 }

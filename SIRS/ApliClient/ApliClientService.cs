@@ -53,7 +53,35 @@ namespace SIRS.ApliClient
                 throw new Exception($"Error al realizar GET en {uri}: {ex.Message}", ex);
             }
         }
+        public async Task PostAsyncWithId(string uri, int id)
+        {
+            try
+            {
+                // Crear la URL final con el ID
+                string requestUri = $"{uri}/{id}"; // Por ejemplo, si uri = "/api/reserva", la url será "/api/reserva/{id}"
 
+                // Enviar la solicitud POST sin contenido adicional
+                var response = await _httpClient.PostAsync(requestUri, null); // No se envía ningún contenido
+
+                // Verificar si la respuesta fue exitosa
+                response.EnsureSuccessStatusCode();
+            }
+            catch (HttpRequestException httpEx)
+            {
+                // Manejo específico para errores relacionados con HTTP
+                throw new Exception($"Error de conexión o solicitud HTTP fallida al realizar POST en {uri}: {httpEx.Message}", httpEx);
+            }
+            catch (TaskCanceledException timeoutEx)
+            {
+                // Manejo de errores de tiempo de espera
+                throw new Exception($"La solicitud POST a {uri} se agotó. Por favor, verifica tu conexión de red o el servidor.", timeoutEx);
+            }
+            catch (Exception ex)
+            {
+                // Manejo general de otros errores inesperados
+                throw new Exception($"Ocurrió un error inesperado al realizar POST en {uri}: {ex.Message}", ex);
+            }
+        }
         public async Task PostAsync(string uri, object data)
         {
             try

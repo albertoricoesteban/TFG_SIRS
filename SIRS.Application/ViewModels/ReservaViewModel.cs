@@ -34,12 +34,12 @@ public class ReservaViewModel
     [Required]
     public int SalaId { get; set; }
 
-
+    public int EdificioId { get; set; }
     public SalaViewModel? Sala { get; set; }
     public EdificioViewModel? Edificio{ get; set; }
     [Required]
     public int UsuarioId { get; set; }
     public UsuarioViewModel? Usuario { get; set; }
 
-    public bool Aprobada { get; set; }
+    public bool? Aprobada { get; set; }
 }

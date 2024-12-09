@@ -12,19 +12,23 @@ namespace SIRS.Application.Services
     {
         private readonly IMapper _mapper;
         private readonly IReservaRepository _reservaRepository;
-
+        private readonly ISalaRepository _salaRepository;
         public ReservaAppService(
             IMapper mapper,
-            IReservaRepository reservaRepository)
+            IReservaRepository reservaRepository, ISalaRepository salaRepository)
         {
             _mapper = mapper;
             _reservaRepository = reservaRepository;
+            _salaRepository = salaRepository;
         }
 
         public ReservaViewModel GetById(int id)
         {
             var reserva = _reservaRepository.GetById(id);
-            return _mapper.Map<ReservaViewModel>(reserva);
+            var elementoARetornar = _mapper.Map<ReservaViewModel>(reserva);
+            var edificio = _salaRepository.GetByIdWithEdificio(elementoARetornar.SalaId);
+            elementoARetornar.EdificioId = edificio.EdificioId;
+            return elementoARetornar;
         }
 
         public void Add(ReservaViewModel reservaViewModel)
@@ -70,9 +74,9 @@ namespace SIRS.Application.Services
             return _mapper.Map<IEnumerable<ReservaViewModel>>(reservas);
         }
 
-        public IEnumerable<ReservaViewModel> GetReservasByFilters(int salaId, DateTime? fechaReserva, TimeSpan? horaInicio)
+        public IEnumerable<ReservaViewModel> GetReservasByFilters(int salaId, DateTime? fechaReserva, TimeSpan? horaInicio, int? usuarioId = null)
         {
-            var reservas = _reservaRepository.GetReservasByFilters(salaId, fechaReserva, horaInicio);
+            var reservas = _reservaRepository.GetReservasByFilters(salaId, fechaReserva, horaInicio,usuarioId);
 
 
             return _mapper.Map<IEnumerable<ReservaViewModel>>(reservas);
@@ -86,6 +90,12 @@ namespace SIRS.Application.Services
 
             return _mapper.Map<IEnumerable<ReservaViewModel>>(reservas);
         }
+
+        public void CancelarReserva(int id)
+        {
+            _reservaRepository.CancelarReserva(id);
+        }
+
     }
 }
 

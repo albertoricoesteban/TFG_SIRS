@@ -1,11 +1,9 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using SIRS.Application.Interfaces;
-using SIRS.Application.Services;
 using SIRS.Application.ViewModels;
-using SIRS.Domain.Models;
 using SIRS.Service.API.DTO;
-using System;
+using System.Collections.Generic;
 
 namespace SIRS.Service.API.Controllers
 {
@@ -24,11 +22,25 @@ namespace SIRS.Service.API.Controllers
         public IActionResult GetById(int id)
         {
             var reserva = _reservaAppService.GetById(id);
-            if (reserva == null)
+            var reservaDto = new ReservaDTO()
+            {
+                Id = reserva.Id,
+                Aprobada = reserva.Aprobada,
+                EdificioId = reserva.EdificioId,
+                FechaReserva = reserva.FechaReserva.Value,
+                HoraInicio = reserva.HoraInicio.Value,
+                TiempoTotal = reserva.TiempoTotal.Value,
+                SalaId = reserva.SalaId,
+                Nombre = reserva.Nombre,
+                Observaciones = reserva.Observaciones,
+                UsuarioId = reserva.UsuarioId
+            };
+
+            if (reservaDto == null)
             {
                 return NotFound();
             }
-            return Ok(reserva);
+            return Ok(reservaDto);
         }
 
         [HttpPost("Add")]
@@ -84,9 +96,9 @@ namespace SIRS.Service.API.Controllers
             return Ok(reservas);
         }
         [HttpGet("GetReservasByFilters")]
-        public IActionResult GetReservasByFilters(int? salaId = null, DateTime? fechaReserva = null, TimeSpan? horaInicio = null)
+        public IActionResult GetReservasByFilters(int? salaId = null, DateTime? fechaReserva = null, TimeSpan? horaInicio = null, int? usuarioId = null)
         {
-            var reservas = _reservaAppService.GetReservasByFilters(salaId ?? 0, fechaReserva, horaInicio);
+            var reservas = _reservaAppService.GetReservasByFilters(salaId ?? 0, fechaReserva, horaInicio, usuarioId);
             var reservasDTO = reservas.Select(s => new ReservaDTO
             {
                 Id = s.Id,
@@ -96,7 +108,8 @@ namespace SIRS.Service.API.Controllers
                 FechaReserva = s.FechaReserva ?? DateTime.MinValue, // Maneja fechas nulas con un valor por defecto
                 HoraInicio = s.HoraInicio ?? TimeSpan.Zero, // Maneja tiempos nulos con un valor por defecto
                 HoraFin = (s.HoraInicio ?? TimeSpan.Zero).Add(TimeSpan.FromMinutes(s.TiempoTotal ?? 0)), // Calcula HoraFin
-
+                Aprobada = s.Aprobada,
+                UsuarioId = s.UsuarioId
             }).ToList();
             return Ok(reservasDTO);
         }
@@ -105,7 +118,15 @@ namespace SIRS.Service.API.Controllers
         public IActionResult ObtenerReservasCalendario(DateTime fechaInicio, DateTime fechaFin)
         {
             var reservasCalendario = _reservaAppService.ObtenerReservasCalendario(fechaInicio, fechaFin);
-            return Ok(reservasCalendario); 
+            return Ok(reservasCalendario);
+        }
+
+        [HttpPost("CancelarReserva/{id}")]
+        public IActionResult CancelarReserva(int id)
+        {
+            _reservaAppService.CancelarReserva(id);
+            return NoContent();
+
         }
     }
 }

@@ -24,7 +24,7 @@
             <!-- Formulario de búsqueda -->
             <form id="searchForm">
                 <div class="row">
-                   <!-- Selección de Sala -->
+                    <!-- Selección de Sala -->
                     <div class="col-md-3">
                         <label for="sala">Sala</label>
                         <select class="form-control" id="sala" name="sala">
@@ -64,6 +64,7 @@
                                 <th>Fecha Reserva</th>
                                 <th>Hora Inicio</th>
                                 <th>Hora Fin</th>
+                                <th>Estado Reserva</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -78,22 +79,77 @@
 
 <script>
     $(document).ready(function () {
-        // Inicializar DataTable-
+        // Inicializar DataTable
         var table = $('#reservasTable').DataTable({
             "ajax": {
-                "url": "/Reserva/GetReservasByFilters", 
+                "url": "/Reserva/GetReservasByFilters",
                 "type": "GET",
                 "dataSrc": "" // Se espera un array simple en el JSON recibido
             },
             "columns": [
-                { "data": "Nombre" },
-                { "data": "NombreSala" },
-                { "data": "FechaReserva" },
-                { "data": "HoraInicio" },
-                { "data": "HoraFin" }
-            ]
+                { "data": "Nombre", "className": "text-center" },
+                { "data": "NombreSala", "className": "text-center" },
+                {
+                    "data": "FechaReserva",
+                    "render": function (data) {
+                        if (data) {
+                            // Formatear fecha a dd/MM/yyyy
+                            var date = new Date(data);
+                            return date.toLocaleDateString("es-ES", {
+                                day: "2-digit",
+                                month: "2-digit",
+                                year: "numeric"
+                            });
+                        }
+                        return "";
+                    },
+                    "className": "text-center"
+                },
+                { "data": "HoraInicio", "className": "text-center" },
+                { "data": "HoraFin", "className": "text-center" },
+                {
+                    "data": "Aprobada",
+                    "render": function (data, type, row) {
+                        let color, estado;
+
+                        if (data === null) {
+                            color = "#E5AE25"; // Naranja para null
+                            estado = "Pendiente";
+                        } else if (data === true) {
+                            color = "#08E631"; // Verde para true
+                            estado = "Aprobada";
+                        } else {
+                            color = "#E53024"; // Rojo para false
+                            estado = "Rechazada";
+                        }
+
+                        // Retornar un círculo con un tooltip que muestra el estado
+                        return `<span
+                                    style="display: inline-block; width: 20px; height: 20px; background-color: ${color}; border-radius: 50%;"
+                                    data-bs-toggle="tooltip"
+                                    data-bs-placement="top"
+                                    title="${estado}">
+                                </span>`;
+                    },
+                    "className": "text-center" // Centrar el contenido
+                }
+            ],
+            "autoWidth": false, // Habilita ajuste automático
+            "columnDefs": [
+                { "targets": "_all", "className": "text-center" } // Centrar todo el contenido
+            ],
+            "scrollX": true, // Habilita desplazamiento horizontal si es necesario
+            "initComplete": function () {
+                // Inicializar tooltips al finalizar la renderización
+                $('[data-bs-toggle="tooltip"]').tooltip();
+            }
         });
-     
+
+        // Ajustar columnas después de la inicialización
+        table.columns.adjust();
+
+
+
 
         // Función para cargar salas
         function cargarSalas() {
@@ -116,7 +172,7 @@
             });
         }
         cargarSalas();
-       
+
 
         // Botón de búsqueda
         $('#searchButton').on('click', function () {
@@ -127,6 +183,29 @@
             table.ajax.url(`/Reserva/GetReservasByFilters?salaId=${sala}&fechaReserva=${fechaReserva}&horaInicio=${horaInicio}`).load();
         });
 
-   
+        // Acción de doble clic en una fila
+        $('#reservasTable').on('dblclick', 'tbody tr', function () {
+            $(this).toggleClass('selected'); // Añade una clase para marcar la fila
+            var data = table.row(this).data();
+            if (data && data.Id) {
+                window.location.href = '/Reserva/Update/' + data.Id;
+            }
+        });
+        function mostrarMensaje() {
+            // Mostrar mensajes de éxito o error si existen
+            var successMessage = '@TempData["SuccessMessage"]';
+            var errorMessage = '@TempData["ErrorMessage"]';
+
+            if (successMessage) {
+                toastr.success(successMessage);
+            }
+
+            if (errorMessage) {
+                toastr.error(errorMessage);
+            }
+        }
+
+        mostrarMensaje();
     });
+
 </script>

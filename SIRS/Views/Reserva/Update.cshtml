@@ -1,6 +1,13 @@
-﻿@{
+﻿@model SIRS.Application.ViewModels.ReservaDTO
+
+@{
     ViewData["Title"] = "Editar Reserva";
+    bool esAdmin = User.IsInRole("Administrador");
+    bool esSolicitante = User.IsInRole("Solicitante");
+    var fechaActual = DateTime.Now;
+    var fechaHoraReserva = Model.FechaReserva.Date.Add(Model.HoraInicio); // Combinamos la fecha y hora de la reserva
 }
+
 <link href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css" rel="stylesheet" />
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
@@ -9,17 +16,34 @@
     <div class="content">
         <div class="container-fluid">
 
-            <!-- Título de sección -->
             <div class="row mb-4">
                 <div class="col-12">
                     <h3>Editar Reserva</h3>
                 </div>
             </div>
 
-            <!-- Formulario para la edición de la reserva -->
-            <form method="post" action="/Reserva/Edit">
-                <input type="hidden" name="Id" value="@Model.Id" />
+            <!-- Etiqueta con el estado de la reserva -->
+            <div class="row mb-3">
+                <div class="col-12">
+                    <h5>Estado de la Reserva:</h5>
+                    @if (Model.Aprobada == null)
+                    {
+                        <span class="badge badge-warning">Pendiente</span> <!-- Color amarillo para pendiente -->
+                    }
+                    else if (Model.Aprobada == true)
+                    {
+                        <span class="badge badge-success">Aprobada</span> <!-- Color verde para aprobada -->
+                    }
+                    else
+                    {
+                        <span class="badge badge-danger">Rechazada</span> <!-- Color rojo para rechazada -->
+                    }
+                </div>
+            </div>
 
+            <form method="post" action="@Url.Action("Edit", "Reserva")">
+                <input type="hidden" name="Id" value="@Model.Id" />
+                <input type="hidden" name="usuarioId" value="@Model.UsuarioId" />
                 <div class="row">
                     <!-- Nombre de la Reserva -->
                     <div class="col-md-6">
@@ -56,72 +80,119 @@
 
                 <div class="row mt-3">
                     <!-- Edificio -->
-                    <div class="col-md-6">
-                        <label for="edificio">Edificio</label>
-                        <select class="form-control" id="edificioId" name="edificioId" required>
-                            <option value="">Seleccione un edificio</option>
-                            @foreach (var edificio in ViewBag.Edificios)
-                            {
-                                <option value="@edificio.Value">@edificio.Text</option>
-                            }
-                        </select>
+                    <div class="col-md-6 mb-3">
+                        <label for="EdificioId">Edificio</label>
+                        @Html.DropDownListFor(model => model.EdificioId,
+                                 new SelectList(ViewBag.Edificios as IEnumerable<SelectListItem>, "Value", "Text", Model.EdificioId),
+                                 "Seleccione el edificio",
+                                 new { @class = "form-control", required = "required" })
                     </div>
 
                     <!-- Sala -->
                     <div class="col-md-6">
-                        <label for="estado">Sala</label>
-                        <select class="form-control" id="SalaId" name="SalaId" required>
-                            <option value="">Seleccione una sala</option>
-                            @foreach (var sala in ViewBag.Salas)
-                            {
-                                <option value="@sala.Id">@sala.NombreCorto</option>
-                            }
-                        </select>
+                        <label for="SalaId">Sala</label>
+                        @Html.DropDownListFor(model => model.SalaId,
+                                 new SelectList(ViewBag.Salas as IEnumerable<SelectListItem>, "Value", "Text", Model.SalaId),
+                                 "Seleccione una sala",
+                                 new { @class = "form-control", required = "required", id = "SalaId" })
                     </div>
-
                 </div>
-                <!-- Botón de Guardar -->
+
                 <div class="row mt-4">
                     <div class="col-12 text-right">
-                        <button type="submit" class="btn btn-primary">Guardar</button>
+                        <!-- Botón Guardar: Solo si la reserva no ha sido aprobada o el usuario es administrador y la fecha no ha pasado -->
+                        @if ((esAdmin || (esSolicitante && Model.Aprobada == null)) && fechaHoraReserva >= fechaActual)
+                        {
+                            <button type="submit" class="btn btn-primary">Guardar</button>
+                            <button type="button" class="btn btn-danger" id="CancelarReservaBtn">Cancelar Reserva</button>
+                        }
                     </div>
                 </div>
             </form>
 
-            <!-- Botón para eliminar reserva si no ha pasado -->
-            @if (Model.FechaReserva >= DateTime.Today && Model.HoraInicio > DateTime.Now.TimeOfDay)
-            {
-                <form method="post" action="/Reserva/Delete" class="mt-3">
-                    <input type="hidden" name="Id" value="@Model.Id" />
-                    <button type="submit" class="btn btn-danger">Eliminar Reserva</button>
-                </form>
-            }
         </div>
     </div>
 </div>
 
 <script>
     $(document).ready(function () {
-        // Cambiar salas según el edificio seleccionado
-        $('#edificioId').on('change', function () {
-            var Id = $(this).val(); // Obtener el ID del edificio seleccionado
-            $('#SalaId').empty().append('<option value="">Seleccione una sala</option>'); // Reiniciar las opciones
+        // Al cambiar el edificio, cargamos las salas correspondientes
+        $('#EdificioId').on('change', function () {
+            var edificioId = $(this).val(); // Obtener el ID del edificio seleccionado
+            $('#SalaId').empty().append('<option value="">Seleccione una sala</option>'); // Reiniciar las opciones de sala y seleccionar la opción vacía
 
-            if (Id && !isNaN(Id)) { // Verificar que el ID no esté vacío y sea un número válido
+            if (edificioId && !isNaN(edificioId)) { // Verificar que el ID no esté vacío y sea válido
+                // Realizar la solicitud AJAX para obtener las salas
                 $.ajax({
                     url: '/Reserva/GetSalasByEdificio', // Endpoint para obtener las salas
                     type: 'GET',
-                    data: { edificioId: Id }, // Parámetros enviados al servidor
+                    data: { edificioId: edificioId }, // Parámetros enviados al servidor
                     success: function (data) {
+                        // Llenar el dropdown de salas con los datos obtenidos
                         $.each(data, function (index, sala) {
                             $('#SalaId').append('<option value="' + sala.Id + '">' + sala.NombreCorto + '</option>');
                         });
+
+                        // Preseleccionar la sala "Seleccione una sala" (value="")
+                        $('#SalaId').val(''); // Asegura que la opción "Seleccione una sala" esté seleccionada
+
+                        // Preseleccionar la sala si ya hay una seleccionada en el modelo
+                        if ('@Model.SalaId' != '') {
+                            $('#SalaId').val('@Model.SalaId');
+                        }
                     },
                     error: function () {
                         alert('No se pudieron cargar las salas. Intente nuevamente.');
                     }
                 });
+            } else {
+                // Si no hay un edificio válido seleccionado, se deselecciona cualquier sala
+                $('#SalaId').val(''); // Asegura que la opción "Seleccione una sala" esté seleccionada
             }
         });
+
+        // Si ya hay un edificio seleccionado al cargar la página, disparar el cambio para cargar las salas
+        if ('@Model.EdificioId' != '') {
+            $('#EdificioId').trigger('change');
+        }
+
+        // Confirmación para cancelar la reserva
+        $('#CancelarReservaBtn').click(function () {
+            if (confirm("¿Está seguro de que desea cancelar esta reserva?")) {
+                var reservaId = '@Model.Id';
+                $.ajax({
+                    url: '/Reserva/CancelarReserva', // Ruta al método del controlador para cancelar la reserva
+                    type: 'POST',
+                    data: { id: reservaId }, // Enviar el Id de la reserva
+                    success: function (response) {
+                        if (response.success) {
+                            toastr.success(response.message); // Mostrar mensaje de éxito
+                            // Redirigir a la lista de reservas o a cualquier página relevante
+                            window.location.href = '/Reserva/Index';
+                        } else {
+                            toastr.error(response.message); // Mostrar mensaje de error
+                        }
+                    },
+                    error: function () {
+                        toastr.error('Hubo un error al intentar cancelar la reserva. Intente nuevamente.');
+                    }
+                });
+            }
+        });
+        function mostrarMensaje() {
+            // Mostrar mensajes de éxito o error si existen
+            var successMessage = '@TempData["SuccessMessage"]';
+            var errorMessage = '@TempData["ErrorMessage"]';
+
+            if (successMessage) {
+                toastr.success(successMessage);
+            }
+
+            if (errorMessage) {
+                toastr.error(errorMessage);
+            }
+        }
+
+        mostrarMensaje();
     });
 </script>

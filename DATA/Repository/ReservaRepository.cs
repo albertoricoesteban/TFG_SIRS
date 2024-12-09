@@ -26,6 +26,7 @@ namespace SIRS.Data.Repository
                          .Include(r => r.Sala) // Incluye la relación con Sala
                          .Include(r => r.Usuario) // Incluye la relación con Usuario
                          .FirstOrDefault(r => r.Id == id);
+
         }
 
         // Método para agregar una nueva Reserva
@@ -81,7 +82,7 @@ namespace SIRS.Data.Repository
                          .ToList();
         }
 
-        public IEnumerable<Reserva> GetReservasByFilters(int salaId, DateTime? fechaReserva, TimeSpan? horaInicio)
+        public IEnumerable<Reserva> GetReservasByFilters(int salaId, DateTime? fechaReserva, TimeSpan? horaInicio, int? usuarioId)
         {
             var query = _dbSet
                 .Include(r => r.Sala) // Incluye los datos de la sala
@@ -105,10 +106,15 @@ namespace SIRS.Data.Repository
             {
                 query = query.Where(r => r.HoraInicio == horaInicio.Value);
             }
+            // Filtramos por usuarioId si no es nulo
+            if (usuarioId.HasValue)
+            {
+                query = query.Where(r => r.UsuarioId == usuarioId.Value);
+            }
 
             return query.ToList();
         }
-        public IEnumerable<Reserva> ObtenerReservasCalendario(DateTime fechaInicio, DateTime fechaFin)
+        public IEnumerable<Reserva> ObtenerReservasCalendario(DateTime fechaInicio, DateTime fechaFin, int? usuarioId)
         {
             var query = _dbSet
                 .AsQueryable();
@@ -117,9 +123,31 @@ namespace SIRS.Data.Repository
             // Filtramos por el intervalo de fechas
 
             query = query.Where(r => r.FechaReserva >= fechaInicio && r.FechaReserva <= fechaFin);
+            // Filtramos por usuarioId si no es nulo
+            if (usuarioId.HasValue)
+            {
+                query = query.Where(r => r.UsuarioId == usuarioId.Value);
+            }
 
 
             return query.ToList();
+        }
+        
+        public void CancelarReserva(int id)
+        {
+            // Buscar la reserva con el id proporcionado
+            var reserva = _dbSet.FirstOrDefault(r => r.Id == id);
+
+            // Verificar que la reserva exista y que no esté aprobada
+            if (reserva != null && reserva.Aprobada == null)
+            {
+                // Cambiar el estado de la reserva a "Cancelada"
+                reserva.FechaBaja = DateTime.Now; // O lo que corresponda según la lógica de tu aplicación
+                reserva.Aprobada = false;
+
+                // Guardar los cambios en la base de datos
+                _db.SaveChanges(); // Guarda los cambios en la base de datos
+            }
         }
 
     }

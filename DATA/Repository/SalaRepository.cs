@@ -22,7 +22,10 @@ namespace SIRS.Data.Repository
         {
             return _dbSet.AsNoTracking().FirstOrDefault(s => s.Id == id);
         }
-
+        public Sala GetByIdWithEdificio(int id)
+        {
+            return _dbSet.Include(a=>a.Edificio).FirstOrDefault(s => s.Id == id);
+        }
         // Método para agregar una nueva Sala
         public void Add(Sala sala)
         {

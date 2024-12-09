@@ -15,4 +15,5 @@ public interface ISalaRepository : IRepository<Sala>
     IEnumerable<Sala> GetByEdificioId(int EdificioId);
 
     IEnumerable<Sala> GetSalasByFilterWithEdificioNombre();
+    Sala GetByIdWithEdificio(int id);
 }

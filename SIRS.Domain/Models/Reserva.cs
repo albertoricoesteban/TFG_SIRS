@@ -22,6 +22,8 @@ namespace SIRS.Domain.Models
         public int UsuarioId { get; set; }
         public Usuario Usuario { get; set; }
 
-        public bool Aprobada { get; set; }
+        public bool? Aprobada { get; set; }
+
+        public DateTime? FechaBaja { get; set; }
     }
 }
