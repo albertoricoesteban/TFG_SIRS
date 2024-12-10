@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using SIRS.Application.Interfaces;
+using SIRS.Application.Services;
 using SIRS.Application.ViewModels;
 using System.Collections.Generic;
 
@@ -132,6 +133,13 @@ namespace SIRS.Service.API.Controllers
         {
             _usuarioAppService.UpdateUsuarioPerfil(id, model);
             return NoContent();
+        }
+
+        [HttpGet("GetUsuariosByFilter")]
+        public IActionResult GetUsuariosByFilter(string? username, string? nombre, string? apellido1, string? apellido2)
+        {
+            var salas = _usuarioAppService.GetUsuariosByFilter(username, nombre, apellido1, apellido2);
+            return Ok(salas);
         }
     }
 }

@@ -65,8 +65,8 @@ namespace SIRS.Data.Repository
 
         public IEnumerable<Edificio> GetEdificiosByFilter(string descripcion, string direccion)
         {
-            var query = _dbSet.AsQueryable(); if (!string.IsNullOrEmpty(descripcion)) { query = query.Where(e => e.Descripcion.Contains(descripcion)); }
-            if (!string.IsNullOrEmpty(direccion)) { query = query.Where(e => e.Direccion.Contains(direccion)); }
+            var query = _dbSet.AsQueryable(); if (!string.IsNullOrEmpty(descripcion)) { query = query.Where(e => e.Descripcion.ToUpper().Contains(descripcion.ToUpper())); }
+            if (!string.IsNullOrEmpty(direccion)) { query = query.Where(e => e.Direccion.ToUpper().Contains(direccion.ToUpper())); }
             return query.ToList();
         }
     }

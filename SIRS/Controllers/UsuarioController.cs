@@ -23,6 +23,13 @@ namespace SIRS.Controllers
         // Vista para la lista de usuarios (Index)
         public async Task<IActionResult> Index()
         {
+
+
+            return View();
+          
+        }
+        public async Task<IActionResult> GetAll()
+        {
             try
             {
                 var usuarios = await _apiUsuarioClientService.GetAsync<List<UsuarioViewModel>>($"{Constantes.Constantes.ApiBaseUrl}{Constantes.Constantes.UsuarioControlador}GetAll");
@@ -31,11 +38,10 @@ namespace SIRS.Controllers
             }
             catch (Exception ex)
             {
-                ViewBag.ErrorMessage = "Error al obtener los usuarios: " + ex.Message;
+                ViewBag.ErrorMessage = "Error al obtener las salas: " + ex.Message;
                 return View("Error");
             }
         }
-
         // Vista para agregar un nuevo usuario
         public async Task<IActionResult> Add()
         {
@@ -239,6 +245,26 @@ namespace SIRS.Controllers
 
             }
             return RedirectToAction("Index");
+        }
+
+        public async Task<IActionResult> GetUsuariosByFilters(string username, string nombre, string apellido1, string apellido2)
+        {
+            try
+            {
+                var query = $"username={(username ?? string.Empty)}" +
+            $"&nombre={(nombre ?? string.Empty)}" +
+            $"&apellido1={(apellido1 ?? string.Empty)}" +
+            $"&apellido2={(apellido2 ?? string.Empty)}";
+
+                var usuarios = await _apiUsuarioClientService.GetAsync<List<UsuarioViewModel>>($"{Constantes.Constantes.ApiBaseUrl}{Constantes.Constantes.UsuarioControlador}GetUsuariosByFilter?{query}");
+                return Json(usuarios);
+            }
+            catch (Exception ex)
+            { // Manejo de errores
+
+                TempData["ErrorMessage"] = "Error al buscar los usuarios: " + ex.Message;
+                return RedirectToAction(nameof(Index)); // Redirigir a 'Add' en caso de excepción
+            }
         }
     }
 

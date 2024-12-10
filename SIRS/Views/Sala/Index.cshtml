@@ -77,9 +77,9 @@
                 "dataSrc": "" // Se espera un array simple en el JSON recibido
             },
             "columns": [
-                { "data": "NombreCorto", "title": "Nombre de Sala" }, // Mapea con "nombreCorto"
-                { "data": "Descripcion", "title": "Descripción" },    // Mapea con "descripcion"
-                { "data": "Capacidad", "title": "Capacidad (personas)" } // Mapea con "capacidad"
+                { "data": "NombreCorto", "title": "Nombre de Sala", "className": "text-center" }, // Mapea con "nombreCorto"
+                { "data": "Descripcion", "title": "Descripción", "className": "text-center" },    // Mapea con "descripcion"
+                { "data": "Capacidad", "title": "Capacidad (personas)", "className": "text-center" } // Mapea con "capacidad"
             ]
         });
 
@@ -148,7 +148,7 @@
             var salaId = $(this).data('id');
             if (confirm("¿Está seguro de que desea eliminar esta sala?")) {
                 $.ajax({
-                    url: `/Sala/Delete/${salaId}`,
+                    url: '/Sala/Delete/${salaId}',
                     type: 'POST',
                     success: function () {
                         table.ajax.reload(); // Recargar la tabla después de eliminar

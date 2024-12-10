@@ -93,13 +93,14 @@
                     "data": "FechaReserva",
                     "render": function (data) {
                         if (data) {
-                            // Formatear fecha a dd/MM/yyyy
                             var date = new Date(data);
-                            return date.toLocaleDateString("es-ES", {
-                                day: "2-digit",
-                                month: "2-digit",
-                                year: "numeric"
-                            });
+                            if (!isNaN(date)) {
+                                return date.toLocaleDateString("es-ES", {
+                                    day: "2-digit",
+                                    month: "2-digit",
+                                    year: "numeric"
+                                });
+                            }
                         }
                         return "";
                     },
@@ -112,7 +113,7 @@
                     "render": function (data, type, row) {
                         let color, estado;
 
-                        if (data === null) {
+                        if (data === null || data === undefined) {
                             color = "#E5AE25"; // Naranja para null
                             estado = "Pendiente";
                         } else if (data === true) {
@@ -123,13 +124,7 @@
                             estado = "Rechazada";
                         }
 
-                        // Retornar un círculo con un tooltip que muestra el estado
-                        return `<span
-                                    style="display: inline-block; width: 20px; height: 20px; background-color: ${color}; border-radius: 50%;"
-                                    data-bs-toggle="tooltip"
-                                    data-bs-placement="top"
-                                    title="${estado}">
-                                </span>`;
+                        return '<span style="display: inline-block; width: 20px; height: 20px; background-color: ' + color + '; border-radius: 50%;" data-bs-toggle="tooltip" data-bs-placement="top" title="' + estado + '"></span>';
                     },
                     "className": "text-center" // Centrar el contenido
                 }
@@ -148,23 +143,22 @@
         // Ajustar columnas después de la inicialización
         table.columns.adjust();
 
-
-
-
         // Función para cargar salas
         function cargarSalas() {
-
             var url = '/Sala/GetSalasByFilterWithEdificioNombre';
+            var salaSelect = $('#sala');
+            salaSelect.prop('disabled', true); // Deshabilitar el selector mientras se carga
+            salaSelect.empty().append('<option value="">Cargando...</option>');
+
             $.ajax({
                 url: url,
                 type: 'GET',
                 success: function (data) {
-                    var salaSelect = $('#sala');
                     salaSelect.empty().append('<option value="">Seleccione una sala</option>');
                     data.forEach(function (sala) {
                         salaSelect.append('<option value="' + sala.Id + '">' + sala.NombreCorto + '</option>');
                     });
-                    salaSelect.prop('disabled', false);
+                    salaSelect.prop('disabled', false); // Habilitar el selector
                 },
                 error: function () {
                     alert("Error al cargar las salas.");
@@ -173,14 +167,13 @@
         }
         cargarSalas();
 
-
         // Botón de búsqueda
         $('#searchButton').on('click', function () {
             var sala = $('#sala').val();
             var fechaReserva = $('#fechaReserva').val();
             var horaInicio = $('#horaInicio').val();
 
-            table.ajax.url(`/Reserva/GetReservasByFilters?salaId=${sala}&fechaReserva=${fechaReserva}&horaInicio=${horaInicio}`).load();
+            table.ajax.url('/Reserva/GetReservasByFilters?salaId=' + sala + '&fechaReserva=' + fechaReserva + '&horaInicio=' + horaInicio).load();
         });
 
         // Acción de doble clic en una fila
@@ -191,6 +184,7 @@
                 window.location.href = '/Reserva/Update/' + data.Id;
             }
         });
+
         function mostrarMensaje() {
             // Mostrar mensajes de éxito o error si existen
             var successMessage = '@TempData["SuccessMessage"]';
@@ -207,5 +201,4 @@
 
         mostrarMensaje();
     });
-
 </script>

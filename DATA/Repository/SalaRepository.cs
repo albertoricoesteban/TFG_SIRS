@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Azure.Identity;
+using Microsoft.EntityFrameworkCore;
 using SIRS.Data.Context;
 using SIRS.Domain.Interfaces;
 using SIRS.Domain.Models;
@@ -55,7 +56,7 @@ namespace SIRS.Data.Repository
         public IEnumerable<Sala> SearchByDescripcion(string descripcion)
         {
             return _dbSet.AsNoTracking()
-                         .Where(s => s.Descripcion.Contains(descripcion))
+                         .Where(s => s.Descripcion.ToUpper().Contains(descripcion.ToUpper()))
                          .ToList();
         }
 
@@ -64,7 +65,7 @@ namespace SIRS.Data.Repository
         {
             return _dbSet.AsNoTracking()
                      .Include(s => s.EstadoSala) // Incluye la relación con EstadoSala
-                     .Where(s => s.EstadoSala.Descripcion == estado) // Filtra por el nombre del estado
+                     .Where(s => s.EstadoSala.Descripcion.ToUpper() == estado.ToUpper()) // Filtra por el nombre del estado
                      .ToList();
         }
         // Método para obtener todos las salas
@@ -75,7 +76,7 @@ namespace SIRS.Data.Repository
 
         public IEnumerable<Sala> GetSalasByFilter(string nombreCorto, int capacidad, int edificioId)
         {
-            var query = _dbSet.AsQueryable(); if (!string.IsNullOrEmpty(nombreCorto)) { query = query.Where(e => e.Descripcion.Contains(nombreCorto)); }
+            var query = _dbSet.AsQueryable(); if (!string.IsNullOrEmpty(nombreCorto)) { query = query.Where(e => e.Descripcion.ToUpper().Contains(nombreCorto.ToUpper())); }
             if (capacidad>0) { query = query.Where(e => e.Capacidad.Equals(capacidad)); }
             if (edificioId> 0) { query = query.Where(e => e.EdificioId.Equals(edificioId)); }
             return query.ToList();

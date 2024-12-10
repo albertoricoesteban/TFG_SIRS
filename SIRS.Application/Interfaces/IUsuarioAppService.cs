@@ -21,5 +21,6 @@ namespace SIRS.Application.Interfaces
 
         bool UserExistsByEmail(string email);
         void UpdateUsuarioPerfil(int id, UsuarioPerfilViewModel model);
+        IEnumerable<UsuarioViewModel> GetUsuariosByFilter(string username, string nombre, string apellido1, string apellido2);
     }
 }

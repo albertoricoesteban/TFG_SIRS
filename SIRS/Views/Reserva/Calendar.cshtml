@@ -83,7 +83,6 @@
                     },
                     eventClick: function (info) {
                         const reservaId = info.event.id;
-                        alert(reservaId);
                         // Si se hace clic sobre un evento, verificar si es del usuario logueado
                         if (String(info.event.extendedProps.usuarioId) !== String(loggedInUserId)) {
                             // Si la reserva no es del usuario logueado, redirigir al calendario
@@ -140,7 +139,7 @@
             $('#buscarBtn').on('click', function () {
                 const edificioId = $('#edificioSelect').val();
                 const salaId = $('#salaSelect').val();
-                const eventsUrl = `/Reserva/ObtenerReservasCalendario?edificioId=${edificioId}&salaId=${salaId}`;
+                const eventsUrl = '/Reserva/ObtenerReservasCalendario?edificioId=${edificioId}&salaId=${salaId}';
 
                 initializeCalendar(eventsUrl);
             });
