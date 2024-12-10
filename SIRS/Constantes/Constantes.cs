@@ -18,6 +18,7 @@
         public const string EstadoSalaControlador = "EstadoSalas/";
         public const string ReservaControlador = "Reservas/";
         public const string RolControlador = "Roles/";
+        public const string UsuarioControlador = "Usuarios/";
         // Mensajes de la Aplicación
         public const string SuccessMessage = "Operación completada con éxito";
         public const string ErrorMessage = "Ha ocurrido un error, inténtelo de nuevo";

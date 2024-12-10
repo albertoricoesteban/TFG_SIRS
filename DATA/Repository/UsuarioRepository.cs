@@ -81,7 +81,7 @@ namespace SIRS.Data.Repository
             var usuario = _dbSet.Find(id); // Busca el Usuario por Id
             if (usuario != null)
             {
-                _dbSet.Remove(usuario); // Elimina el Usuario si existe
+                usuario.FechaBaja = DateTime.Now; // Elimina el Usuario si existe
                 _db.SaveChanges(); // Guarda los cambios en la base de datos
             }
         }

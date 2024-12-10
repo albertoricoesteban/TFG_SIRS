@@ -1,0 +1,48 @@
+﻿@model SIRS.Application.ViewModels.UsuarioViewModel
+
+@{
+    ViewData["Title"] = "Editar Usuario";
+}
+
+<h3>Editar Usuario</h3>
+
+<form asp-action="Edit" method="post">
+    <input type="hidden" asp-for="Id" />
+
+    <div class="form-group">
+        <label for="Username">Username</label>
+        <input type="text" id="Username" name="Username" class="form-control" value="@Model.Username" required />
+    </div>
+
+    <div class="form-group">
+        <label for="Nombre">Nombre</label>
+        <input type="text" id="Nombre" name="Nombre" class="form-control" value="@Model.Nombre" required />
+    </div>
+
+    <div class="form-group">
+        <label for="Apellido1">Apellido1</label>
+        <input type="text" id="Apellido1" name="Apellido1" class="form-control" value="@Model.Apellido1" required />
+    </div>
+
+    <div class="form-group">
+        <label for="Apellido2">Apellido2</label>
+        <input type="text" id="Apellido2" name="Apellido2" class="form-control" value="@Model.Apellido2" />
+    </div>
+
+    <div class="form-group">
+        <label for="Email">Email</label>
+        <input type="email" id="Email" name="Email" class="form-control" value="@Model.Email" required />
+    </div>
+
+    <div class="form-group">
+        <label for="RolId">Rol</label>
+        @* <select id="RolId" name="RolId" class="form-control" required>
+            @foreach (var rol in ViewBag.Roles)
+            {
+                <option value="@rol.Id" @(rol.Id == Model.RolId ? "selected" : "")>@rol.Nombre</option>
+            }
+        </select> *@
+    </div>
+
+    <button type="submit" class="btn btn-primary">Guardar Cambios</button>
+</form>

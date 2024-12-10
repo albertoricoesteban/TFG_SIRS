@@ -1,0 +1,54 @@
+﻿@model IEnumerable<SIRS.Application.ViewModels.UsuarioViewModel>
+
+@{
+    ViewData["Title"] = "Gestión de Usuarios";
+}
+
+<h3>Gestión de Usuarios</h3>
+
+@if (TempData["SuccessMessage"] != null)
+{
+    <div class="alert alert-success">
+        @TempData["SuccessMessage"]
+    </div>
+}
+
+@if (TempData["ErrorMessage"] != null)
+{
+    <div class="alert alert-danger">
+        @TempData["ErrorMessage"]
+    </div>
+}
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>Username</th>
+            <th>Nombre</th>
+            <th>Email</th>
+            <th>Rol</th>
+            <th>Fecha de Registro</th>
+            <th>Acciones</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var usuario in Model)
+        {
+            <tr>
+                <td>@usuario.Username</td>
+                <td>@usuario.Nombre @usuario.Apellido1</td>
+                <td>@usuario.Email</td>
+            @*     <td>@usuario.Rol.Nombre</td> *@
+                <td>@usuario.FechaRegistro</td>
+                <td>
+                    <a href="@Url.Action("Edit", "Usuario", new { id = usuario.Id })" class="btn btn-warning">Editar</a>
+                    <form action="@Url.Action("Eliminar", "Usuario", new { id = usuario.Id })" method="post" style="display:inline;">
+                        <button type="submit" class="btn btn-danger">Dar de Baja</button>
+                    </form>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+<a href="@Url.Action("Add", "Usuario")" class="btn btn-primary">Agregar Usuario</a>

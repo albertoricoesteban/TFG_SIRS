@@ -29,7 +29,7 @@ namespace SIRS.Service.API
 
                 var usuario = await _context.Usuario
                     .Include(u => u.Rol)
-                    .FirstOrDefaultAsync(u => u.Username == username);
+                    .FirstOrDefaultAsync(u => u.Username == username && u.FechaBaja == null);
 
                 if (usuario != null && BCrypt.Net.BCrypt.Verify(password, usuario.Password))
                 {

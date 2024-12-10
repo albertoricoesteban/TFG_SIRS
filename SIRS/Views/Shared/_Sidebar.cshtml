@@ -13,7 +13,7 @@
             <div class="image">
                 <img src="~/adminlte/dist/img/user2-160x160.jpg" class="img-circle elevation-2" alt="User Image">
             </div>
-            
+
             <div class="info">
                 <a href="@Url.Action("Index", "Home")" class="d-block">
                     @User.Identity.Name <!-- Muestra el nombre del usuario logado -->
@@ -87,15 +87,43 @@
                         </li>
                         @if (User.IsInRole("Administrador"))
                         {
-                        <li class="nav-item">
-                            <a href="@Url.Action("Add", "Sala")" class="nav-link">
-                                <i class="far fa-circle nav-icon"></i>
-                                <p>Alta de sala</p>
-                            </a>
-                        </li>
+                            <li class="nav-item">
+                                <a href="@Url.Action("Add", "Sala")" class="nav-link">
+                                    <i class="far fa-circle nav-icon"></i>
+                                    <p>Alta de sala</p>
+                                </a>
+                            </li>
                         }
                     </ul>
                 </li>
+
+                <!-- Menu Usuarios (visible solo para administradores) -->
+                @if (User.IsInRole("Administrador"))
+                {
+                    <li class="nav-item has-treeview">
+                        <a href="#" class="nav-link">
+                            <i class="nav-icon fas fa-users"></i>
+                            <p>
+                                Usuarios
+                                <i class="right fas fa-angle-left"></i>
+                            </p>
+                        </a>
+                        <ul class="nav nav-treeview">
+                            <li class="nav-item">
+                                <a href="@Url.Action("Index", "Usuario")" class="nav-link">
+                                    <i class="far fa-circle nav-icon"></i>
+                                    <p>Gestión de usuarios</p>
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="@Url.Action("Add", "Usuario")" class="nav-link">
+                                    <i class="far fa-circle nav-icon"></i>
+                                    <p>Alta de usuario</p>
+                                </a>
+                            </li>
+                        </ul>
+                    </li>
+                }
 
                 <!-- Menu Edificio (visible solo para administradores) -->
                 @if (User.IsInRole("Administrador"))

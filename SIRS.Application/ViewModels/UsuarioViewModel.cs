@@ -34,6 +34,7 @@ public class UsuarioViewModel
     [Required(ErrorMessage = "El rol es obligatorio.")]
     public int RolId { get; set; }
     public DateTime FechaRegistro { get; set; }
+    public DateTime? FechaBaja { get; set; }
     // public IEnumerable<SelectListItem> Roles { get; set; } // Lista de roles para el dropdown
 
 }

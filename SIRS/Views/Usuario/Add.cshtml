@@ -1,0 +1,114 @@
+﻿@model SIRS.Application.ViewModels.UsuarioViewModel
+@{
+    ViewData["Title"] = "Alta de Usuario";
+}
+<link href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css" rel="stylesheet" />
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
+
+<div class="content-wrapper">
+    <div class="content">
+        <div class="container-fluid">
+
+            <!-- Título de la sección -->
+            <div class="row mb-4">
+                <div class="col-12">
+                    <h3>Alta de Usuario</h3>
+                </div>
+            </div>
+
+            <!-- Formulario para agregar un usuario -->
+            <div class="col-md-12">
+                <form asp-action="Add" method="post">
+                    @Html.AntiForgeryToken()
+
+                    <div class="row">
+                        <!-- Primer par de campos: Username y Nombre -->
+                        <div class="col-md-6 mb-3">
+                            <label for="Username">Nombre de Usuario</label>
+                            <input type="text" class="form-control" id="Username" name="Username" placeholder="Nombre de usuario" value="@Model.Username" required>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="Nombre">Nombre</label>
+                            <input type="text" class="form-control" id="Nombre" name="Nombre" placeholder="Nombre" value="@Model.Nombre" required>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <!-- Segundo par de campos: Apellido y Email -->
+                        <div class="col-md-6 mb-3">
+                            <label for="Apellido1">Apellido</label>
+                            <input type="text" class="form-control" id="Apellido1" name="Apellido1" placeholder="Apellido" value="@Model.Apellido1" required>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="Apellido2">Segundo Apellido</label>
+                            <input type="text" class="form-control" id="Apellido2" name="Apellido2" placeholder="Segundo Apellido" value="@Model.Apellido2">
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <!-- Tercer par de campos: Email y Rol -->
+                        <div class="col-md-6 mb-3">
+                            <label for="Email">Correo Electrónico</label>
+                            <input type="email" class="form-control" id="Email" name="Email" placeholder="Correo electrónico" value="@Model.Email" required>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="RolId">Rol</label>
+                            <select class="form-control" id="RolId" name="RolId" required>
+                                <option value="">Seleccione un Rol</option>
+                            </select>
+                        </div> 
+                    </div>
+
+                    <!-- Botón Guardar -->
+                    <div class="row">
+                        <div class="col-md-12 text-right">
+                            <button type="submit" class="btn btn-primary">Guardar</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    $(document).ready(function () {
+        function mostrarMensaje() {
+            // Mostrar mensajes de éxito o error si existen
+            var successMessage = '@TempData["SuccessMessage"]';
+            var errorMessage = '@TempData["ErrorMessage"]';
+
+            if (successMessage) {
+                toastr.success(successMessage);
+            }
+
+            if (errorMessage) {
+                toastr.error(errorMessage);
+            }
+        }
+        // Cargar opciones de rol dinámicamente
+        function cargarRoles() {
+            $.ajax({
+                url: '/Usuario/GetRoles',
+                type: 'GET',
+                success: function (data) {
+                    var buildingSelect = $('#RolId');
+                    buildingSelect.empty().append('<option value="">Seleccione un rol</option>');
+                    data.forEach(function (rol) {
+                        if (rol && rol.Id && rol.Nombre) {
+                            buildingSelect.append('<option value="' + rol.Id + '">' + rol.Nombre+ '</option>');
+                        }
+                    });
+                },
+                error: function (xhr, status, error) {
+                    alert("Error al cargar los roles: " + error);
+                }
+            });
+        }
+
+        cargarRoles(); // Llamar al cargar la página.
+        mostrarMensaje();
+    
+    });
+</script>

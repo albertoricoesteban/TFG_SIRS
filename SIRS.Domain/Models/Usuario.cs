@@ -22,5 +22,7 @@ namespace SIRS.Domain.Models
         public Rol Rol { get; set; }
 
         public ICollection<Reserva> Reservas { get; set; }
+
+        public DateTime? FechaBaja { get; set; }
     }
 }

@@ -38,8 +38,8 @@ namespace SIRS.Controllers
             var loggedInUserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
 
             // Llamar al API para obtener el usuario mediante su ID (o correo, dependiendo del sistema).
-            var existingUserEmail = await _apiClientService.GetAsync<UsuarioPerfilViewModel>($"{Constantes.Constantes.ApiBaseUrl}{Constantes.Constantes.AccountControlador}GetUserById/{loggedInUserId}");
-            return View(existingUserEmail);
+            var existingUser = await _apiClientService.GetAsync<UsuarioPerfilViewModel>($"{Constantes.Constantes.ApiBaseUrl}{Constantes.Constantes.AccountControlador}GetUserById/{loggedInUserId}");
+            return View(existingUser);
         }
 
 
