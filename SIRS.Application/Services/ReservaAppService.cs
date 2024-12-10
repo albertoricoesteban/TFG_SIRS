@@ -82,18 +82,18 @@ namespace SIRS.Application.Services
             return _mapper.Map<IEnumerable<ReservaViewModel>>(reservas);
         }
 
-        public IEnumerable<ReservaViewModel> ObtenerReservasCalendario(DateTime fechaInicio, DateTime fechaFin)
+        public IEnumerable<ReservaViewModel> ObtenerReservasCalendario(DateTime fechaInicio, DateTime fechaFin,  int? salaId = null)
 
         {
-            var reservas = _reservaRepository.ObtenerReservasCalendario(fechaInicio,fechaFin);
+            var reservas = _reservaRepository.ObtenerReservasCalendario(fechaInicio,fechaFin, null,salaId);
 
 
             return _mapper.Map<IEnumerable<ReservaViewModel>>(reservas);
         }
 
-        public void CancelarReserva(int id)
+        public void CancelarReserva(int id, int usuarioGestionId)
         {
-            _reservaRepository.CancelarReserva(id);
+            _reservaRepository.CancelarReserva(id, usuarioGestionId);
         }
 
     }

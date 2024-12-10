@@ -1,14 +1,40 @@
-﻿@{
+﻿@using System.Security.Claims
+@{
     ViewData["Title"] = "Calendario";
+    string usuarioLogado = User.FindFirstValue(ClaimTypes.NameIdentifier);
 }
 
 <div class="content-wrapper">
+    <input type="hidden" id="loggedInUserId" value="@usuarioLogado" />
+
     <div class="container-fluid">
         <div class="row mb-3">
             <div class="col-12">
                 <h3>Calendario de Reservas</h3>
             </div>
         </div>
+
+        <!-- Filtros -->
+        <div class="row mb-3">
+            <div class="col-md-4">
+                <label for="edificioSelect">Edificio:</label>
+                <select id="edificioSelect" class="form-control">
+                    <option value="">Seleccione un edificio</option>
+                    @* Opciones de edificio, se deben cargar desde el backend *@
+                </select>
+            </div>
+            <div class="col-md-4">
+                <label for="salaSelect">Sala:</label>
+                <select id="salaSelect" class="form-control" disabled>
+                    <option value="">Seleccione una sala</option>
+                </select>
+            </div>
+            <div class="col-md-4 d-flex align-items-end">
+                <button id="buscarBtn" class="btn btn-primary">Buscar</button>
+            </div>
+        </div>
+
+        <!-- Calendario -->
         <div class="row">
             <div class="col-12">
                 <div class="card card-primary">
@@ -29,12 +55,17 @@
 
     <script>
         $(document).ready(function () {
+            var calendar;
             var Calendar = FullCalendar.Calendar;
             var calendarEl = document.getElementById('calendar');
+            var loggedInUserId = $('#loggedInUserId').val(); // Obtener el ID del usuario logueado desde el atributo data-* en el HTML
+           
 
-            if (calendarEl) {
-                var calendar = new Calendar(calendarEl, {
-                    locale: 'es', // Configura el idioma
+            function initializeCalendar(eventsUrl) {
+                if (calendar) calendar.destroy();
+
+                calendar = new Calendar(calendarEl, {
+                    locale: 'es',
                     headerToolbar: {
                         left: 'prev,next today',
                         center: 'title',
@@ -42,28 +73,83 @@
                     },
                     initialView: 'dayGridMonth',
                     themeSystem: 'bootstrap',
-                    events: '/Reserva/ObtenerReservasCalendario', // URL al método que devuelve las reservas
+                    events: eventsUrl,
                     editable: false,
                     droppable: false,
-
-                    // Formato de la hora de los eventos
                     eventTimeFormat: {
                         hour: '2-digit',
                         minute: '2-digit',
-                        meridiem: false, // Para usar formato de 24 horas (sin AM/PM)
+                        meridiem: false
                     },
-                    // Evento al hacer doble clic sobre un evento
-                    // eventClick: function (info) {
-                    //     var reservaId = info.event.id; // Obtiene el ID de la reserva
-                    //     window.location.href = `/Reservas/Editar/${reservaId}`; // Redirige a la edición
-                    // }
+                    eventClick: function (info) {
+                        const reservaId = info.event.id;
+                        alert(reservaId);
+                        // Si se hace clic sobre un evento, verificar si es del usuario logueado
+                        if (String(info.event.extendedProps.usuarioId) !== String(loggedInUserId)) {
+                            // Si la reserva no es del usuario logueado, redirigir al calendario
+                            alert('No puede editar una reserva que no es suya.');
+                            window.location.href = '/Reserva/Calendar'; // Redirigir al calendario
+                        } else {
+                            // Si la reserva es del usuario logueado, redirigir a la página de actualización
+                            window.location.href = '/Reserva/Update/' + reservaId;
+                        }
+                    }
                 });
                 calendar.render();
             }
+            // Cargar edificios dinámicamente
+            $.getJSON('/Edificio/GetAll', function (data) {
+                data.forEach(function (edificio) {
+                    $('#edificioSelect').append(new Option(edificio.Descripcion, edificio.Id));
+                });
+            });
+
+            // Manejar el cambio de edificio
+            // Cambiar salas según el edificio seleccionado
+            $('#edificioSelect').on('change', function () {
+                var Id = $(this).val(); // Obtener el ID del edificio seleccionado
+                $('#salaSelect').empty().append('<option value="">Seleccione una sala</option>'); // Reiniciar las opciones
+
+                if (Id && !isNaN(Id)) { // Verificar que el ID no esté vacío y sea un número válido
+                    $.ajax({
+                        url: '/Reserva/GetSalasByEdificio', // Endpoint para obtener las salas
+                        type: 'GET',
+                        data: { edificioId: Id }, // Parámetros enviados al servidor
+                        success: function (data) {
+                            if (data.length > 0) {
+                                $.each(data, function (index, sala) {
+                                    $('#salaSelect').append('<option value="' + sala.Id + '">' + sala.NombreCorto + '</option>');
+                                });
+                                $('#salaSelect').prop('disabled', false); // Habilitar el campo después de cargar las opciones
+                            } else {
+                                $('#salaSelect').prop('disabled', true); // Si no hay salas, mantener deshabilitado
+                            }
+                        },
+                        error: function () {
+                            alert('No se pudieron cargar las salas. Intente nuevamente.');
+                            $('#salaSelect').prop('disabled', true); // Mantener deshabilitado si ocurre un error
+                        }
+                    });
+                } else {
+                    $('#salaSelect').prop('disabled', true); // Deshabilitar si no se selecciona un edificio válido
+                }
+            });
+
+
+            // Buscar reservas
+            $('#buscarBtn').on('click', function () {
+                const edificioId = $('#edificioSelect').val();
+                const salaId = $('#salaSelect').val();
+                const eventsUrl = `/Reserva/ObtenerReservasCalendario?edificioId=${edificioId}&salaId=${salaId}`;
+
+                initializeCalendar(eventsUrl);
+            });
+
+            // Inicializar el calendario sin filtros
+            initializeCalendar('/Reserva/ObtenerReservasCalendario');
         });
     </script>
 }
-
 
 <style>
     #calendar {
@@ -73,6 +159,6 @@
     }
 
     .content-wrapper {
-        margin-left: 250px; /* Ajusta según el ancho del menú lateral */
+        margin-left: 250px;
     }
 </style>

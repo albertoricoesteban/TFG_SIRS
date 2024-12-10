@@ -114,7 +114,7 @@ namespace SIRS.Data.Repository
 
             return query.ToList();
         }
-        public IEnumerable<Reserva> ObtenerReservasCalendario(DateTime fechaInicio, DateTime fechaFin, int? usuarioId)
+        public IEnumerable<Reserva> ObtenerReservasCalendario(DateTime fechaInicio, DateTime fechaFin, int? usuarioId, int? salaId=null)
         {
             var query = _dbSet
                 .AsQueryable();
@@ -128,12 +128,15 @@ namespace SIRS.Data.Repository
             {
                 query = query.Where(r => r.UsuarioId == usuarioId.Value);
             }
-
+            if (salaId.HasValue)
+            {
+                query = query.Where(r => r.SalaId == salaId.Value);
+            }
 
             return query.ToList();
         }
         
-        public void CancelarReserva(int id)
+        public void CancelarReserva(int id, int usuarioGestionId)
         {
             // Buscar la reserva con el id proporcionado
             var reserva = _dbSet.FirstOrDefault(r => r.Id == id);
@@ -144,6 +147,7 @@ namespace SIRS.Data.Repository
                 // Cambiar el estado de la reserva a "Cancelada"
                 reserva.FechaBaja = DateTime.Now; // O lo que corresponda según la lógica de tu aplicación
                 reserva.Aprobada = false;
+                reserva.UsuarioGestionId = usuarioGestionId;
 
                 // Guardar los cambios en la base de datos
                 _db.SaveChanges(); // Guarda los cambios en la base de datos

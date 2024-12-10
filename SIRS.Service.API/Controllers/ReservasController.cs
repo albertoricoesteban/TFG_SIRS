@@ -115,16 +115,16 @@ namespace SIRS.Service.API.Controllers
         }
 
         [HttpGet("ObtenerReservasCalendario")]
-        public IActionResult ObtenerReservasCalendario(DateTime fechaInicio, DateTime fechaFin)
+        public IActionResult ObtenerReservasCalendario(DateTime fechaInicio, DateTime fechaFin, int? salaId = null)
         {
-            var reservasCalendario = _reservaAppService.ObtenerReservasCalendario(fechaInicio, fechaFin);
+            var reservasCalendario = _reservaAppService.ObtenerReservasCalendario(fechaInicio, fechaFin, salaId);
             return Ok(reservasCalendario);
         }
 
-        [HttpPost("CancelarReserva/{id}")]
-        public IActionResult CancelarReserva(int id)
+        [HttpPost("CancelarReserva/{id}/{usuarioGestionId}")]
+        public IActionResult CancelarReserva(int id, int usuarioGestionId)
         {
-            _reservaAppService.CancelarReserva(id);
+            _reservaAppService.CancelarReserva(id, usuarioGestionId);
             return NoContent();
 
         }

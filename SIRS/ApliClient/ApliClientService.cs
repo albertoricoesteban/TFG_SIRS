@@ -53,12 +53,12 @@ namespace SIRS.ApliClient
                 throw new Exception($"Error al realizar GET en {uri}: {ex.Message}", ex);
             }
         }
-        public async Task PostAsyncWithId(string uri, int id)
+        public async Task PostAsyncWithId(string uri, int id, int loggedInUserId)
         {
             try
             {
-                // Crear la URL final con el ID
-                string requestUri = $"{uri}/{id}"; // Por ejemplo, si uri = "/api/reserva", la url será "/api/reserva/{id}"
+                // Crear la URL final con el ID y el UsuarioId en los parámetros de la query string
+                string requestUri = $"{uri}?id={id}&loggedInUserId={loggedInUserId}";
 
                 // Enviar la solicitud POST sin contenido adicional
                 var response = await _httpClient.PostAsync(requestUri, null); // No se envía ningún contenido

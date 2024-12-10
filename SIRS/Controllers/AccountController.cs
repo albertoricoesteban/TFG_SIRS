@@ -48,89 +48,101 @@ namespace SIRS.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Loguear(LoginViewModel login)
         {
-            if (!ModelState.IsValid)
+            try
             {
-                // Si el modelo no es válido, redirigimos al login con el error.
-                return View("Login", login);
-            }
-
-            // Realizar la petición al REST API para validar las credenciales del usuario
-            var result = await _apiClientService.PostAsync<string>($"{Constantes.Constantes.ApiBaseUrl}{Constantes.Constantes.AuthControlador}Login", login);
-
-            // Verificamos que la respuesta del API sea correcta
-            if (string.IsNullOrEmpty(result))
-            {
-                TempData["ErrorMessage"] = "Usuario o contraseña incorrectos.";
-                return View("Login", login);
-            }
-
-            // Almacenar el token en la sesión
-            HttpContext.Session.SetString("JwtToken", result);
-
-            // Leer y deserializar el token usando JwtSecurityTokenHandler
-            var jwtToken = Utilidades.JwtDecoder.DecodeJwtToken(result);
-
-            // Extraer los claims y almacenarlos en la sesión
-            foreach (var claim in jwtToken.Claims)
-            {
-                switch (claim.Type)
+                if (!ModelState.IsValid)
                 {
-                    case ClaimTypes.UserData:
-                        HttpContext.Session.SetString("Username", claim.Value);
-                        break;
-                    case ClaimTypes.Name:
-                        HttpContext.Session.SetString("Nombre", claim.Value);
-                        break;
-                    case ClaimTypes.Surname:
-                        // Si los apellidos vienen separados por guión, los dividimos
-                        var apellidos = claim.Value.Split('-');
-                        if (apellidos.Length == 2)
-                        {
-                            HttpContext.Session.SetString("Apellido1", apellidos[0]);
-                            HttpContext.Session.SetString("Apellido2", apellidos[1]);
-                        }
-                        else
-                        {
-                            // Si no hay dos apellidos, manejamos el caso
-                            HttpContext.Session.SetString("Apellido1", claim.Value);
-                            HttpContext.Session.SetString("Apellido2", string.Empty);
-                        }
-                        break;
-                    case ClaimTypes.Email:
-                        HttpContext.Session.SetString("Email", claim.Value);
-                        break;
-                    case ClaimTypes.Role:
-                        HttpContext.Session.SetString("Rol", claim.Value);
-                        break;
-                    case ClaimTypes.NameIdentifier:
-                        HttpContext.Session.SetString("UserId", claim.Value);
-                        break;
-                    default:
-                        // Manejar otros claims si es necesario
-                        break;
+                    // Si el modelo no es válido, redirigimos al login con el error.
+                    return View("Login", login);
                 }
 
+                // Realizar la petición al REST API para validar las credenciales del usuario
+                var result = await _apiClientService.PostAsync<string>($"{Constantes.Constantes.ApiBaseUrl}{Constantes.Constantes.AuthControlador}Login", login);
+
+                // Verificamos que la respuesta del API sea correcta
+                if (string.IsNullOrEmpty(result))
+                {
+                    TempData["ErrorMessage"] = "Usuario o contraseña incorrectos.";
+                    return View("Login", login);
+                }
+
+                // Almacenar el token en la sesión
+                HttpContext.Session.SetString("JwtToken", result);
+
+                // Leer y deserializar el token usando JwtSecurityTokenHandler
+                var jwtToken = Utilidades.JwtDecoder.DecodeJwtToken(result);
+
+                // Extraer los claims y almacenarlos en la sesión
+                foreach (var claim in jwtToken.Claims)
+                {
+                    switch (claim.Type)
+                    {
+                        case ClaimTypes.UserData:
+                            HttpContext.Session.SetString("Username", claim.Value);
+                            break;
+                        case ClaimTypes.Name:
+                            HttpContext.Session.SetString("Nombre", claim.Value);
+                            break;
+                        case ClaimTypes.Surname:
+                            // Si los apellidos vienen separados por guión, los dividimos
+                            var apellidos = claim.Value.Split('-');
+                            if (apellidos.Length == 2)
+                            {
+                                HttpContext.Session.SetString("Apellido1", apellidos[0]);
+                                HttpContext.Session.SetString("Apellido2", apellidos[1]);
+                            }
+                            else
+                            {
+                                // Si no hay dos apellidos, manejamos el caso
+                                HttpContext.Session.SetString("Apellido1", claim.Value);
+                                HttpContext.Session.SetString("Apellido2", string.Empty);
+                            }
+                            break;
+                        case ClaimTypes.Email:
+                            HttpContext.Session.SetString("Email", claim.Value);
+                            break;
+                        case ClaimTypes.Role:
+                            HttpContext.Session.SetString("Rol", claim.Value);
+                            break;
+                        case ClaimTypes.NameIdentifier:
+                            HttpContext.Session.SetString("UserId", claim.Value);
+                            break;
+                        default:
+                            // Manejar otros claims si es necesario
+                            break;
+                    }
+                }
+
+                // Crear un ClaimsIdentity con los claims
+                var identity = new ClaimsIdentity(jwtToken.Claims, "Jwt");
+                // Crear un ClaimsPrincipal
+                var principal = new ClaimsPrincipal(identity);
+
+                // Autenticar al usuario
+                await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, principal);
+
+                // Verificar si el usuario está autenticado después de almacenar el token
+                if (principal.Identity != null && principal.Identity.IsAuthenticated)
+                {
+                    // Si el usuario está autenticado, redirigimos a la página principal
+                    return RedirectToAction("Index", "Home");
+                }
+
+                // Si no está autenticado, mostramos el login nuevamente con un mensaje de error.
+                TempData["ErrorMessage"] = "No se pudo autenticar el usuario.";
+                return View("Login", login);
             }
-            // Crear un ClaimsIdentity con los claims
-
-            var identity = new ClaimsIdentity(jwtToken.Claims, "Jwt");
-            // Crear un ClaimsPrincipal
-            var principal = new ClaimsPrincipal(identity);
-
-            // Autenticar al usuario
-            await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, principal);
-
-            // Verificar si el usuario está autenticado después de almacenar el token
-            if (User.Identity.IsAuthenticated)
+            catch (Exception ex)
             {
-                // Si el usuario está autenticado, redirigimos a la página principal
-                return RedirectToAction("Index", "Home");
-            }
+                // Loguear el error (se recomienda usar un sistema de logging como Serilog, NLog, etc.)
+                //Console.WriteLine($"Error al loguear el usuario: {ex.Message}");
 
-            // Si no está autenticado, mostramos el login nuevamente con un mensaje de error.
-            TempData["ErrorMessage"] = "No se pudo autenticar el usuario.";
-            return View("Login", login);
+                // Mostrar mensaje de error genérico
+                TempData["ErrorMessage"] = "Ocurrió un error inesperado. Intente nuevamente.";
+                return View("Login", login);
+            }
         }
+
 
 
         // GET: Account/Details/5

@@ -129,14 +129,14 @@ namespace SIRS.Controllers
                 }
 
                 // Verificar si el usuario logueado es el propietario de la reserva
-                var loggedInUserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-                if (User.IsInRole("Solicitante") && reserva.UsuarioId != int.Parse(loggedInUserId.ToString()))
+                var loggedInUserId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier));
+                if (User.IsInRole("Solicitante") && reserva.UsuarioId != loggedInUserId)
                 {
                     return Json(new { success = false, message = "No puede cancelar una reserva que no es suya." });
                 }
 
                 // Cancelar la reserva
-                await _apiReservaClientService.PostAsyncWithId($"{Constantes.Constantes.ApiBaseUrl}{Constantes.Constantes.ReservaControlador}CancelarReserva", id);
+                await _apiReservaClientService.PostAsyncWithId($"{Constantes.Constantes.ApiBaseUrl}{Constantes.Constantes.ReservaControlador}CancelarReserva",id, loggedInUserId);
 
                 return Json(new { success = true, message = "Reserva cancelada correctamente." });
             }
@@ -187,7 +187,8 @@ namespace SIRS.Controllers
                         FechaReserva = reserva.FechaReserva,
                         HoraInicio = reserva.HoraInicio,
                         TiempoTotal = reserva.TiempoTotal,
-                        UsuarioId = int.Parse(loggedInUserId.ToString())  // Usamos el Usuario logueado para la actualización
+                        UsuarioId = int.Parse(loggedInUserId.ToString()),  // Usamos el Usuario logueado para la actualización
+                        UsuarioGestionId = int.Parse(loggedInUserId.ToString())
                     };
                     await _apiReservaClientService.PutAsync($"{Constantes.Constantes.ApiBaseUrl}{Constantes.Constantes.ReservaControlador}Update/{reserva.Id}", reser);
 
@@ -210,26 +211,11 @@ namespace SIRS.Controllers
             return View();
         }
 
-        // POST: ReservaController/Delete/5
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public ActionResult Delete(int id, IFormCollection collection)
-        {
-            try
-            {
-                return RedirectToAction(nameof(Index));
-            }
-            catch
-            {
-                return View();
-            }
-        }
-
         [HttpGet]
         public IActionResult GetSalasByEdificio(int edificioId)
         {
-            var edificios = _apiReservaClientService.GetAsync<List<SalaViewModel>>($"{Constantes.Constantes.ApiBaseUrl}{Constantes.Constantes.SalaControlador}GetByEdificioId/{edificioId}").Result;
-            return Json(edificios);
+            var salas = _apiReservaClientService.GetAsync<List<SalaViewModel>>($"{Constantes.Constantes.ApiBaseUrl}{Constantes.Constantes.SalaControlador}GetByEdificioId/{edificioId}").Result;
+            return Json(salas);
         }
         [HttpPost]
         public async Task<IActionResult> Create(ReservaViewModel reserva)
@@ -240,6 +226,7 @@ namespace SIRS.Controllers
             //todo quitar este usuario para coger el que está logado
             var loggedInUserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
             reserva.UsuarioId = int.Parse(loggedInUserId.ToString());
+            reserva.UsuarioGestionId = int.Parse(loggedInUserId.ToString());
             if (User.IsInRole("Solicitante"))
             {
                 reserva.Aprobada = null;
@@ -248,7 +235,6 @@ namespace SIRS.Controllers
             {
                 reserva.Aprobada = true;
             }
-
             if (ModelState.IsValid)
             {
                 await _apiReservaClientService.PostAsync($"{Constantes.Constantes.ApiBaseUrl}{Constantes.Constantes.ReservaControlador}Add", reserva);
@@ -295,41 +281,52 @@ namespace SIRS.Controllers
             }
         }
         [HttpGet]
-        public async Task<IActionResult> ObtenerReservasCalendario(DateTime start, DateTime end)
+        public async Task<IActionResult> ObtenerReservasCalendario(DateTime start, DateTime end, int? edificioId = null, int? salaId = null)
         {
             try
             {
+                var query = new List<string>
+        {
+            $"fechaInicio={start:yyyy-MM-dd}",
+            $"fechaFin={end:yyyy-MM-dd}"
+        };
 
-                var query = new List<string>();
+                if (edificioId.HasValue)
+                    query.Add($"edificioId={edificioId.Value}");
 
-                query.Add($"fechaInicio={start.ToString("yyyy-MM-dd")}");
-
-
-                query.Add($"fechaFin= {end.ToString("yyyy-MM-dd")}");
-
-
+                if (salaId.HasValue)
+                    query.Add($"salaId={salaId.Value}");
 
                 var queryString = string.Join("&", query);
 
-                var reservas = await _apiReservaClientService.GetAsync<List<ReservaDTO>>($"{Constantes.Constantes.ApiBaseUrl}{Constantes.Constantes.ReservaControlador}ObtenerReservasCalendario?{queryString}");
+                var reservas = await _apiReservaClientService.GetAsync<List<ReservaDTO>>(
+                    $"{Constantes.Constantes.ApiBaseUrl}{Constantes.Constantes.ReservaControlador}ObtenerReservasCalendario?{queryString}");
+
+                var usuarioId = User.FindFirstValue(ClaimTypes.NameIdentifier);
                 var eventosCalendario = reservas.Select(r => new
                 {
-                    title = r.Nombre, // Título del evento
-                    start = r.FechaReserva.Add(r.HoraInicio).ToString("yyyy-MM-ddTHH:mm:ss"), // Fecha y hora de inicio en formato ISO
-                    end = r.FechaReserva.Add(r.HoraFin).ToString("yyyy-MM-ddTHH:mm:ss"), // Fecha y hora de fin en formato ISO
-                    allDay = r.HoraInicio == TimeSpan.Zero && r.HoraFin == TimeSpan.Zero, // Si es todo el día (ejemplo, cuando no hay horas específicas)
-                    color = r.Aprobada == null ? "#E5AE25" : (r.Aprobada.Value ? "#08E631" : "#E53024"), // Naranja si nulo, verde si true, rojo si false
-                    description = r.Observaciones // Observaciones como descripción
+                    title = User.IsInRole("Solicitante") && int.Parse(r.UsuarioId.ToString()) != int.Parse(usuarioId.ToString())
+                        ? (r.Aprobada == true ? "Reservada" : "Pendiente de aprobar")
+                        : r.Nombre,
+                    start = r.FechaReserva.Add(r.HoraInicio).ToString("yyyy-MM-ddTHH:mm:ss"),
+                    end = r.FechaReserva.Add(r.HoraFin).ToString("yyyy-MM-ddTHH:mm:ss"),
+                    allDay = r.HoraInicio == TimeSpan.Zero && r.HoraFin == TimeSpan.Zero,
+                    color = r.Aprobada == null ? "#E5AE25" : (r.Aprobada.Value ? "#08E631" : "#E53024"),
+                    description = r.Observaciones,
+                    id = r.Id,
+                    // Agregar el usuarioId en extendedProps para poder usarlo en el frontend
+                    extendedProps = new
+                    {
+                        usuarioId = r.UsuarioId
+                    }
                 }).ToList();
 
-                // Devolver los datos en formato JSON
                 return Json(eventosCalendario);
             }
             catch (Exception ex)
-            { // Manejo de errores
-
-                TempData["ErrorMessage"] = "Error al buscar el edificio con el filtro indicado: " + ex.Message;
-                return RedirectToAction(nameof(Index)); // Redirigir a 'Add' en caso de excepción
+            {
+                TempData["ErrorMessage"] = "Error al cargar el calendario: " + ex.Message;
+                return RedirectToAction(nameof(Index));
             }
         }
     }
