@@ -32,12 +32,6 @@ namespace SIRS.Application.Services
             _usuarioRepository.Add(usuario);
         }
 
-        public void Update(UsuarioViewModel usuarioViewModel)
-        {
-            var usuario = _mapper.Map<Usuario>(usuarioViewModel);
-            _usuarioRepository.Update(usuario);
-        }
-
         public void Delete(int id)
         {
             _usuarioRepository.Delete(id);
@@ -71,10 +65,10 @@ namespace SIRS.Application.Services
             var usuarios = _usuarioRepository.UserExistsByEmail(email);
             return usuarios;
         }
-        public void UpdateUsuarioPerfil(int id, UsuarioPerfilViewModel model)
+        public void UpdateUsuarioPerfil(int id, UsuarioPerfilViewModel model, bool edicionAdmin)
         {
             var usuario = _mapper.Map<Usuario>(model);
-            _usuarioRepository.UpdateUsuarioPerfil(id, usuario);
+            _usuarioRepository.UpdateUsuarioPerfil(id, usuario,edicionAdmin);
         }
         public IEnumerable<UsuarioViewModel> GetAllUsuarios()
         {

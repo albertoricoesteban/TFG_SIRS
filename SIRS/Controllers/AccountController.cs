@@ -57,20 +57,20 @@ namespace SIRS.Controllers
                 }
 
                 // Realizar la petición al REST API para validar las credenciales del usuario
-                var result = await _apiClientService.PostAsync<string>($"{Constantes.Constantes.ApiBaseUrl}{Constantes.Constantes.AuthControlador}Login", login);
+                var token = await _apiClientService.PostAsyncLogin($"{Constantes.Constantes.ApiBaseUrl}{Constantes.Constantes.AuthControlador}Login", login);
 
                 // Verificamos que la respuesta del API sea correcta
-                if (string.IsNullOrEmpty(result))
+                if (string.IsNullOrEmpty(token))
                 {
                     TempData["ErrorMessage"] = "Usuario o contraseña incorrectos.";
                     return View("Login", login);
                 }
 
                 // Almacenar el token en la sesión
-                HttpContext.Session.SetString("JwtToken", result);
+                HttpContext.Session.SetString("JwtToken", token);
 
                 // Leer y deserializar el token usando JwtSecurityTokenHandler
-                var jwtToken = Utilidades.JwtDecoder.DecodeJwtToken(result);
+                var jwtToken = Utilidades.JwtDecoder.DecodeJwtToken(token);
 
                 // Extraer los claims y almacenarlos en la sesión
                 foreach (var claim in jwtToken.Claims)

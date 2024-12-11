@@ -39,7 +39,7 @@ namespace SIRS.Data.Repository
             _dbSet.Update(usuario);
             _db.SaveChanges(); // Guarda los cambios en la base de datos
         }
-        public void UpdateUsuarioPerfil(int id, Usuario model)
+        public void UpdateUsuarioPerfil(int id, Usuario model, bool edicionAdmin)
         {
             // Obtén el usuario de la base de datos por su ID
             var usuario = _dbSet.Find(id); // Asume que _dbSet es tu DbSet<Usuario>
@@ -62,6 +62,11 @@ namespace SIRS.Data.Repository
                 if (!string.IsNullOrEmpty(model.Email))
                     usuario.Email = model.Email;
 
+                if (edicionAdmin)
+                {
+                    if (model.RolId>0)
+                        usuario.RolId = model.RolId;
+                }
                 // La fecha de registro no se actualiza, ya que es informativa y solo se lee
 
                 // Actualiza el usuario en la base de datos

@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using SIRS.Application.Interfaces;
 using SIRS.Application.Services;
@@ -7,6 +8,7 @@ using SIRS.Domain.Models;
 
 namespace SIRS.Service.API.Controllers
 {
+    
     [ApiController]
     [Route("api/[controller]")]
     public class AccountsController : ControllerBase
@@ -61,8 +63,8 @@ namespace SIRS.Service.API.Controllers
         }
 
 
-        [HttpPut("UpdateUsuarioPerfil/{Id}")]
-        public IActionResult UpdateUsuarioPerfil(int Id, UsuarioPerfilViewModel model)
+        [HttpPut("UpdateUsuarioPerfil/{Id}/{edicionAdmin}")]
+        public IActionResult UpdateUsuarioPerfil(int Id, UsuarioPerfilViewModel model, bool edicionAdmin)
         {
           
             try
@@ -75,7 +77,7 @@ namespace SIRS.Service.API.Controllers
                 }
 
                 // Llamamos al servicio para actualizar el perfil del usuario
-                _usuarioAppService.UpdateUsuarioPerfil(Id, model);
+                _usuarioAppService.UpdateUsuarioPerfil(Id, model, edicionAdmin);
 
                 // Si todo fue bien, devolvemos un mensaje de éxito con el estado 200 (OK).
                 return Ok(new { message = "Usuario modificado exitosamente." });

@@ -6,7 +6,6 @@ using System.Collections.Generic;
 
 namespace SIRS.Service.API.Controllers
 {
-    //[Authorize]
     [ApiController]
     [Route("api/[controller]")]
     public class EstadoSalasController : ControllerBase

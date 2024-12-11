@@ -28,5 +28,7 @@ public class UsuarioPerfilViewModel
 
     public DateTime FechaRegistro { get; set; }
 
+    public int? RolId{ get; set; }
+
 
 }

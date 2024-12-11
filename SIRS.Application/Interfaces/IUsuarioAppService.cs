@@ -8,7 +8,7 @@ namespace SIRS.Application.Interfaces
     {
         UsuarioViewModel GetById(int id);
         void Add(UsuarioViewModel usuario);
-        void Update(UsuarioViewModel usuario);
+       
         
         void Delete(int id);
         IEnumerable<UsuarioViewModel> SearchByName(string name);
@@ -20,7 +20,7 @@ namespace SIRS.Application.Interfaces
         bool UserExistsByUsername(string username);
 
         bool UserExistsByEmail(string email);
-        void UpdateUsuarioPerfil(int id, UsuarioPerfilViewModel model);
+        void UpdateUsuarioPerfil(int id, UsuarioPerfilViewModel model, bool edicionAdmin);
         IEnumerable<UsuarioViewModel> GetUsuariosByFilter(string username, string nombre, string apellido1, string apellido2);
     }
 }

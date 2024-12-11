@@ -9,7 +9,6 @@ using SIRS.Application.Interfaces;
 
 namespace SIRS.Service.API.Controllers
 {
-
     [ApiController]
     [Route("api/[controller]")]
     public class RolesController: ControllerBase

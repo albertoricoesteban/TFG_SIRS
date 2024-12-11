@@ -45,23 +45,7 @@ namespace SIRS.Service.API.Controllers
 
             // Retornar un código de estado 201 Created
             return CreatedAtAction(nameof(GetById), new { id = usuarioViewModel.Id }, usuarioViewModel);
-        }
-
-        // Actualizar usuario existente
-        [HttpPut("Update/{id}")]
-        public IActionResult Update(int id, UsuarioViewModel usuarioViewModel)
-        {
-            if (id != usuarioViewModel.Id)
-            {
-                return BadRequest();
-            }
-
-            // Actualizar usuario
-            _usuarioAppService.Update(usuarioViewModel);
-
-            return NoContent(); // Retornar 204 No Content
-        }
-
+        }       
         // Eliminar usuario
         [HttpDelete("Delete/{id}")]
         public IActionResult Delete(int id)
@@ -129,9 +113,9 @@ namespace SIRS.Service.API.Controllers
 
         // Actualizar perfil de usuario
         [HttpPut("UpdatePerfil/{id}")]
-        public IActionResult UpdatePerfil(int id, UsuarioPerfilViewModel model)
+        public IActionResult UpdatePerfil(int id, UsuarioPerfilViewModel model, bool edicionAdmin)
         {
-            _usuarioAppService.UpdateUsuarioPerfil(id, model);
+            _usuarioAppService.UpdateUsuarioPerfil(id, model, edicionAdmin);
             return NoContent();
         }
 

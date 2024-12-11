@@ -7,6 +7,8 @@ using SIRS.Application.ViewModels;
 using SIRS.ApliClient;
 using System.Security.Claims;
 using SIRS.Utilidades;
+using static System.Runtime.InteropServices.JavaScript.JSType;
+using System.Net.Http;
 
 namespace SIRS.Controllers
 {
@@ -23,10 +25,7 @@ namespace SIRS.Controllers
         // Vista para la lista de usuarios (Index)
         public async Task<IActionResult> Index()
         {
-
-
             return View();
-          
         }
         public async Task<IActionResult> GetAll()
         {
@@ -68,9 +67,9 @@ namespace SIRS.Controllers
                     return View(nameof(Add), usuario);
                 }
 
-                    // Verificar si el nombre de usuario ya existe
-                    var existingUserUserName = await _apiUsuarioClientService.GetAsync<bool>(
-                $"{Constantes.Constantes.ApiBaseUrl}{Constantes.Constantes.AccountControlador}UserExistsByUsername/{usuario.Username}");
+                // Verificar si el nombre de usuario ya existe
+                var existingUserUserName = await _apiUsuarioClientService.GetAsync<bool>(
+            $"{Constantes.Constantes.ApiBaseUrl}{Constantes.Constantes.AccountControlador}UserExistsByUsername/{usuario.Username}");
 
                 if (existingUserUserName)
                 {
@@ -135,7 +134,7 @@ namespace SIRS.Controllers
         // Vista para editar un usuario (modificar)
         public async Task<IActionResult> Edit(int id)
         {
-            var usuario = await _apiUsuarioClientService.GetAsync<UsuarioPerfilViewModel>($"{Constantes.Constantes.ApiBaseUrl}{Constantes.Constantes.AccountControlador}GetUserById/{id}");
+            var usuario = await _apiUsuarioClientService.GetAsync<UsuarioViewModel>($"{Constantes.Constantes.ApiBaseUrl}{Constantes.Constantes.AccountControlador}GetUserById/{id}");
 
             if (usuario == null)
             {
@@ -157,66 +156,78 @@ namespace SIRS.Controllers
                 return NotFound();
             }
 
+            // Quitamos la validación de la contraseña porque no es necesaria.
+            ModelState.Remove("Password");
+
             // Verificar que el modelo es válido
             if (!ModelState.IsValid)
             {
                 // Si no es válido, devolvemos la misma vista con los errores de validación
                 return RedirectToAction(nameof(Edit), usuario);
             }
+
+            // Obtener el nombre del usuario actual desde las claims
             var UserNameInUser = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.UserData)?.Value;
-            if (usuario.Username != UserNameInUser)
-            {
-                // Verificar si el nombre de usuario ya existe
-                var existingUserUserName = await _apiUsuarioClientService.GetAsync<bool>(
-                $"{Constantes.Constantes.ApiBaseUrl}{Constantes.Constantes.AccountControlador}UserExistsByUsername/{usuario.Username}");
-
-                if (existingUserUserName)
-                {
-                    ModelState.AddModelError("Username", "El nombre de usuario ya está en uso.");
-                    return RedirectToAction(nameof(Edit), usuario);
-                }
-            }
-
-            // Comprobamos si el email es el mismo que el email del usuario logado (desde los claims)
-            var loggedInUserEmail = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Email)?.Value;
-
-            // Si el email recibido no es igual al email de los claims, verificamos si ya existe en la base de datos
-            if (usuario.Email != loggedInUserEmail)
-            {
-                var existingUserEmail = await _apiUsuarioClientService.GetAsync<bool>(
-                    $"{Constantes.Constantes.ApiBaseUrl}{Constantes.Constantes.AccountControlador}UserExistsByEmail/{usuario.Email}");
-
-                if (existingUserEmail)
-                {
-                    ModelState.AddModelError("Email", "El correo electrónico ya está en uso.");
-                    return RedirectToAction(nameof(Edit), usuario);
-                }
-            }
 
             try
             {
+                // 1. Solicitar todos los usuarios que tienen el mismo DNI
+                var urlDni = $"{Constantes.Constantes.ApiBaseUrl}{Constantes.Constantes.UsuarioControlador}SearchByFilters?username={usuario.Username}";
+                var usuariosConMismoDni = await _apiUsuarioClientService.GetAsync<List<UsuarioViewModel>>(urlDni);
+
+                // 2. Solicitar todos los usuarios que tienen el mismo Email
+                var urlEmail = $"{Constantes.Constantes.ApiBaseUrl}{Constantes.Constantes.UsuarioControlador}SearchByFilters?email={usuario.Email}";
+                var usuariosConMismoEmail = await _apiUsuarioClientService.GetAsync<List<UsuarioViewModel>>(urlEmail);
+
+                // Validar si existe algún conflicto con el DNI
+                var conflictoDni = usuariosConMismoDni?.Any(u => u.Id != usuario.Id);
+                if (conflictoDni == true)
+                {
+                    TempData["ErrorMessage"] = "El DNI ya está registrado por otro usuario.";
+                    return RedirectToAction(nameof(Edit), usuario);
+                }
+
+                // Validar si existe algún conflicto con el Email
+                var conflictoEmail = usuariosConMismoEmail?.Any(u => u.Id != usuario.Id);
+                if (conflictoEmail == true)
+                {
+                    TempData["ErrorMessage"] = "El Email ya está registrado por otro usuario.";
+                    return RedirectToAction(nameof(Edit), usuario);
+                }
+                // Si no hay conflictos, convertir a UsuarioPerfilViewModel
+                var usuarioPerfil = new UsuarioPerfilViewModel
+                {
+                    Id = usuario.Id,
+                    Username = usuario.Username,
+                    Nombre = usuario.Nombre,
+                    Apellido1 = usuario.Apellido1,
+                    Apellido2 = usuario.Apellido2,
+                    Email = usuario.Email,
+                    FechaRegistro = usuario.FechaRegistro,
+                    RolId = usuario.RolId
+                };
+                // Si no hay conflictos, proceder con la actualización del usuario
+                var esAdmin = User.IsInRole("Administrador");
+                var urlEdicion = $"{Constantes.Constantes.ApiBaseUrl}{Constantes.Constantes.AccountControlador}UpdateUsuarioPerfil/{id}/{esAdmin}";
+
                 // Llamar al método del servicio REST API para actualizar el usuario
-                //var result = await _apiUsuarioClientService.PutAsync<UsuarioViewModel>(
-                //    $"{Constantes.Constantes.ApiBaseUrl}{Constantes.Constantes.AccountControlador}UpdateUsuarioPerfil/{User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier).Value}");
+                var result = await _apiUsuarioClientService.PutAsync<UsuarioPerfilViewModel>(urlEdicion, usuarioPerfil);
 
-                //// Verificamos si la actualización fue exitosa
-                //if (result != null)
-                //{
-
-                //    TempData["SuccessMessage"] = "Datos actualizados correctamente.";
-                //    return RedirectToAction(nameof(Edit), usuario);
-                //}
-                //else
-                //{
-
-                //    TempData["ErrorMessage"] = "Hubo un error al actualizar los datos.";
-                return RedirectToAction(nameof(Edit), usuario);
-                //}
+                // Verificamos si la actualización fue exitosa
+                if (result != null)
+                {
+                    TempData["SuccessMessage"] = "Datos actualizados correctamente.";
+                    return RedirectToAction(nameof(Edit), usuario);
+                }
+                else
+                {
+                    TempData["ErrorMessage"] = "Hubo un error al actualizar los datos.";
+                    return RedirectToAction(nameof(Edit), usuario);
+                }
             }
             catch (Exception ex)
             {
                 // Si hay un error inesperado en la llamada al API
-
                 TempData["ErrorMessage"] = $"Hubo un error al actualizar los datos del usuario: {ex.Message}";
                 return RedirectToAction(nameof(Edit), usuario);
             }
@@ -230,13 +241,16 @@ namespace SIRS.Controllers
             try
             {
                 var loggedInUserId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier));
-
-                // Cancelar la reserva
-                await _apiUsuarioClientService.PostAsyncWithId($"{Constantes.Constantes.ApiBaseUrl}{Constantes.Constantes.UsuarioControlador}Delete", id, loggedInUserId);
-
-
-
-                TempData["SuccessMessage"] = "Usuario dado de baja con éxito.";
+                if (loggedInUserId == id)
+                {
+                    TempData["ErrorMessage"] = "No puede dar de baja su propio usuario";
+                }
+                else
+                {
+                    // Cancelar la reserva
+                    await _apiUsuarioClientService.DeleteAsync($"{Constantes.Constantes.ApiBaseUrl}{Constantes.Constantes.UsuarioControlador}Delete/{id}");
+                    TempData["SuccessMessage"] = "Usuario dado de baja con éxito.";
+                }
             }
             catch (Exception ex)
             {
