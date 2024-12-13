@@ -36,4 +36,10 @@
     </Content>
   </ItemGroup>
 
+	<ItemGroup>
+		<None Include="..\SIRS.Service.API\config\appsettings.json">
+			<Link>config\appsettings.json</Link>
+		</None>
+	</ItemGroup>
+	
 </Project>

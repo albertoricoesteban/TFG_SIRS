@@ -31,8 +31,8 @@
                         <div class="row">
                             <!-- Primer par de campos: Nombre de usuario y Nombre -->
                             <div class="col-md-6 mb-3">
-                                <label for="username">Nombre de Usuario</label>
-                                <input type="text" class="form-control @((ViewData.ModelState["Username"]?.Errors.Count > 0) ? "is-invalid" : "")" id="username" name="Username" value="@Model.Username" />
+                                <label for="username">NIF (Usuario)</label>
+                                <input readonly type="text" class="form-control @((ViewData.ModelState["Username"]?.Errors.Count > 0) ? "is-invalid" : "")" id="username" name="Username" value="@Model.Username" />
                                 @Html.ValidationMessageFor(model => model.Username, "", new { @class = "text-danger" })
                             </div>
                             <div class="col-md-6 mb-3">

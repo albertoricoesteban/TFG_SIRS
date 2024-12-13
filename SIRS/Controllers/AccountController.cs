@@ -157,7 +157,7 @@ namespace SIRS.Controllers
             if (!ModelState.IsValid)
             {
                 // Si no es válido, devolvemos la misma vista con los errores de validación
-                return RedirectToAction(nameof(MiPerfil), model);
+                return RedirectToAction(nameof(MiPerfil));
             }
             var UserNameInUser = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.UserData)?.Value;
             if (model.Username != UserNameInUser)
@@ -169,7 +169,7 @@ namespace SIRS.Controllers
                 if (existingUserUserName)
                 {
                     ModelState.AddModelError("Username", "El nombre de usuario ya está en uso.");
-                    return RedirectToAction(nameof(MiPerfil), model);
+                    return RedirectToAction(nameof(MiPerfil));
                 }
             }
 
@@ -185,28 +185,31 @@ namespace SIRS.Controllers
                 if (existingUserEmail)
                 {
                     ModelState.AddModelError("Email", "El correo electrónico ya está en uso.");
-                    return RedirectToAction(nameof(MiPerfil), model);
+                    return RedirectToAction(nameof(MiPerfil));
                 }
             }
 
             try
             {
+                var idUsuario = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier).Value;
+                var esAdmin = User.IsInRole("Administrador");
+
+                var urlEdicion = $"{Constantes.Constantes.ApiBaseUrl}{Constantes.Constantes.AccountControlador}UpdateUsuarioPerfil/{idUsuario}/{esAdmin}";
                 // Llamar al método del servicio REST API para actualizar el usuario
-                var result = await _apiClientService.PutAsync<UsuarioPerfilViewModel>(
-                    $"{Constantes.Constantes.ApiBaseUrl}{Constantes.Constantes.AccountControlador}UpdateUsuarioPerfil/{User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier).Value}", model);
+                var result = await _apiClientService.PutAsync<UsuarioPerfilViewModel>(urlEdicion, model);
 
                 // Verificamos si la actualización fue exitosa
                 if (result != null)
                 {
 
                     TempData["SuccessMessage"] = "Datos actualizados correctamente.";
-                    return RedirectToAction(nameof(MiPerfil), model);
+                    return RedirectToAction(nameof(MiPerfil));
                 }
                 else
                 {
 
                     TempData["ErrorMessage"] = "Hubo un error al actualizar los datos.";
-                    return RedirectToAction(nameof(MiPerfil), model);
+                    return RedirectToAction(nameof(MiPerfil));
                 }
             }
             catch (Exception ex)
@@ -214,12 +217,8 @@ namespace SIRS.Controllers
                 // Si hay un error inesperado en la llamada al API
 
                 TempData["ErrorMessage"] = $"Hubo un error al actualizar los datos del usuario: {ex.Message}";
-                return RedirectToAction(nameof(MiPerfil), model);
+                return RedirectToAction(nameof(MiPerfil));
             }
-
-            // Volver a la misma vista con los mensajes de éxito o error y el modelo actualizado
-            return RedirectToAction(nameof(MiPerfil)); // Redirigir a 'Login' 
-
         }
 
 
@@ -253,7 +252,8 @@ namespace SIRS.Controllers
             }
             else
             {
-                Console.WriteLine("Error: " + errorMessage);
+                TempData["ErrorMessage"] = errorMessage;
+                return RedirectToAction(nameof(Register),usuario); // Redirigir a 'Add' en caso de excepción
             }
 
             usuario.RolId = 2;

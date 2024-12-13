@@ -139,7 +139,7 @@
             $('#buscarBtn').on('click', function () {
                 const edificioId = $('#edificioSelect').val();
                 const salaId = $('#salaSelect').val();
-                const eventsUrl = '/Reserva/ObtenerReservasCalendario?edificioId=${edificioId}&salaId=${salaId}';
+                const eventsUrl = '/Reserva/ObtenerReservasCalendario?edificioId='+edificioId+'&salaId='+salaId;
 
                 initializeCalendar(eventsUrl);
             });

@@ -3,10 +3,12 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
 using SIRS.ApliClient;
 using SIRS.Application.ViewModels;
 using SIRS.Domain.Models;
 using SIRS.Service.API.DTO;
+using System.Globalization;
 using System.Security.Claims;
 
 namespace SIRS.Controllers
@@ -33,8 +35,13 @@ namespace SIRS.Controllers
         }
 
         // GET: ReservaController/Create
-        public ActionResult Add()
+        public ActionResult Add(ReservaViewModel reserva)
         {
+
+            if (reserva == null)
+            {
+                reserva = new ReservaViewModel();
+            }
 
             var edificios = _apiReservaClientService.GetAsync<List<EdificioViewModel>>($"{Constantes.Constantes.ApiBaseUrl}{Constantes.Constantes.EdificioControlador}GetAll").Result;
 
@@ -53,7 +60,7 @@ namespace SIRS.Controllers
                 ViewBag.Edificios = new List<SelectListItem>();
             }
 
-            return View();
+            return View(reserva);
         }
 
         // GET: ReservaController/Edit/5
@@ -190,7 +197,10 @@ namespace SIRS.Controllers
                         UsuarioId = int.Parse(loggedInUserId.ToString()),  // Usamos el Usuario logueado para la actualización
                         UsuarioGestionId = int.Parse(loggedInUserId.ToString())
                     };
-                    await _apiReservaClientService.PutAsync($"{Constantes.Constantes.ApiBaseUrl}{Constantes.Constantes.ReservaControlador}Update/{reserva.Id}", reser);
+                    var esAdmin = User.IsInRole("Administrador");
+
+                    var urlEdicion = $"{Constantes.Constantes.ApiBaseUrl}{Constantes.Constantes.ReservaControlador}Update/{reserva.Id}/{esAdmin}";
+                    await _apiReservaClientService.PutAsync(urlEdicion, reser);
 
                     TempData["SuccessMessage"] = "La reserva se ha actualizado correctamente.";
                     return RedirectToAction(nameof(Update), new { id = reserva.Id });
@@ -235,6 +245,25 @@ namespace SIRS.Controllers
             {
                 reserva.Aprobada = true;
             }
+            DateTime fechaHoraInicio;
+            try
+            {
+                // Combinar FechaReserva y HoraInicio y analizar con ParseExact
+                var fechaHoraTexto = $"{reserva.FechaReserva:dd/MM/yyyy} {reserva.HoraInicio}";
+                fechaHoraInicio = DateTime.Parse(fechaHoraTexto);
+            }
+            catch (FormatException ex)
+            {
+                TempData["ErrorMessage"] = $"El formato de la fecha o la hora de inicio es incorrecto. {ex.Message}";
+                return RedirectToAction(nameof(Add), reserva);
+            }
+
+            // Validar que la fecha y hora de inicio no sean anteriores a la actual
+            if (fechaHoraInicio < DateTime.Now)
+            {
+                TempData["ErrorMessage"] = "La fecha y hora de inicio no pueden ser anteriores a la fecha y hora actual.";
+                return RedirectToAction(nameof(Add), reserva);
+            }
             if (ModelState.IsValid)
             {
                 await _apiReservaClientService.PostAsync($"{Constantes.Constantes.ApiBaseUrl}{Constantes.Constantes.ReservaControlador}Add", reserva);
@@ -243,7 +272,7 @@ namespace SIRS.Controllers
                 return RedirectToAction(nameof(Add)); // Redirigir a 'Add' para una nueva inserción
             }
             TempData["ErrorMessage"] = "Ocurrió un error al crear la reserva.";
-            return View("Add", reserva); // Redirigir a la vista 'Add' si hay errores
+            return RedirectToAction(nameof(Add), reserva); // Redirigir a la vista 'Add' si hay errores
         }
 
 

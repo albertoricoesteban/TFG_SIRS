@@ -99,7 +99,10 @@ namespace SIRS.Controllers
                 if (ModelState.IsValid)
                 {
                     sala.Reservas = new List<ReservaViewModel>();
-                    await _apiSalaClientService.PutAsync($"{Constantes.Constantes.ApiBaseUrl}{Constantes.Constantes.SalaControlador}Update/{sala.Id}", sala);
+                    var esAdmin = User.IsInRole("Administrador");
+
+                    var urlEdicion = $"{Constantes.Constantes.ApiBaseUrl}{Constantes.Constantes.SalaControlador}Update/{sala.Id}/{esAdmin}";
+                    await _apiSalaClientService.PutAsync(urlEdicion, sala);
 
                     TempData["SuccessMessage"] = "El edificio se ha actualizado correctamente.";
                     return RedirectToAction(nameof(Update), new { id = sala.Id }); // Redirigir a 'Update' en caso de excepción

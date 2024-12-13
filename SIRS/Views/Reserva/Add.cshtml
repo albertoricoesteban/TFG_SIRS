@@ -22,13 +22,13 @@
                     <!-- Nombre de la Reserva -->
                     <div class="col-md-6">
                         <label for="nombreReserva">Nombre de la reserva</label>
-                        <input type="text" class="form-control" id="Nombre" name="Nombre" maxlength="500" required placeholder="Nombre de la reserva">
+                        <input type="text" class="form-control" id="Nombre" name="Nombre" maxlength="500" value="@Model.Nombre" required placeholder="Nombre de la reserva">
                     </div>
 
                     <!-- Observaciones -->
                     <div class="col-md-6">
                         <label for="observaciones">Observaciones</label>
-                        <textarea class="form-control" id="Observaciones" name="Observaciones" maxlength="1000" rows="2" placeholder="Opcional"></textarea>
+                        <textarea class="form-control" id="Observaciones" name="Observaciones" maxlength="1000" rows="2" value="@Model.Observaciones" placeholder="Opcional"></textarea>
                     </div>
                 </div>
 
@@ -36,19 +36,19 @@
                     <!-- Fecha de la Reserva -->
                     <div class="col-md-4">
                         <label for="fechaReserva">Fecha de la reserva</label>
-                        <input type="date" class="form-control" id="FechaReserva" name="FechaReserva" required>
+                        <input type="date" class="form-control" id="FechaReserva" name="FechaReserva" value="@Model.FechaReserva" required>
                     </div>
 
                     <!-- Hora de Inicio -->
                     <div class="col-md-4">
                         <label for="horaInicio">Hora de inicio</label>
-                        <input type="time" class="form-control" id="HoraInicio" name="HoraInicio" required>
+                        <input type="time" class="form-control" id="HoraInicio" name="HoraInicio" value="@Model.HoraInicio" required>
                     </div>
 
                     <!-- Tiempo Total -->
                     <div class="col-md-4">
                         <label for="tiempoTotal">Tiempo total (en minutos)</label>
-                        <input type="number" class="form-control" id="TiempoTotal" name="TiempoTotal" min="1" required placeholder="Duración en minutos">
+                        <input type="number" class="form-control" id="TiempoTotal" name="TiempoTotal" min="1" value="@Model.TiempoTotal"  required placeholder="Duración en minutos">
                     </div>
                 </div>
 
