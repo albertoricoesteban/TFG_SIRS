@@ -128,5 +128,19 @@ namespace SIRS.Service.API.Controllers
             return NoContent();
 
         }
+        [HttpPost("ReactivarReserva/{id}/{usuarioGestionId}")]
+        public IActionResult ReactivarReserva(int id, int usuarioGestionId)
+        {
+            _reservaAppService.ReactivarReserva(id, usuarioGestionId);
+            return NoContent();
+
+        }
+        [HttpPost("AprobarReserva/{id}/{usuarioGestionId}")]
+        public IActionResult AprobarReserva(int id, int usuarioGestionId)
+        {
+            _reservaAppService.AprobarReserva(id, usuarioGestionId);
+            return NoContent();
+
+        }
     }
 }

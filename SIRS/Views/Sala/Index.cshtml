@@ -69,6 +69,9 @@
 
 <script>
     $(document).ready(function () {
+
+        var userRole = '@ViewBag.UserRole';
+
         // Inicializar DataTable
         var table = $('#roomsTable').DataTable({
             "ajax": {
@@ -83,8 +86,12 @@
             ]
         });
 
-        // Acción de doble clic en una fila
         $('#roomsTable').on('dblclick', 'tbody tr', function () {
+            if (userRole === "Solicitante") {
+                toastr.warning("No tienes permiso para realizar esta acción.");
+                return; // Prevenir cualquier acción para "Solicitante"
+            }
+
             $(this).toggleClass('selected'); // Añade una clase para marcar la fila
             var data = table.row(this).data();
             if (data && data.Id) {

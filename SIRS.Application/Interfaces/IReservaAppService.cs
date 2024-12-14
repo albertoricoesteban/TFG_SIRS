@@ -19,6 +19,8 @@ namespace SIRS.Application.Interfaces
 
         IEnumerable<ReservaViewModel> ObtenerReservasCalendario(DateTime fechaInicio, DateTime fechaFin, int? salaId = null);
         void CancelarReserva(int id, int usuarioGestionId);
+        void ReactivarReserva(int id, int usuarioGestionId);
+        void AprobarReserva(int id, int usuarioGestionId);
 
     }
 }

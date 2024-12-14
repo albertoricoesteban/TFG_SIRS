@@ -96,7 +96,7 @@
                     var edificioSelect = $('#edificio');
                     edificioSelect.empty().append('<option value="">Seleccione un edificio</option>');
                     data.forEach(function (edificio) {
-                        edificioSelect.append('<option value="' + edificio.id + '">' + edificio.descripcion + '</option>');
+                        edificioSelect.append('<option value="' + edificio.Id + '">' + edificio.Descripcion + '</option>');
                     });
                 },
                 error: function () {
@@ -115,7 +115,7 @@
                     var estadoSelect = $('#estado');
                     estadoSelect.empty().append('<option value="">Seleccione un estado</option>');
                     data.forEach(function (estado) {
-                        estadoSelect.append('<option value="' + estado.id + '">' + estado.descripcion + '</option>');
+                        estadoSelect.append('<option value="' + estado.Id + '">' + estado.Descripcion + '</option>');
                     });
                 },
                 error: function () {

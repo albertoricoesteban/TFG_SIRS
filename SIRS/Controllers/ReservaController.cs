@@ -77,8 +77,8 @@ namespace SIRS.Controllers
                     .Result;
                 var loggedInUserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
 
-            
-                if (reserva == null || (reserva.UsuarioId != int.Parse(loggedInUserId.ToString())))
+
+                if (reserva == null || (User.IsInRole("Solicitante") && (reserva.UsuarioId != int.Parse(loggedInUserId.ToString()))))
                 {
                     TempData["ErrorMessage"] = "No puede editar una reserva que no es suya o que no coincide con la reserva solicitada.";
                     return RedirectToAction(nameof(Index));
@@ -143,9 +143,74 @@ namespace SIRS.Controllers
                 }
 
                 // Cancelar la reserva
-                await _apiReservaClientService.PostAsyncWithId($"{Constantes.Constantes.ApiBaseUrl}{Constantes.Constantes.ReservaControlador}CancelarReserva",id, loggedInUserId);
+                await _apiReservaClientService.PostAsyncWithId($"{Constantes.Constantes.ApiBaseUrl}{Constantes.Constantes.ReservaControlador}CancelarReserva/{id}/{loggedInUserId}",id,loggedInUserId);
 
                 return Json(new { success = true, message = "Reserva cancelada correctamente." });
+            }
+            catch (Exception ex)
+            {
+                return Json(new { success = false, message = $"Hubo un error al cancelar la reserva: {ex.Message}" });
+            }
+        }
+        [HttpPost]
+        public async Task<IActionResult> AprobarReserva(int id)
+        {
+            try
+            {
+                if (User.IsInRole("Administrador"))
+                {
+                    // Obtener la reserva para verificar el UsuarioId
+                    var reserva = await _apiReservaClientService.GetAsync<ReservaDTO>($"{Constantes.Constantes.ApiBaseUrl}{Constantes.Constantes.ReservaControlador}GetById/{id}");
+
+                    if (reserva == null)
+                    {
+                        return Json(new { success = false, message = "La reserva no existe." });
+                    }
+
+                    // Verificar si el usuario logueado es el propietario de la reserva
+                    var loggedInUserId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier));
+
+                    // Cancelar la reserva
+                    await _apiReservaClientService.PostAsyncWithId($"{Constantes.Constantes.ApiBaseUrl}{Constantes.Constantes.ReservaControlador}AprobarReserva/{id}/{loggedInUserId}", id, loggedInUserId);
+
+                    return Json(new { success = true, message = "Reserva aprobada correctamente." });
+                }
+                else
+                {
+                    return Json(new { success = false, message = "No tiene permisos para realziar esta acción." });
+                }
+            }
+            catch (Exception ex)
+            {
+                return Json(new { success = false, message = $"Hubo un error al aprobada la reserva: {ex.Message}" });
+            }
+        }
+        [HttpPost]
+        public async Task<IActionResult> ReactivarReserva(int id)
+        {
+            try
+            {
+                if (User.IsInRole("Administrador"))
+                {
+                    // Obtener la reserva para verificar el UsuarioId
+                    var reserva = await _apiReservaClientService.GetAsync<ReservaDTO>($"{Constantes.Constantes.ApiBaseUrl}{Constantes.Constantes.ReservaControlador}GetById/{id}");
+
+                    if (reserva == null)
+                    {
+                        return Json(new { success = false, message = "La reserva no existe." });
+                    }
+
+                    // Verificar si el usuario logueado es el propietario de la reserva
+                    var loggedInUserId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier));
+                  
+                    await _apiReservaClientService.PostAsyncWithId($"{Constantes.Constantes.ApiBaseUrl}{Constantes.Constantes.ReservaControlador}ReactivarReserva/{id}/{loggedInUserId}", id, loggedInUserId);
+
+                    return Json(new { success = true, message = "Reserva reactivada correctamente." });
+                }
+                else
+                {
+                    return Json(new { success = false, message = "No tiene permisos para realizar esta acción." });
+                }
             }
             catch (Exception ex)
             {
@@ -199,7 +264,7 @@ namespace SIRS.Controllers
                     };
                     var esAdmin = User.IsInRole("Administrador");
 
-                    var urlEdicion = $"{Constantes.Constantes.ApiBaseUrl}{Constantes.Constantes.ReservaControlador}Update/{reserva.Id}/{esAdmin}";
+                    var urlEdicion = $"{Constantes.Constantes.ApiBaseUrl}{Constantes.Constantes.ReservaControlador}Update/{reserva.Id}";
                     await _apiReservaClientService.PutAsync(urlEdicion, reser);
 
                     TempData["SuccessMessage"] = "La reserva se ha actualizado correctamente.";
@@ -342,6 +407,9 @@ namespace SIRS.Controllers
                     allDay = r.HoraInicio == TimeSpan.Zero && r.HoraFin == TimeSpan.Zero,
                     color = r.Aprobada == null ? "#E5AE25" : (r.Aprobada.Value ? "#08E631" : "#E53024"),
                     description = r.Observaciones,
+                    textColor = User.IsInRole("Solicitante") && int.Parse(r.UsuarioId.ToString()) != int.Parse(usuarioId.ToString())
+        ? "#FF0000" // Texto rojo si no es propio
+        : "#000000", // Texto negro para eventos propios
                     id = r.Id,
                     // Agregar el usuarioId en extendedProps para poder usarlo en el frontend
                     extendedProps = new

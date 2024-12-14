@@ -2,10 +2,13 @@
 using Microsoft.AspNetCore.Mvc;
 using SIRS.ApliClient;
 using SIRS.Application.ViewModels;
+using SIRS.Domain.Models;
+using SIRS.Service.API.DTO;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace SIRS.Controllers
 {
@@ -146,8 +149,22 @@ namespace SIRS.Controllers
         {
             try
             {
-                // Llamada al método DELETE del API
-                await _apiClientService.DeleteAsync($"{Constantes.Constantes.ApiBaseUrl}{Constantes.Constantes.EdificioControlador}Delete/{id}");
+                // Verificar si hay salas asociadas al edificio
+                var query = $"nombreCorto={string.Empty}" + $"&capacidad=0" + $"&edificioId={(id > 0 ? id.ToString() : "0")}";
+
+                var salas = await _apiClientService.GetAsync<List<SalaViewModel>>($"{Constantes.Constantes.ApiBaseUrl}{Constantes.Constantes.SalaControlador}GetSalasByFilter?{query}");
+
+
+                if (salas != null && salas.Count > 0)
+                {
+                    // Hay salas asociadas, no se puede eliminar
+                    TempData["ErrorMessage"] = "No se puede eliminar el edificio porque hay salas asociadas.";
+                    return RedirectToAction(nameof(Index)); // Redirigir a la página principal o donde corresponda
+                }
+
+                // No hay salas asociadas, proceder con la eliminación
+                var deleteUrl = $"{Constantes.Constantes.ApiBaseUrl}{Constantes.Constantes.EdificioControlador}Delete/{id}";
+                await _apiClientService.DeleteAsync(deleteUrl);
 
                 // Mostrar mensaje de éxito
                 TempData["SuccessMessage"] = "El edificio ha sido eliminado con éxito.";

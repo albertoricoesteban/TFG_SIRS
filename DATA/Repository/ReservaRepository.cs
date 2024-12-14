@@ -153,6 +153,39 @@ namespace SIRS.Data.Repository
                 _db.SaveChanges(); // Guarda los cambios en la base de datos
             }
         }
+        public void ReactivarReserva(int id, int usuarioGestionId)
+        {
+            // Buscar la reserva con el id proporcionado
+            var reserva = _dbSet.FirstOrDefault(r => r.Id == id);
 
+            // Verificar que la reserva exista 
+            if (reserva != null )
+            {
+                // Cambiar el estado de la reserva a "Cancelada"
+                reserva.FechaBaja = null; // O lo que corresponda según la lógica de tu aplicación
+                reserva.Aprobada = null;
+                reserva.UsuarioGestionId = usuarioGestionId;
+
+                // Guardar los cambios en la base de datos
+                _db.SaveChanges(); // Guarda los cambios en la base de datos
+            }
+        }
+        public void AprobarReserva(int id, int usuarioGestionId)
+        {
+            // Buscar la reserva con el id proporcionado
+            var reserva = _dbSet.FirstOrDefault(r => r.Id == id);
+
+            // Verificar que la reserva exista 
+            if (reserva != null)
+            {
+                // Cambiar el estado de la reserva a "Cancelada"
+                reserva.FechaBaja = null; // O lo que corresponda según la lógica de tu aplicación
+                reserva.Aprobada = true;
+                reserva.UsuarioGestionId = usuarioGestionId;
+
+                // Guardar los cambios en la base de datos
+                _db.SaveChanges(); // Guarda los cambios en la base de datos
+            }
+        }
     }
 }

@@ -23,6 +23,8 @@ namespace SIRS.Controllers
         }
         public ActionResult Index()
         {
+            ViewBag.UserRole = User.IsInRole("Solicitante") ? "Solicitante" : "Otro";
+
             return View();
         }
 
@@ -101,7 +103,7 @@ namespace SIRS.Controllers
                     sala.Reservas = new List<ReservaViewModel>();
                     var esAdmin = User.IsInRole("Administrador");
 
-                    var urlEdicion = $"{Constantes.Constantes.ApiBaseUrl}{Constantes.Constantes.SalaControlador}Update/{sala.Id}/{esAdmin}";
+                    var urlEdicion = $"{Constantes.Constantes.ApiBaseUrl}{Constantes.Constantes.SalaControlador}Update/{sala.Id}";
                     await _apiSalaClientService.PutAsync(urlEdicion, sala);
 
                     TempData["SuccessMessage"] = "El edificio se ha actualizado correctamente.";

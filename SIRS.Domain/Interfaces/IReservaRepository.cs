@@ -14,4 +14,8 @@ public interface IReservaRepository : IRepository<Reserva>
     IEnumerable<Reserva> GetReservasByFilters(int salaId, DateTime? fechaReserva, TimeSpan? horaInicio, int? usuarioId = null);
     IEnumerable<Reserva> ObtenerReservasCalendario(DateTime fechaInicio, DateTime fechaFin, int? usuarioId = null, int? salaId= null);
     void CancelarReserva(int id, int usuarioGestionId);
+    void ReactivarReserva(int id, int usuarioGestionId);
+
+    void AprobarReserva(int id, int usuarioGestionId);
+
 }

@@ -101,11 +101,40 @@
                 <div class="row mt-4">
                     <div class="col-12 text-right">
                         <!-- Botón Guardar: Solo si la reserva no ha sido aprobada o el usuario es administrador y la fecha no ha pasado -->
-                        @if ((esAdmin || (esSolicitante && Model.Aprobada == null)) && fechaHoraReserva >= fechaActual)
-                        {
-                            <button type="submit" class="btn btn-primary">Guardar</button>
-                            <button type="button" class="btn btn-danger" id="CancelarReservaBtn">Cancelar Reserva</button>
-                        }
+                        <div class="col-12 text-right">
+                            @if (esAdmin)
+                            {
+                                <!-- Si es administrador, puede hacer todo -->
+                                @if (Model.Aprobada == true && fechaHoraReserva >= fechaActual)
+                                {
+                                    <!-- Mostrar botón para eliminar reserva si está aprobada y la fecha no ha pasado -->
+                                    <button type="button" class="btn btn-danger" id="EliminarReservaBtn">Eliminar Reserva</button>
+                                }
+                                else if (Model.Aprobada == false && fechaHoraReserva >= fechaActual)
+                                {
+                                    <!-- Mostrar botón para reactivar reserva si no está aprobada y la fecha no ha pasado -->
+                                    <button type="button" class="btn btn-info" id="ReactivarReservaBtn">Reactivar Reserva</button>
+                                }
+                                else if (Model.Aprobada == true && fechaHoraReserva < fechaActual)
+                                {
+                                    <!-- No mostrar botones si está aprobada y la fecha ya pasó -->
+                                }
+                                else if (Model.Aprobada == null && fechaHoraReserva >= fechaActual)
+                                {
+                                    <!-- Mostrar botón para eliminar reserva si está aprobada y la fecha no ha pasado -->
+                                    <button type="button" class="btn btn-success" id="AprobarReservaBtn">Aprobar Reserva</button>
+                                }
+                            }
+                            else if (esSolicitante)
+                            {
+                                <!-- Si es solicitante, solo puede cancelar reservas que no hayan pasado -->
+                                @if (fechaHoraReserva >= fechaActual)
+                                {
+                                    <button type="button" class="btn btn-danger" id="CancelarReservaBtn">Cancelar Reserva</button>
+                                }
+                            }
+                        </div>
+
                     </div>
                 </div>
             </form>
@@ -162,6 +191,51 @@
                 var reservaId = '@Model.Id';
                 $.ajax({
                     url: '/Reserva/CancelarReserva', // Ruta al método del controlador para cancelar la reserva
+                    type: 'POST',
+                    data: { id: reservaId }, // Enviar el Id de la reserva
+                    success: function (response) {
+                        if (response.success) {
+                            toastr.success(response.message); // Mostrar mensaje de éxito
+                            // Redirigir a la lista de reservas o a cualquier página relevante
+                            window.location.href = '/Reserva/Index';
+                        } else {
+                            toastr.error(response.message); // Mostrar mensaje de error
+                        }
+                    },
+                    error: function () {
+                        toastr.error('Hubo un error al intentar cancelar la reserva. Intente nuevamente.');
+                    }
+                });
+            }
+        });
+        $('#ReactivarReservaBtn').click(function () {
+            if (confirm("¿Está seguro de que desea reactivar esta reserva?")) {
+                var reservaId = '@Model.Id';
+                $.ajax({
+                    url: '/Reserva/ReactivarReserva', // Ruta al método del controlador para cancelar la reserva
+                    type: 'POST',
+                    data: { id: reservaId }, // Enviar el Id de la reserva
+                    success: function (response) {
+                        if (response.success) {
+                            toastr.success(response.message); // Mostrar mensaje de éxito
+                            // Redirigir a la lista de reservas o a cualquier página relevante
+                            window.location.href = '/Reserva/Index';
+                        } else {
+                            toastr.error(response.message); // Mostrar mensaje de error
+                        }
+                    },
+                    error: function () {
+                        toastr.error('Hubo un error al intentar reactivar la reserva. Intente nuevamente.');
+                    }
+                });
+            }
+        });
+        // Confirmación para cancelar la reserva
+        $('#AprobarReservaBtn').click(function () {
+            if (confirm("¿Está seguro de que desea aprobar esta reserva?")) {
+                var reservaId = '@Model.Id';
+                $.ajax({
+                    url: '/Reserva/AprobarReserva', // Ruta al método del controlador para cancelar la reserva
                     type: 'POST',
                     data: { id: reservaId }, // Enviar el Id de la reserva
                     success: function (response) {

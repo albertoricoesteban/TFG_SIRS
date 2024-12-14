@@ -95,7 +95,15 @@ namespace SIRS.Application.Services
         {
             _reservaRepository.CancelarReserva(id, usuarioGestionId);
         }
+        public void ReactivarReserva(int id, int usuarioGestionId)
+        {
+            _reservaRepository.ReactivarReserva(id, usuarioGestionId);
 
+        }
+        public void AprobarReserva(int id, int usuarioGestionId)
+        {
+            _reservaRepository.AprobarReserva(id, usuarioGestionId);
+        }
     }
 }
 
