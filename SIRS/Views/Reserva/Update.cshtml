@@ -25,7 +25,7 @@
             <!-- Etiqueta con el estado de la reserva -->
             <div class="row mb-3">
                 <div class="col-12">
-                    <h5>Estado de la Reserva:</h5>
+                   <h5>Estado de la Reserva:</h5>
                     @if (Model.Aprobada == null)
                     {
                         <span class="badge badge-warning">Pendiente</span> <!-- Color amarillo para pendiente -->
@@ -42,8 +42,8 @@
             </div>
 
             <form method="post" action="@Url.Action("Edit", "Reserva")">
+                <input type="hidden" name="Aprobada" value="@(Model.Aprobada.HasValue ? Model.Aprobada.ToString() : "null")" />
                 <input type="hidden" name="Id" value="@Model.Id" />
-                <input type="hidden" name="usuarioId" value="@Model.UsuarioId" />
                 <div class="row">
                     <!-- Nombre de la Reserva -->
                     <div class="col-md-6">
@@ -97,39 +97,60 @@
                                  new { @class = "form-control", required = "required", id = "SalaId" })
                     </div>
                 </div>
+                @if (esAdmin)
+                {
+                    <div class="row mt-3">
+                        <!-- Usuario -->
 
+                        <div class="col-md-6">
+                            <label for="UsuarioId">Usuario</label>
+                            @Html.DropDownListFor(model => model.UsuarioId,
+                                     new SelectList(ViewBag.Usuarios as IEnumerable<SelectListItem>, "Value", "Text", Model.UsuarioId),
+                                     "Seleccione un usuario",
+                                     new { @class = "form-control", required = "required", id = "UsuarioId", name = "UsuarioId" })
+
+                        </div>
+                    </div>
+                }
                 <div class="row mt-4">
                     <div class="col-12 text-right">
                         <!-- Botón Guardar: Solo si la reserva no ha sido aprobada o el usuario es administrador y la fecha no ha pasado -->
                         <div class="col-12 text-right">
                             @if (esAdmin)
                             {
-                                <!-- Si es administrador, puede hacer todo -->
-                                @if (Model.Aprobada == true && fechaHoraReserva >= fechaActual)
+                                @if (esAdmin)
                                 {
-                                    <!-- Mostrar botón para eliminar reserva si está aprobada y la fecha no ha pasado -->
-                                    <button type="button" class="btn btn-danger" id="EliminarReservaBtn">Eliminar Reserva</button>
-                                }
-                                else if (Model.Aprobada == false && fechaHoraReserva >= fechaActual)
-                                {
-                                    <!-- Mostrar botón para reactivar reserva si no está aprobada y la fecha no ha pasado -->
-                                    <button type="button" class="btn btn-info" id="ReactivarReservaBtn">Reactivar Reserva</button>
-                                }
-                                else if (Model.Aprobada == true && fechaHoraReserva < fechaActual)
-                                {
-                                    <!-- No mostrar botones si está aprobada y la fecha ya pasó -->
-                                }
-                                else if (Model.Aprobada == null && fechaHoraReserva >= fechaActual)
-                                {
-                                    <!-- Mostrar botón para eliminar reserva si está aprobada y la fecha no ha pasado -->
-                                    <button type="button" class="btn btn-success" id="AprobarReservaBtn">Aprobar Reserva</button>
+                                    if (Model.Aprobada == null && fechaHoraReserva < fechaActual)
+                                    {
+                                        <!-- No mostrar botones si la reserva está pendiente y la fecha ya pasó -->
+                                    }
+                                    else if (Model.Aprobada == true && fechaHoraReserva >= fechaActual)
+                                    {
+                                        <!-- Mostrar botones "Eliminar" y "Guardar" si está aprobada y la fecha no ha pasado -->
+                                        <button type="button" class="btn btn-danger" id="EliminarReservaBtn">Eliminar Reserva</button>
+                                        <button type="submit" class="btn btn-primary" id="GuardarBtn">Guardar</button>
+                                    }
+                                    else if (Model.Aprobada == false && fechaHoraReserva >= fechaActual)
+                                    {
+                                        <!-- Mostrar botón "Reactivar" si está rechazada y la fecha no ha pasado -->
+                                        <button type="button" class="btn btn-info" id="ReactivarReservaBtn">Reactivar Reserva</button>
+                                    }
+                                    else if (Model.Aprobada == null && fechaHoraReserva >= fechaActual)
+                                    {
+                                        <!-- Mostrar botones "Guardar", "Eliminar", "Aprobar" y "Cancelar" si está pendiente y la fecha no ha pasado -->
+                                        <button type="submit" class="btn btn-primary" id="GuardarBtn">Guardar</button>
+                                        <button type="button" class="btn btn-danger" id="EliminarReservaBtn">Eliminar Reserva</button>
+                                        <button type="button" class="btn btn-success" id="AprobarReservaBtn">Aprobar Reserva</button>
+                                        <button type="button" class="btn btn-warning" id="CancelarReservaBtn">Cancelar Reserva</button>
+                                    }
                                 }
                             }
                             else if (esSolicitante)
                             {
                                 <!-- Si es solicitante, solo puede cancelar reservas que no hayan pasado -->
-                                @if (fechaHoraReserva >= fechaActual)
+                                @if (Model.Aprobada == null && fechaHoraReserva >= fechaActual)
                                 {
+                                    <button type="Submit" class="btn btn-primary" id="GuardarBtn">Guardar</button>
                                     <button type="button" class="btn btn-danger" id="CancelarReservaBtn">Cancelar Reserva</button>
                                 }
                             }

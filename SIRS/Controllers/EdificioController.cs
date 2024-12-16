@@ -159,7 +159,7 @@ namespace SIRS.Controllers
                 {
                     // Hay salas asociadas, no se puede eliminar
                     TempData["ErrorMessage"] = "No se puede eliminar el edificio porque hay salas asociadas.";
-                    return RedirectToAction(nameof(Index)); // Redirigir a la página principal o donde corresponda
+                    return RedirectToAction("Index", "Edificio"); 
                 }
 
                 // No hay salas asociadas, proceder con la eliminación
@@ -168,13 +168,14 @@ namespace SIRS.Controllers
 
                 // Mostrar mensaje de éxito
                 TempData["SuccessMessage"] = "El edificio ha sido eliminado con éxito.";
-                return RedirectToAction(nameof(Index)); // Redirigir a la página principal o donde corresponda
+                return RedirectToAction("Index", "Edificio"); 
             }
             catch (Exception ex)
             {
                 // Manejar el error y mostrar un mensaje de error
                 TempData["ErrorMessage"] = "Error al eliminar el edificio: " + ex.Message;
-                return RedirectToAction(nameof(Index)); // Redirigir a la página principal o donde corresponda
+                return RedirectToAction("Index", "Edificio"); // Asegúrate de redirigir al controlador correcto
+
             }
         }
 

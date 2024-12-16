@@ -59,7 +59,24 @@ namespace SIRS.Controllers
                 // Si no hay resultados de la API, asignar una lista vacía
                 ViewBag.Edificios = new List<SelectListItem>();
             }
-
+            if (User.IsInRole("Administrador"))
+            {
+                var usuarios = _apiReservaClientService.GetAsync<List<UsuarioViewModel>>($"{Constantes.Constantes.ApiBaseUrl}{Constantes.Constantes.UsuarioControlador}GetAll").Result;
+                if (usuarios != null && usuarios.Any())
+                {
+                    // Convertir la respuesta en una lista de SelectListItem para usar en la vista
+                    ViewBag.Usuarios = usuarios.Select(e => new SelectListItem
+                    {
+                        Value = e.Id.ToString(),  // El valor será el Id del Edificio
+                        Text = $"{e.Nombre} {e.Apellido1} {e.Apellido2}"       // El texto será la descripción del Edificio
+                    }).ToList();
+                }
+                else
+                {
+                    // Si no hay resultados de la API, asignar una lista vacía
+                    ViewBag.Usuarios = new List<SelectListItem>();
+                }
+            }
             return View(reserva);
         }
 
@@ -77,7 +94,24 @@ namespace SIRS.Controllers
                     .Result;
                 var loggedInUserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
 
-
+                if (User.IsInRole("Administrador"))
+                {
+                    var usuarios = _apiReservaClientService.GetAsync<List<UsuarioViewModel>>($"{Constantes.Constantes.ApiBaseUrl}{Constantes.Constantes.UsuarioControlador}GetAll").Result;
+                    if (usuarios != null && usuarios.Any())
+                    {
+                        // Convertir la respuesta en una lista de SelectListItem para usar en la vista
+                        ViewBag.Usuarios = usuarios.Select(e => new SelectListItem
+                        {
+                            Value = e.Id.ToString(),  // El valor será el Id del Edificio
+                            Text = $"{e.Nombre} {e.Apellido1} {e.Apellido2}"       // El texto será la descripción del Edificio
+                        }).ToList();
+                    }
+                    else
+                    {
+                        // Si no hay resultados de la API, asignar una lista vacía
+                        ViewBag.Usuarios = new List<SelectListItem>();
+                    }
+                }
                 if (reserva == null || (User.IsInRole("Solicitante") && (reserva.UsuarioId != int.Parse(loggedInUserId.ToString()))))
                 {
                     TempData["ErrorMessage"] = "No puede editar una reserva que no es suya o que no coincide con la reserva solicitada.";
@@ -143,7 +177,7 @@ namespace SIRS.Controllers
                 }
 
                 // Cancelar la reserva
-                await _apiReservaClientService.PostAsyncWithId($"{Constantes.Constantes.ApiBaseUrl}{Constantes.Constantes.ReservaControlador}CancelarReserva/{id}/{loggedInUserId}",id,loggedInUserId);
+                await _apiReservaClientService.PostAsyncWithId($"{Constantes.Constantes.ApiBaseUrl}{Constantes.Constantes.ReservaControlador}CancelarReserva/{id}/{loggedInUserId}", id, loggedInUserId);
 
                 return Json(new { success = true, message = "Reserva cancelada correctamente." });
             }
@@ -202,7 +236,7 @@ namespace SIRS.Controllers
 
                     // Verificar si el usuario logueado es el propietario de la reserva
                     var loggedInUserId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier));
-                  
+
                     await _apiReservaClientService.PostAsyncWithId($"{Constantes.Constantes.ApiBaseUrl}{Constantes.Constantes.ReservaControlador}ReactivarReserva/{id}/{loggedInUserId}", id, loggedInUserId);
 
                     return Json(new { success = true, message = "Reserva reactivada correctamente." });
@@ -246,7 +280,19 @@ namespace SIRS.Controllers
                     TempData["ErrorMessage"] = "La fecha y hora de la reserva no puede ser anterior al momento actual.";
                     return RedirectToAction(nameof(Update), new { id = reserva.Id });
                 }
-
+                if (User.IsInRole("Administrador"))
+                {
+                    if (reserva.UsuarioId <= 0)
+                    {
+                        TempData["ErrorMessage"] = "Debe seleccionar un usuario válido.";
+                        return RedirectToAction(nameof(Update), new { id = reserva.Id });
+                    }
+                }
+                else
+                {
+                    // Si es un solicitante, usamos el usuario logueado
+                    reserva.UsuarioId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier));
+                }
                 if (ModelState.IsValid)
                 {
                     ReservaViewModel reser = new ReservaViewModel()
@@ -259,7 +305,7 @@ namespace SIRS.Controllers
                         FechaReserva = reserva.FechaReserva,
                         HoraInicio = reserva.HoraInicio,
                         TiempoTotal = reserva.TiempoTotal,
-                        UsuarioId = int.Parse(loggedInUserId.ToString()),  // Usamos el Usuario logueado para la actualización
+                        UsuarioId = User.IsInRole("Administrador") ? reserva.UsuarioId : int.Parse(loggedInUserId.ToString()),  // Usamos el Usuario logueado para la actualización
                         UsuarioGestionId = int.Parse(loggedInUserId.ToString())
                     };
                     var esAdmin = User.IsInRole("Administrador");
@@ -300,7 +346,10 @@ namespace SIRS.Controllers
             // Enviar los datos a la API
             //todo quitar este usuario para coger el que está logado
             var loggedInUserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-            reserva.UsuarioId = int.Parse(loggedInUserId.ToString());
+            if (User.IsInRole("Solicitante"))
+            {
+                reserva.UsuarioId = int.Parse(loggedInUserId.ToString());
+            }
             reserva.UsuarioGestionId = int.Parse(loggedInUserId.ToString());
             if (User.IsInRole("Solicitante"))
             {

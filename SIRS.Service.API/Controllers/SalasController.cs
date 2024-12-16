@@ -12,10 +12,12 @@ namespace SIRS.Service.API.Controllers
     public class SalasController : ControllerBase
     {
         private readonly ISalaAppService _salaAppService;
+        private readonly IEstadoSalaAppService _estadoSalaAppService;
 
-        public SalasController(ISalaAppService salaAppService)
+        public SalasController(ISalaAppService salaAppService, IEstadoSalaAppService estadoSalaAppService)
         {
             _salaAppService = salaAppService;
+            _estadoSalaAppService = estadoSalaAppService;
         }
 
         [HttpGet("GetById/{id}")]
@@ -84,8 +86,21 @@ namespace SIRS.Service.API.Controllers
                 Id = s.Id,
                 NombreCorto = s.NombreCorto,
                 Descripcion = s.Descripcion,
-                Capacidad = s.Capacidad
-            }).ToList(); 
+                Capacidad = s.Capacidad,
+                EstadoSalaId = s.EstadoSalaId,
+            }).ToList();
+
+            var estados = _estadoSalaAppService.GetAllEstados().ToList();
+
+            foreach (var item in salas)
+            {
+                // Encuentra el estado correspondiente por ID
+                var estado = estados.FirstOrDefault(a => a.Id == item.EstadoSalaId);
+                if (estado != null)
+                {
+                    item.EstadoSala = estado.Descripcion; // Asigna la descripción del estado
+                }
+            }
             return Ok(salas);
         }
         [HttpGet("GetSalasByFilter")]

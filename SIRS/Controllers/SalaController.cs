@@ -9,6 +9,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
 using Microsoft.AspNetCore.Authorization;
+using SIRS.Service.API.DTO;
 
 namespace SIRS.Controllers
 {
@@ -39,7 +40,7 @@ namespace SIRS.Controllers
         {
             try
             {
-                var salas = await _apiSalaClientService.GetAsync<List<SalaViewModel>>($"{Constantes.Constantes.ApiBaseUrl}{Constantes.Constantes.SalaControlador}GetAll");
+                var salas = await _apiSalaClientService.GetAsync<List<SalaDTO>>($"{Constantes.Constantes.ApiBaseUrl}{Constantes.Constantes.SalaControlador}GetAll");
 
                 return Json(salas);
             }

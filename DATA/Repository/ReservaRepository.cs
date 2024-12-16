@@ -122,7 +122,7 @@ namespace SIRS.Data.Repository
 
             // Filtramos por el intervalo de fechas
 
-            query = query.Where(r => r.FechaReserva >= fechaInicio && r.FechaReserva <= fechaFin);
+            query = query.Where(r => r.FechaReserva >= fechaInicio && r.FechaReserva <= fechaFin && r.Aprobada!=false);
             // Filtramos por usuarioId si no es nulo
             if (usuarioId.HasValue)
             {

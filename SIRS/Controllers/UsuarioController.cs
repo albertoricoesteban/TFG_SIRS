@@ -92,8 +92,36 @@ namespace SIRS.Controllers
                     return RedirectToAction(nameof(Add), usuario);
                 }
 
-                var passwordHased = BCrypt.Net.BCrypt.HashPassword(usuario.Nombre[0].ToString().ToUpper() + usuario.Nombre.Substring(1).ToLower() + "#1234");
-                usuario.Password = passwordHased;
+                // Ejemplo de datos del usuario
+                string nombre = usuario.Nombre;
+                string apellido1 = usuario.Apellido1;
+
+                // Transformar el nombre para generar la contraseña base
+                string basePassword;
+
+                // Si el nombre tiene menos de 5 caracteres
+                if (nombre.Length < 5)
+                {
+                    // Completar con caracteres del primer apellido
+                    string complemento = apellido1.Substring(0, Math.Min(5 - nombre.Length, apellido1.Length));
+                    basePassword = nombre + complemento;
+                }
+                else
+                {
+                    // Tomar los primeros 5 caracteres del nombre
+                    basePassword = nombre.Substring(0, 5);
+                }
+
+                // Asegurar que el primer carácter sea mayúscula y el resto minúscula
+                basePassword = basePassword[0].ToString().ToUpper() + basePassword.Substring(1).ToLower();
+
+                // Agregar el sufijo y generar el hash
+                string passwordFinal = basePassword + "*1234";
+                var passwordHashed = BCrypt.Net.BCrypt.HashPassword(passwordFinal);
+
+                // Salida de ejemplo (opcional)
+                usuario.Password = passwordHashed;
+
                 if (!string.IsNullOrEmpty(usuario.Password))
                 {
                     ModelState.Remove("Password");

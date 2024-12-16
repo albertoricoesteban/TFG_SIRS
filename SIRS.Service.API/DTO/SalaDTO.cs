@@ -7,6 +7,7 @@
         public string Descripcion { get; set; }
         public int Capacidad { get; set; }
         public string NombreEdificio { get; set; }
+        public int EstadoSalaId { get; set; }
         public string EstadoSala { get; set; }
     }
 }

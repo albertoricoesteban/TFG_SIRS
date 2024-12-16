@@ -48,12 +48,29 @@
                         </a>
                     </div>
                 </div>
+                <!-- Card 4: Gestión de edificios (Visible solo si es Admin) -->
+                @if (isAdmin)
+                {
+                    <div class="col-lg-3 col-6">
+                        <div class="small-box bg-warning">
+                            <div class="inner">
+                                <h3>Edificios</h3>
+                            </div>
+                            <div class="icon">
+                                <i class="fas fa-city"></i>
+                            </div>
+                            <a href="@Url.Action("Index", "Edificio")" class="small-box-footer">
+                                Ver gestión de edificios <i class="fas fa-arrow-circle-right"></i>
+                            </a>
+                        </div>
+                    </div>
+                }
 
                 <!-- Card 2: Productos -->
                 <div class="col-lg-3 col-6">
                     <div class="small-box bg-success">
                         <div class="inner">
-                            <h3>Gestión de salas</h3>
+                            <h3>Salas</h3>
                         </div>
                         <div class="icon">
                             <i class="fas fa-tachometer-alt"></i>
@@ -83,15 +100,15 @@
                 @if (isAdmin)
                 {
                     <div class="col-lg-3 col-6">
-                        <div class="small-box bg-warning">
+                        <div class="small-box bg-ligth">
                             <div class="inner">
-                                <h3>Gestión de edificios</h3>
+                                <h3>Usuarios</h3>
                             </div>
                             <div class="icon">
-                                <i class="fas fa-city"></i>
+                                <i class="fas fa-users"></i>
                             </div>
-                            <a href="@Url.Action("Index", "Edificio")" class="small-box-footer">
-                                Ver gestión de edificios <i class="fas fa-arrow-circle-right"></i>
+                            <a href="@Url.Action("Index", "Usuario")" class="small-box-footer">
+                                Ver gestión de usuarios <i class="fas fa-arrow-circle-right"></i>
                             </a>
                         </div>
                     </div>

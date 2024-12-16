@@ -2,6 +2,7 @@
 @{
     ViewData["Title"] = "Calendario";
     string usuarioLogado = User.FindFirstValue(ClaimTypes.NameIdentifier);
+    var esAdmin = User.IsInRole("Administrador");
 }
 <link href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css" rel="stylesheet" />
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
@@ -62,6 +63,7 @@
             var Calendar = FullCalendar.Calendar;
             var calendarEl = document.getElementById('calendar');
             var loggedInUserId = $('#loggedInUserId').val(); // Obtener el ID del usuario logueado
+            var isAdmin = @esAdmin.ToString().ToLower(); // Obtener si el usuario es administrador (true o false)
 
             // Función para inicializar el calendario
             function initializeCalendar(eventsUrl) {
@@ -89,6 +91,12 @@
                     eventClick: function (info) {
                         const reservaId = info.event.id;
                         const usuarioId = info.event.extendedProps?.usuarioId || null;
+
+                        if (isAdmin) {
+                            // Permitir edición si es administrador
+                            window.location.href = '/Reserva/Update/' + reservaId;
+                            return;
+                        }
 
                         if (usuarioId && String(usuarioId) !== String(loggedInUserId)) {
                             toastr.info('No puede editar una reserva que no es suya.');
