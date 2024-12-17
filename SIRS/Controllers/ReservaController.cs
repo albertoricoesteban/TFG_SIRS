@@ -293,6 +293,7 @@ namespace SIRS.Controllers
                     // Si es un solicitante, usamos el usuario logueado
                     reserva.UsuarioId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier));
                 }
+                ModelState.Remove("Aprobada");
                 if (ModelState.IsValid)
                 {
                     ReservaViewModel reser = new ReservaViewModel()

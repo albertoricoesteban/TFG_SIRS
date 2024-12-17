@@ -139,7 +139,6 @@
                                     {
                                         <!-- Mostrar botones "Guardar", "Eliminar", "Aprobar" y "Cancelar" si está pendiente y la fecha no ha pasado -->
                                         <button type="submit" class="btn btn-primary" id="GuardarBtn">Guardar</button>
-                                        <button type="button" class="btn btn-danger" id="EliminarReservaBtn">Eliminar Reserva</button>
                                         <button type="button" class="btn btn-success" id="AprobarReservaBtn">Aprobar Reserva</button>
                                         <button type="button" class="btn btn-warning" id="CancelarReservaBtn">Cancelar Reserva</button>
                                     }
@@ -152,6 +151,10 @@
                                 {
                                     <button type="Submit" class="btn btn-primary" id="GuardarBtn">Guardar</button>
                                     <button type="button" class="btn btn-danger" id="CancelarReservaBtn">Cancelar Reserva</button>
+                                }
+                                @if (Model.Aprobada == true && fechaHoraReserva >= fechaActual)
+                                {
+                                    <button type="Submit" class="btn btn-primary" id="GuardarBtn">Guardar</button>
                                 }
                             }
                         </div>
@@ -192,7 +195,7 @@
                         }
                     },
                     error: function () {
-                        alert('No se pudieron cargar las salas. Intente nuevamente.');
+                        toastr.error('No se pudieron cargar las salas. Intente nuevamente.');
                     }
                 });
             } else {
