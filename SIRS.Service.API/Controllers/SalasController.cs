@@ -106,7 +106,25 @@ namespace SIRS.Service.API.Controllers
         [HttpGet("GetSalasByFilter")]
         public IActionResult GetSalasByFilter(string? nombreCorto, int capacidad, int edificioId)
         {
-            var salas = _salaAppService.GetSalasByFilter(nombreCorto,capacidad,edificioId);
+            var salas = _salaAppService.GetSalasByFilter(nombreCorto,capacidad,edificioId).Select(s => new SalaDTO
+            {
+                Id = s.Id,
+                NombreCorto = s.NombreCorto,
+                Descripcion = s.Descripcion,
+                Capacidad = s.Capacidad,
+                EstadoSalaId = s.EstadoSalaId,
+            }).ToList();
+            var estados = _estadoSalaAppService.GetAllEstados().ToList();
+
+            foreach (var item in salas)
+            {
+                // Encuentra el estado correspondiente por ID
+                var estado = estados.FirstOrDefault(a => a.Id == item.EstadoSalaId);
+                if (estado != null)
+                {
+                    item.EstadoSala = estado.Descripcion; // Asigna la descripción del estado
+                }
+            }
             return Ok(salas);
         }
 

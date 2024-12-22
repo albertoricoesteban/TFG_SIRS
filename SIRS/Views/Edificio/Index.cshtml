@@ -57,11 +57,12 @@
     </div>
 </div>
 
-@section Scripts {
-    <script>
-        $(function () {
-            // Inicializar DataTable
-            var table = $('#edificiosTable').DataTable({
+
+<script>
+    $(function () {
+        // Inicializar DataTable
+        function initDataTable() {
+            return $('#edificiosTable').DataTable({
                 "ajax": {
                     "url": "/Edificio/GetAll", // Ruta de la acción para obtener los datos de edificios
                     "dataSrc": ""
@@ -73,43 +74,49 @@
                     { "data": "Longitud", "className": "text-center" }
                 ]
             });
+        }
 
-            // Filtro de búsqueda personalizado
+        // Configurar búsqueda personalizada
+        function configureSearch(table) {
             $('#searchButton').on('click', function () {
-                // Capturar los valores de los filtros
                 var nombre = $('#searchName').val();
                 var direccion = $('#searchAddress').val();
 
-                // Configurar correctamente los parámetros de filtro para enviar al servidor
                 var url = '/Edificio/GetByFilter?nombre=' + encodeURIComponent(nombre) + '&direccion=' + encodeURIComponent(direccion);
 
-                // Configurar la nueva URL con los parámetros y recargar los datos de la tabla
                 table.ajax.url(url).load();
             });
-            // Evento de doble clic en las filas de la tabla
+        }
+
+        // Configurar evento de doble clic en las filas
+        function configureRowDblClick(table) {
             $('#edificiosTable tbody').on('dblclick', 'tr', function () {
                 var data = table.row(this).data();
                 if (data && data.Id) {
-                    // Redirigir a la vista 'add' con el parámetro 'id'
                     window.location.href = '/Edificio/Update/' + data.Id;
                 }
             });
+        }
 
-            function mostrarMensaje() {
-                // Mostrar mensajes de éxito o error si existen
-                var successMessage = '@TempData["SuccessMessage"]';
-                var errorMessage = '@TempData["ErrorMessage"]';
+        // Mostrar mensajes de notificación
+        function showMessages() {
+            var successMessage = '@TempData["SuccessMessage"]';
+            var errorMessage = '@TempData["ErrorMessage"]';
 
-                if (successMessage) {
-                    toastr.success(successMessage);
-                }
-
-                if (errorMessage) {
-                    toastr.error(errorMessage);
-                }
+            if (successMessage && successMessage.trim() !== "") {
+                toastr.success(successMessage);
             }
 
-            mostrarMensaje();
-        });
-    </script>
-}
+            if (errorMessage && errorMessage.trim() !== "") {
+                toastr.error(errorMessage);
+            }
+        }
+        showMessages();
+        // Inicializar componentes
+        var table = initDataTable();
+        configureSearch(table);
+        configureRowDblClick(table);
+
+    });
+</script>
+

@@ -38,7 +38,8 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
 // Configuración de MVC y JSON
 builder.Services.AddControllersWithViews()
     .AddDataAnnotationsLocalization()
-    .AddJsonOptions(options => {
+    .AddJsonOptions(options =>
+    {
         options.JsonSerializerOptions.PropertyNamingPolicy = null;
     });
 

@@ -177,7 +177,7 @@ namespace SIRS.Controllers
             $"&capacidad={(capacidad > 0 ? capacidad.ToString() : "0")}" +
             $"&edificioId={(edificioId > 0 ? edificioId.ToString() : "0")}";
 
-                var salas = await _apiSalaClientService.GetAsync<List<SalaViewModel>>($"{Constantes.Constantes.ApiBaseUrl}{Constantes.Constantes.SalaControlador}GetSalasByFilter?{query}");
+                var salas = await _apiSalaClientService.GetAsync<List<SalaDTO>>($"{Constantes.Constantes.ApiBaseUrl}{Constantes.Constantes.SalaControlador}GetSalasByFilter?{query}");
                 return Json(salas);
             }
             catch (Exception ex)
